@@ -1,0 +1,206 @@
+.course-info__link {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    border-radius: 0.3rem;
+    padding: 0.4rem 1rem;
+    background-color: var(--lightBlue--color);
+    ;
+}
+
+.course-info__title {
+    margin: 2rem 0;
+    font-weight: bold;
+    font-size: 2.4rem;
+    color: #464749;
+}
+
+.course-info__text {
+    margin-bottom: 3rem;
+    font-size: 1.6rem;
+    color: var(--dark-color);
+}
+
+.course-info__social-media-item {
+    color: #b1bbbf;
+    margin-left: 1.7rem;
+    transition: all 400ms ease;
+}
+
+.course-info__icon {
+    font-size: 2rem;
+}
+
+.course-info__video {
+    width: 100%;
+    height: 300px;
+    border-radius: 1rem;
+}
+
+/* Finish Course Info Styles */
+
+
+
+/* Start Course Progress Styles */
+
+.course-progress {
+    border-radius: 1rem;
+    margin: 3rem 0;
+    padding: 2rem 2rem 1.2rem 2rem;
+    background-color: var(--white-color);
+    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.2);
+
+
+}
+
+.course-progress__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+}
+
+.course-progress__icon {
+    font-size: 2.5rem;
+    color: var(--dark-color);
+}
+
+.course-progress__title {
+    margin-left: 1.5rem;
+    font-size: 1.5rem;
+    color: var(--dark-color);
+}
+
+.course-progress__bar {
+    border-radius: 10rem;
+    height: 1rem;
+}
+
+.progress-bar {
+    background-color: var(--primary-color);
+}
+
+/* Finish Course Progress Styles */
+
+/* Start Introduction styles */
+
+.introduction {
+    padding: 3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.08);
+    background-color: var(--white-color);
+}
+
+.introduction__item {
+    margin: 2rem 0;
+}
+
+.introduction__img {
+    margin-top: 3rem;
+    display: block;
+    border-radius: 1rem;
+    margin-right: 1rem;
+}
+
+.introduction__text {
+    margin-top: 2rem;
+    color: var(--dark-color);
+    font-size: 1.5rem;
+}
+
+.introduction__btns {
+    margin-top: 4rem;
+}
+
+.introduction__btns-item {
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.introduction__btns-item:hover {
+    color: var(--background-color);
+    background-color: var(--primary-color);
+}
+
+.introduction__topic {
+    margin-top: 4rem;
+}
+
+/* Finish Introduction styles */
+
+/* Start Teacher Details Styles */
+
+.techer-details {
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.08);
+    background-color: var(--white-color);
+}
+
+.techer-details__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.techer-details__header-right {
+    display: flex;
+    align-items: center;
+}
+
+.techer-details__header-img {
+    width: 62px;
+    height: 62px;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0 5px 30px rgba(70, 72, 77, 0.3);
+    margin-right: 1rem;
+}
+
+.techer-details__header-titles {
+    display: flex;
+    flex-direction: column;
+    margin-right: 2rem;
+}
+
+.techer-details__header-link {
+    text-decoration: none;
+    color: var(--dark-color);
+}
+
+.techer-details__header-skill {
+    color: var(--dark-color);
+    font-size: 1.2rem;
+}
+
+.techer-details__header-left {
+    display: flex;
+    align-items: center;
+    color: var(--background-color);
+    background-color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    gap: 1rem;
+}
+
+.techer-details__header-icon {
+    font-size: 1.8rem;
+}
+
+.techer-details__header-name {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-right: 0.4rem;
+}
+
+.techer-details__footer {
+    margin-top: 1rem;
+    color: var(--dark-color);
+    font-size: 14px;
+}
+
+/* Finish Teacher Details Styles */

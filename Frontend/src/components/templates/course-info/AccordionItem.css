@@ -1,0 +1,71 @@
+.acordion {
+    background-color: var(--primary-color);
+}
+
+.acordion-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--white-color);
+}
+
+.acordion-body_right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.acordion-body_right svg {
+    font-size: 3rem;
+    color:#b1adad;
+
+}
+
+.acordion-body_right svg.active {
+    color: var(--primary-color);
+}
+
+.acordion-body_right a {
+    color: var(--dark-color);
+    transition: all 200ms ease-in-out;
+    font-size: 1.8rem;
+}
+
+.acordion-body_right a:hover {
+    color: var(--primary-color);
+}
+
+
+.acordion-body_right span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 100%;
+    color: var(--white-color);
+    font-weight: bold;
+    background-color: #b1adad;
+}
+
+.acordion-body_right span.active {
+    background-color: var(--primary-color);
+}
+
+.acordion-body_left svg,
+.acordion-body_left span {
+    font-size: 1.8rem;
+    color: var(--dark-color);
+    margin-left: 0.5rem;
+}
+
+.accordion-button {
+    background-color: var(--primary-color);
+    padding: 2rem;
+    border: none;
+    font-size: 1.5rem;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+    color: var(--white-color);
+}
+

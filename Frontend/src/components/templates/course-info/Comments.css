@@ -1,0 +1,198 @@
+.comments {
+    margin-top: 2rem;
+    width: 100%;
+    padding: 3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+    background-color: var(--white-color);
+    margin-bottom: 3rem;
+}
+
+
+.comments>div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+
+}
+
+
+.comments-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 2rem;
+    margin: 3rem 2rem;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-container {
+    background-color: var(--white-color);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+    padding: 3rem 2rem;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+    -moz-border-radius: 1rem;
+    -ms-border-radius: 1rem;
+    -o-border-radius: 1rem;
+    width: 100%;
+    border: 1px solid var(--primary-color);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.comment-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+}
+
+.coomment-member__name {
+    font-size: 1.5rem;
+    color: var(--dark-color);
+}
+
+.comment-role {
+    color: var(--white-color);
+    background-color: var(--primary-color);
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+    padding: 0 0.5rem;
+
+}
+
+.comment-date {
+    color: var(--dark-color);
+}
+
+.comment-header button {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+    font-size: 12px;
+    padding: 0.5rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cooments-body {
+    margin-top: 1rem;
+    color: var(--dark-color);
+
+}
+
+.comment-answer {
+    background-color: var(--background-color);
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    padding: 3rem 2rem;
+    margin: 2rem 2rem;
+    border-radius: 1rem;
+    -webkit-border-radius: 1rem;
+    -moz-border-radius: 1rem;
+    -ms-border-radius: 1rem;
+    -o-border-radius: 1rem;
+}
+
+
+
+.rules-comment {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.rules-comment_title {
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+.rules-item {
+    font-size: 1.4rem;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rules-item svg {
+    color: var(--primary-color);
+}
+
+.creat-comment_container {
+    background-color: var(--primary-color);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+    padding: 3rem 2rem;
+    margin-top: 1rem;
+}
+
+.comments__respond-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#comment-score {
+    width: 100%;
+    padding: 0 0.5rem;
+    color: var(--dark-color);
+    border: 1px solid var(--dark-color);
+    margin: 1rem 0;
+}
+
+.comments__respond-title,
+.comments__score-title {
+    color: var(--white-color);
+}
+
+.comments__respond-content textarea {
+    height: 200px;
+    border: 1px solid var(--dark-color);
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+}
+
+.comments__respond-content button {
+    border: none;
+    background-color: var(--white-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-color);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+    width: 100px;
+    margin-top: 2rem;
+}

@@ -1,0 +1,33 @@
+.form__btn,
+.form__btn {
+    width: 300px;
+    border: none;
+    border-radius: 3px;
+    padding: 1.2rem 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 1rem auto;
+    background-color: var(--gray-color);
+    transition: all 250ms ease-in-out;
+}
+
+
+.form__btn.active {
+    color: var(--white-color);
+    background-color:var(--primary-color);
+}
+
+.form__btn-icon,
+.form__btn-icon {
+    color: var(--white-color);
+    font-size: 1.8rem;
+    position: absolute;
+    right: 1rem;
+}
+
+.form__btn-text,
+.form__btn-text {
+    color: var(--white-color);
+    margin: 0 auto;
+}

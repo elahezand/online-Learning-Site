@@ -1,0 +1,9 @@
+.ck-reset_all :not(.ck-reset_all-excluded *),
+.ck.ck-reset_all {
+    color: var(--primary-color) !important;
+}
+
+.ck-content {
+    color: var(--dark-color);
+    height: 300px;
+}

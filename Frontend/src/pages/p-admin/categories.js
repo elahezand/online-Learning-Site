@@ -1,0 +1,264 @@
+import { useState, useEffect } from 'react'
+import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
+import "../../styles/p-admin/categories.css"
+import { useParams } from 'react-router-dom'
+import Pageination from '../../components/modules/Pageination/Pageination'
+import Input from '../../components/modules/Form/Input'
+import Button from '../../components/modules/Form/Button'
+import useForm from '../../Hooks/useForm'
+import { requiredValidator, minValidator, maxValidator } from '../../validators/rules'
+import swal from 'sweetalert'
+import getMe from '../../utils/auth'
+
+export default function Categories() {
+    const param = useParams()
+    const { page } = param
+
+    const pageSize = 10
+
+    const [categories, setCategories] = useState([])
+    const [currentPage, setCurrentPage] = useState(1)
+
+
+    const [formState, changeInputHandeler] = useForm(
+        {
+            shortName:
+            {
+                value: "",
+                isValid: false
+            },
+            title:
+            {
+                value: "",
+                isValid: false
+            },
+
+        },
+        false)
+
+    let { shortName, title } = formState.inputs
+
+    const getCategories = async () => {
+        const res = await fetch("http://localhost:4000/v1/category")
+        if (res.ok) {
+            const data = await res.json()
+            setCategories(data)
+        }
+    }
+
+    useEffect(() => {
+        getCategories()
+    }, [])
+
+    useEffect(() => {
+        setCurrentPage(page)
+    }, [page, currentPage])
+
+    const lastChild = currentPage * pageSize
+    const firstChild = lastChild - pageSize
+
+    const pageCount = Math.ceil(categories.length / pageSize)
+    const paginatedData = categories.slice(firstChild, lastChild)
+
+    const addNewCategory = async () => {
+        const token = await getMe()
+        if (token) {
+            const res = await fetch("http://localhost:4000/v1/category", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify({
+                    name: shortName.value,
+                    title: title.value
+                })
+            })
+
+            if (res.ok) {
+                swal({
+                    title: "this category was added successfuly",
+                    icon: "success",
+                    buttons: "ok"
+                }).then(result => {
+                    if (result) {
+                        getCategories()
+                    }
+                })
+            }
+        }
+    }
+
+    const removeCategory = async (Id) => {
+        const token = await getMe()
+        if (token) {
+            swal({
+                title: "are you sure to remove this category",
+                icon: "warning",
+                buttons: ["No", "yes"]
+            }).then(async result => {
+                if (result) {
+                    const res = await fetch(`http://localhost:4000/v1/category/${Id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    })
+                    if (res.ok) {
+                        swal({
+                            title: "this category was removed successfuly",
+                            icon: "success",
+                            buttons: "ok"
+                        }).then(result => {
+                            if (result) {
+                                getCategories()
+                            }
+                        })
+                    }
+                }
+            })
+        }
+
+    }
+
+    const editCategory = async (categoryID, shortName) => {
+        const token = await getMe()
+        if (token) {
+            swal({
+                title: "plaese send new title",
+                content: "input",
+                buttons: "Create New Title"
+            })
+                .then(async result => {
+                    if (result?.trim().length) {
+                        const res = await fetch(`http://localhost:4000/v1/category/${categoryID}`, {
+                            method: "PUT",
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                                "Content-Type": "application/json"
+
+                            },
+
+                            body: JSON.stringify({
+                                title: result,
+                                name: shortName
+                            })
+                        })
+                        if (res.ok) {
+                            console.log(res);
+
+                            swal({
+                                title: "this category was updated successfuly",
+                                icon: "success",
+                                buttons: "ok"
+                            }).then(result => {
+                                if (result) {
+                                    getCategories()
+                                }
+                            })
+                        }
+                    }
+                    else {
+                        swal({
+                            title: "Please inter new Title",
+                            icon: "warning",
+                            buttons: "ok"
+                        })
+                    }
+                })
+        }
+    }
+
+
+    return (
+        <>
+            <div className='form-container'>
+                <div className='form-header'>
+                    <i className="fa-solid fa-plus"></i>
+                    <h1>Add New Category</h1>
+                </div>
+                <form className="form">
+                    <div className='row'>
+                        <div className="col-6">
+                            <div className="register-form__username">
+                                <Input
+                                    isValid={title.isValid}
+                                    className="register-form__username-input"
+                                    placeholder="Title"
+                                    type="input"
+                                    onChangeInput={(e) =>
+                                        changeInputHandeler(e, "title", [
+                                            requiredValidator(),
+                                            maxValidator(20),
+                                            minValidator(6),
+                                        ])} />
+                                <i className="fa fa-user register-form__username-icon"></i>
+                            </div>
+                        </div>
+                        <div className="col-6">
+                            <div className="register-form__username">
+                                <Input
+                                    isValid={shortName.isValid}
+                                    className="register-form__username-input"
+                                    placeholder="shortName"
+                                    type="input"
+                                    onChangeInput={(e) =>
+                                        changeInputHandeler(e, "shortName", [
+                                            requiredValidator(),
+                                            maxValidator(20),
+                                            minValidator(6),
+                                        ])} />
+                                <i className="fa fa-user register-form__username-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <Button
+                    className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                    disabled={!formState.isFormValid} type="submit"
+                    actionForm={(e) => addNewCategory(e)}>
+                    <span className="form__btn-text">Create</span>
+                    <i className="fa fa-plus form__btn-icon"></i>
+                </Button>
+            </div>
+            <DataTable title={"Categories"}>
+                <table style={{ width: "100%" }}>
+                    <thead>
+                        <tr>
+                            <th className='number'>#</th>
+                            <th>Name</th>
+                            <th>ShortName</th>
+                            <th><i className='fa fa-edit'></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {paginatedData.map((item, index) => (
+                            <tr key={index}>
+                                <td className='number'>{index + 1}</td>
+                                <td>{item.name}</td>
+                                <td>{item.title}</td>
+                                <td>
+                                    <button
+                                        className='edit-user'
+                                        onClick={() => editCategory(item._id, item.name)}>
+                                        Edit</button>
+                                    <button
+                                        onClick={(() => removeCategory(item._id))
+                                        } className='remove-user'>Remove</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </DataTable>
+            <Pageination
+                data={paginatedData}
+                pathName={`/p-admin/categories`}
+                pageCount={pageCount}
+                currentPage={currentPage} />
+        </>
+    )
+}

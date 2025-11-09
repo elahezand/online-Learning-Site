@@ -1,0 +1,28 @@
+.add-ticket {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    background-color: var(--primary-color);
+    padding: 1rem;
+    color: var(--white-color);
+    margin: 2rem;
+    border-radius: 5px;
+    transition: all 250ms ease-in-out;
+    transform: scale(1);
+}
+
+.add-ticket:hover {
+    color: var(--white-color);
+    transform: scale(1.08);
+}
+
+.table a {
+    color: var(--dark-clor);
+    font-size: 1.6rem;
+    transition: all 250ms ease-in-out;
+}
+
+table a:hover {
+    color: var(--primary-color);
+}

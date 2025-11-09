@@ -1,0 +1,1454 @@
+(globalThis.TURBOPACK = globalThis.TURBOPACK || []).push(["static/chunks/[root of the server]__273e21._.js", {
+
+"[turbopack]/browser/dev/hmr-client/websocket.ts [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+// Adapted from https://github.com/vercel/next.js/blob/canary/packages/next/src/client/dev/error-overlay/websocket.ts
+__turbopack_esm__({
+    "addMessageListener": (()=>addMessageListener),
+    "connectHMR": (()=>connectHMR),
+    "sendMessage": (()=>sendMessage)
+});
+let source;
+const eventCallbacks = [];
+// TODO: add timeout again
+// let lastActivity = Date.now()
+function getSocketProtocol(assetPrefix) {
+    let protocol = location.protocol;
+    try {
+        // assetPrefix is a url
+        protocol = new URL(assetPrefix).protocol;
+    } catch (_) {}
+    return protocol === "http:" ? "ws" : "wss";
+}
+function addMessageListener(cb) {
+    eventCallbacks.push(cb);
+}
+function sendMessage(data) {
+    if (!source || source.readyState !== source.OPEN) return;
+    return source.send(data);
+}
+function connectHMR(options) {
+    const { timeout = 5 * 1000 } = options;
+    function init() {
+        if (source) source.close();
+        console.log("[HMR] connecting...");
+        function handleOnline() {
+            const connected = {
+                type: "turbopack-connected"
+            };
+            eventCallbacks.forEach((cb)=>{
+                cb(connected);
+            });
+            if (options.log) console.log("[HMR] connected");
+        // lastActivity = Date.now()
+        }
+        function handleMessage(event) {
+            // lastActivity = Date.now()
+            const message = {
+                type: "turbopack-message",
+                data: JSON.parse(event.data)
+            };
+            eventCallbacks.forEach((cb)=>{
+                cb(message);
+            });
+        }
+        // let timer: NodeJS.Timeout
+        function handleDisconnect() {
+            source.close();
+            setTimeout(init, timeout);
+        }
+        const { hostname, port } = location;
+        const protocol = getSocketProtocol(options.assetPrefix || "");
+        const assetPrefix = options.assetPrefix.replace(/^\/+/, "");
+        let url = `${protocol}://${hostname}:${port}${assetPrefix ? `/${assetPrefix}` : ""}`;
+        if (assetPrefix.startsWith("http")) {
+            url = `${protocol}://${assetPrefix.split("://")[1]}`;
+        }
+        source = new window.WebSocket(`${url}${options.path}`);
+        source.onopen = handleOnline;
+        source.onerror = handleDisconnect;
+        source.onmessage = handleMessage;
+    }
+    init();
+}
+}}),
+"[turbopack]/browser/dev/hmr-client/hmr-client.ts [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+/// <reference path="../../../shared/runtime-types.d.ts" />
+/// <reference path="../../runtime/base/dev-globals.d.ts" />
+/// <reference path="../../runtime/base/dev-protocol.d.ts" />
+/// <reference path="../../runtime/base/dev-extensions.ts" />
+__turbopack_esm__({
+    "connect": (()=>connect),
+    "setHooks": (()=>setHooks),
+    "subscribeToUpdate": (()=>subscribeToUpdate)
+});
+var __TURBOPACK__imported__module__$5b$turbopack$5d2f$browser$2f$dev$2f$hmr$2d$client$2f$websocket$2e$ts__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[turbopack]/browser/dev/hmr-client/websocket.ts [client] (ecmascript)");
+;
+function connect({ // TODO(WEB-1465) Remove this backwards compat fallback once
+// vercel/next.js#54586 is merged.
+addMessageListener = __TURBOPACK__imported__module__$5b$turbopack$5d2f$browser$2f$dev$2f$hmr$2d$client$2f$websocket$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["addMessageListener"], // TODO(WEB-1465) Remove this backwards compat fallback once
+// vercel/next.js#54586 is merged.
+sendMessage = __TURBOPACK__imported__module__$5b$turbopack$5d2f$browser$2f$dev$2f$hmr$2d$client$2f$websocket$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["sendMessage"], onUpdateError = console.error }) {
+    addMessageListener((msg)=>{
+        switch(msg.type){
+            case "turbopack-connected":
+                handleSocketConnected(sendMessage);
+                break;
+            default:
+                try {
+                    if (Array.isArray(msg.data)) {
+                        for(let i = 0; i < msg.data.length; i++){
+                            handleSocketMessage(msg.data[i]);
+                        }
+                    } else {
+                        handleSocketMessage(msg.data);
+                    }
+                    applyAggregatedUpdates();
+                } catch (e) {
+                    console.warn("[Fast Refresh] performing full reload\n\n" + "Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.\n" + "You might have a file which exports a React component but also exports a value that is imported by a non-React component file.\n" + "Consider migrating the non-React component export to a separate file and importing it into both files.\n\n" + "It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.\n" + "Fast Refresh requires at least one parent function component in your React tree.");
+                    onUpdateError(e);
+                    location.reload();
+                }
+                break;
+        }
+    });
+    const queued = globalThis.TURBOPACK_CHUNK_UPDATE_LISTENERS;
+    if (queued != null && !Array.isArray(queued)) {
+        throw new Error("A separate HMR handler was already registered");
+    }
+    globalThis.TURBOPACK_CHUNK_UPDATE_LISTENERS = {
+        push: ([chunkPath, callback])=>{
+            subscribeToChunkUpdate(chunkPath, sendMessage, callback);
+        }
+    };
+    if (Array.isArray(queued)) {
+        for (const [chunkPath, callback] of queued){
+            subscribeToChunkUpdate(chunkPath, sendMessage, callback);
+        }
+    }
+}
+const updateCallbackSets = new Map();
+function sendJSON(sendMessage, message) {
+    sendMessage(JSON.stringify(message));
+}
+function resourceKey(resource) {
+    return JSON.stringify({
+        path: resource.path,
+        headers: resource.headers || null
+    });
+}
+function subscribeToUpdates(sendMessage, resource) {
+    sendJSON(sendMessage, {
+        type: "turbopack-subscribe",
+        ...resource
+    });
+    return ()=>{
+        sendJSON(sendMessage, {
+            type: "turbopack-unsubscribe",
+            ...resource
+        });
+    };
+}
+function handleSocketConnected(sendMessage) {
+    for (const key of updateCallbackSets.keys()){
+        subscribeToUpdates(sendMessage, JSON.parse(key));
+    }
+}
+// we aggregate all pending updates until the issues are resolved
+const chunkListsWithPendingUpdates = new Map();
+function aggregateUpdates(msg) {
+    const key = resourceKey(msg.resource);
+    let aggregated = chunkListsWithPendingUpdates.get(key);
+    if (aggregated) {
+        aggregated.instruction = mergeChunkListUpdates(aggregated.instruction, msg.instruction);
+    } else {
+        chunkListsWithPendingUpdates.set(key, msg);
+    }
+}
+function applyAggregatedUpdates() {
+    if (chunkListsWithPendingUpdates.size === 0) return;
+    hooks.beforeRefresh();
+    for (const msg of chunkListsWithPendingUpdates.values()){
+        triggerUpdate(msg);
+    }
+    chunkListsWithPendingUpdates.clear();
+    finalizeUpdate();
+}
+function mergeChunkListUpdates(updateA, updateB) {
+    let chunks;
+    if (updateA.chunks != null) {
+        if (updateB.chunks == null) {
+            chunks = updateA.chunks;
+        } else {
+            chunks = mergeChunkListChunks(updateA.chunks, updateB.chunks);
+        }
+    } else if (updateB.chunks != null) {
+        chunks = updateB.chunks;
+    }
+    let merged;
+    if (updateA.merged != null) {
+        if (updateB.merged == null) {
+            merged = updateA.merged;
+        } else {
+            // Since `merged` is an array of updates, we need to merge them all into
+            // one, consistent update.
+            // Since there can only be `EcmascriptMergeUpdates` in the array, there is
+            // no need to key on the `type` field.
+            let update = updateA.merged[0];
+            for(let i = 1; i < updateA.merged.length; i++){
+                update = mergeChunkListEcmascriptMergedUpdates(update, updateA.merged[i]);
+            }
+            for(let i = 0; i < updateB.merged.length; i++){
+                update = mergeChunkListEcmascriptMergedUpdates(update, updateB.merged[i]);
+            }
+            merged = [
+                update
+            ];
+        }
+    } else if (updateB.merged != null) {
+        merged = updateB.merged;
+    }
+    return {
+        type: "ChunkListUpdate",
+        chunks,
+        merged
+    };
+}
+function mergeChunkListChunks(chunksA, chunksB) {
+    const chunks = {};
+    for (const [chunkPath, chunkUpdateA] of Object.entries(chunksA)){
+        const chunkUpdateB = chunksB[chunkPath];
+        if (chunkUpdateB != null) {
+            const mergedUpdate = mergeChunkUpdates(chunkUpdateA, chunkUpdateB);
+            if (mergedUpdate != null) {
+                chunks[chunkPath] = mergedUpdate;
+            }
+        } else {
+            chunks[chunkPath] = chunkUpdateA;
+        }
+    }
+    for (const [chunkPath, chunkUpdateB] of Object.entries(chunksB)){
+        if (chunks[chunkPath] == null) {
+            chunks[chunkPath] = chunkUpdateB;
+        }
+    }
+    return chunks;
+}
+function mergeChunkUpdates(updateA, updateB) {
+    if (updateA.type === "added" && updateB.type === "deleted" || updateA.type === "deleted" && updateB.type === "added") {
+        return undefined;
+    }
+    if (updateA.type === "partial") {
+        invariant(updateA.instruction, "Partial updates are unsupported");
+    }
+    if (updateB.type === "partial") {
+        invariant(updateB.instruction, "Partial updates are unsupported");
+    }
+    return undefined;
+}
+function mergeChunkListEcmascriptMergedUpdates(mergedA, mergedB) {
+    const entries = mergeEcmascriptChunkEntries(mergedA.entries, mergedB.entries);
+    const chunks = mergeEcmascriptChunksUpdates(mergedA.chunks, mergedB.chunks);
+    return {
+        type: "EcmascriptMergedUpdate",
+        entries,
+        chunks
+    };
+}
+function mergeEcmascriptChunkEntries(entriesA, entriesB) {
+    return {
+        ...entriesA,
+        ...entriesB
+    };
+}
+function mergeEcmascriptChunksUpdates(chunksA, chunksB) {
+    if (chunksA == null) {
+        return chunksB;
+    }
+    if (chunksB == null) {
+        return chunksA;
+    }
+    const chunks = {};
+    for (const [chunkPath, chunkUpdateA] of Object.entries(chunksA)){
+        const chunkUpdateB = chunksB[chunkPath];
+        if (chunkUpdateB != null) {
+            const mergedUpdate = mergeEcmascriptChunkUpdates(chunkUpdateA, chunkUpdateB);
+            if (mergedUpdate != null) {
+                chunks[chunkPath] = mergedUpdate;
+            }
+        } else {
+            chunks[chunkPath] = chunkUpdateA;
+        }
+    }
+    for (const [chunkPath, chunkUpdateB] of Object.entries(chunksB)){
+        if (chunks[chunkPath] == null) {
+            chunks[chunkPath] = chunkUpdateB;
+        }
+    }
+    if (Object.keys(chunks).length === 0) {
+        return undefined;
+    }
+    return chunks;
+}
+function mergeEcmascriptChunkUpdates(updateA, updateB) {
+    if (updateA.type === "added" && updateB.type === "deleted") {
+        // These two completely cancel each other out.
+        return undefined;
+    }
+    if (updateA.type === "deleted" && updateB.type === "added") {
+        const added = [];
+        const deleted = [];
+        const deletedModules = new Set(updateA.modules ?? []);
+        const addedModules = new Set(updateB.modules ?? []);
+        for (const moduleId of addedModules){
+            if (!deletedModules.has(moduleId)) {
+                added.push(moduleId);
+            }
+        }
+        for (const moduleId of deletedModules){
+            if (!addedModules.has(moduleId)) {
+                deleted.push(moduleId);
+            }
+        }
+        if (added.length === 0 && deleted.length === 0) {
+            return undefined;
+        }
+        return {
+            type: "partial",
+            added,
+            deleted
+        };
+    }
+    if (updateA.type === "partial" && updateB.type === "partial") {
+        const added = new Set([
+            ...updateA.added ?? [],
+            ...updateB.added ?? []
+        ]);
+        const deleted = new Set([
+            ...updateA.deleted ?? [],
+            ...updateB.deleted ?? []
+        ]);
+        if (updateB.added != null) {
+            for (const moduleId of updateB.added){
+                deleted.delete(moduleId);
+            }
+        }
+        if (updateB.deleted != null) {
+            for (const moduleId of updateB.deleted){
+                added.delete(moduleId);
+            }
+        }
+        return {
+            type: "partial",
+            added: [
+                ...added
+            ],
+            deleted: [
+                ...deleted
+            ]
+        };
+    }
+    if (updateA.type === "added" && updateB.type === "partial") {
+        const modules = new Set([
+            ...updateA.modules ?? [],
+            ...updateB.added ?? []
+        ]);
+        for (const moduleId of updateB.deleted ?? []){
+            modules.delete(moduleId);
+        }
+        return {
+            type: "added",
+            modules: [
+                ...modules
+            ]
+        };
+    }
+    if (updateA.type === "partial" && updateB.type === "deleted") {
+        // We could eagerly return `updateB` here, but this would potentially be
+        // incorrect if `updateA` has added modules.
+        const modules = new Set(updateB.modules ?? []);
+        if (updateA.added != null) {
+            for (const moduleId of updateA.added){
+                modules.delete(moduleId);
+            }
+        }
+        return {
+            type: "deleted",
+            modules: [
+                ...modules
+            ]
+        };
+    }
+    // Any other update combination is invalid.
+    return undefined;
+}
+function invariant(_, message) {
+    throw new Error(`Invariant: ${message}`);
+}
+const CRITICAL = [
+    "bug",
+    "error",
+    "fatal"
+];
+function compareByList(list, a, b) {
+    const aI = list.indexOf(a) + 1 || list.length;
+    const bI = list.indexOf(b) + 1 || list.length;
+    return aI - bI;
+}
+const chunksWithIssues = new Map();
+function emitIssues() {
+    const issues = [];
+    const deduplicationSet = new Set();
+    for (const [_, chunkIssues] of chunksWithIssues){
+        for (const chunkIssue of chunkIssues){
+            if (deduplicationSet.has(chunkIssue.formatted)) continue;
+            issues.push(chunkIssue);
+            deduplicationSet.add(chunkIssue.formatted);
+        }
+    }
+    sortIssues(issues);
+    hooks.issues(issues);
+}
+function handleIssues(msg) {
+    const key = resourceKey(msg.resource);
+    let hasCriticalIssues = false;
+    for (const issue of msg.issues){
+        if (CRITICAL.includes(issue.severity)) {
+            hasCriticalIssues = true;
+        }
+    }
+    if (msg.issues.length > 0) {
+        chunksWithIssues.set(key, msg.issues);
+    } else if (chunksWithIssues.has(key)) {
+        chunksWithIssues.delete(key);
+    }
+    emitIssues();
+    return hasCriticalIssues;
+}
+const SEVERITY_ORDER = [
+    "bug",
+    "fatal",
+    "error",
+    "warning",
+    "info",
+    "log"
+];
+const CATEGORY_ORDER = [
+    "parse",
+    "resolve",
+    "code generation",
+    "rendering",
+    "typescript",
+    "other"
+];
+function sortIssues(issues) {
+    issues.sort((a, b)=>{
+        const first = compareByList(SEVERITY_ORDER, a.severity, b.severity);
+        if (first !== 0) return first;
+        return compareByList(CATEGORY_ORDER, a.category, b.category);
+    });
+}
+const hooks = {
+    beforeRefresh: ()=>{},
+    refresh: ()=>{},
+    buildOk: ()=>{},
+    issues: (_issues)=>{}
+};
+function setHooks(newHooks) {
+    Object.assign(hooks, newHooks);
+}
+function handleSocketMessage(msg) {
+    sortIssues(msg.issues);
+    handleIssues(msg);
+    switch(msg.type){
+        case "issues":
+            break;
+        case "partial":
+            // aggregate updates
+            aggregateUpdates(msg);
+            break;
+        default:
+            // run single update
+            const runHooks = chunkListsWithPendingUpdates.size === 0;
+            if (runHooks) hooks.beforeRefresh();
+            triggerUpdate(msg);
+            if (runHooks) finalizeUpdate();
+            break;
+    }
+}
+function finalizeUpdate() {
+    hooks.refresh();
+    hooks.buildOk();
+    // This is used by the Next.js integration test suite to notify it when HMR
+    // updates have been completed.
+    // TODO: Only run this in test environments (gate by `process.env.__NEXT_TEST_MODE`)
+    if (globalThis.__NEXT_HMR_CB) {
+        globalThis.__NEXT_HMR_CB();
+        globalThis.__NEXT_HMR_CB = null;
+    }
+}
+function subscribeToChunkUpdate(chunkPath, sendMessage, callback) {
+    return subscribeToUpdate({
+        path: chunkPath
+    }, sendMessage, callback);
+}
+function subscribeToUpdate(resource, sendMessage, callback) {
+    // TODO(WEB-1465) Remove this backwards compat fallback once
+    // vercel/next.js#54586 is merged.
+    if (callback === undefined) {
+        callback = sendMessage;
+        sendMessage = __TURBOPACK__imported__module__$5b$turbopack$5d2f$browser$2f$dev$2f$hmr$2d$client$2f$websocket$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["sendMessage"];
+    }
+    const key = resourceKey(resource);
+    let callbackSet;
+    const existingCallbackSet = updateCallbackSets.get(key);
+    if (!existingCallbackSet) {
+        callbackSet = {
+            callbacks: new Set([
+                callback
+            ]),
+            unsubscribe: subscribeToUpdates(sendMessage, resource)
+        };
+        updateCallbackSets.set(key, callbackSet);
+    } else {
+        existingCallbackSet.callbacks.add(callback);
+        callbackSet = existingCallbackSet;
+    }
+    return ()=>{
+        callbackSet.callbacks.delete(callback);
+        if (callbackSet.callbacks.size === 0) {
+            callbackSet.unsubscribe();
+            updateCallbackSets.delete(key);
+        }
+    };
+}
+function triggerUpdate(msg) {
+    const key = resourceKey(msg.resource);
+    const callbackSet = updateCallbackSets.get(key);
+    if (!callbackSet) {
+        return;
+    }
+    for (const callback of callbackSet.callbacks){
+        callback(msg);
+    }
+    if (msg.type === "notFound") {
+        // This indicates that the resource which we subscribed to either does not exist or
+        // has been deleted. In either case, we should clear all update callbacks, so if a
+        // new subscription is created for the same resource, it will send a new "subscribe"
+        // message to the server.
+        // No need to send an "unsubscribe" message to the server, it will have already
+        // dropped the update stream before sending the "notFound" message.
+        updateCallbackSets.delete(key);
+    }
+}
+}}),
+"[project]/components/modules/House/House.module.css [client] (css module)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_export_value__({
+  "btn": "House-module__-Y95uq__btn",
+  "btn-card": "House-module__-Y95uq__btn-card",
+  "btn_brown": "House-module__-Y95uq__btn_brown",
+  "btn_card": "House-module__-Y95uq__btn_card",
+  "card": "House-module__-Y95uq__card",
+  "card__details": "House-module__-Y95uq__card__details",
+  "card__icon": "House-module__-Y95uq__card__icon",
+  "card__img": "House-module__-Y95uq__card__img",
+  "card__like": "House-module__-Y95uq__card__like",
+  "card__text": "House-module__-Y95uq__card__text",
+  "card__title": "House-module__-Y95uq__card__title",
+});
+}}),
+"[project]/components/modules/House/House.js [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>House)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/index.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__ = __turbopack_import__("[project]/components/modules/House/House.module.css [client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [client] (ecmascript)");
+;
+;
+;
+;
+function House(props) {
+    const { title, img, roomCount, meterage, price, id } = props;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            class: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card,
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                    src: img,
+                    alt: "House 6",
+                    class: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__img
+                }, void 0, false, {
+                    fileName: "[project]/components/modules/House/House.js",
+                    lineNumber: 10,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h5", {
+                    class: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__title,
+                    children: [
+                        " ",
+                        title
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/modules/House/House.js",
+                    lineNumber: 11,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                    class: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__like,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("use", {
+                        href: "img/sprite.svg#icon-heart-full"
+                    }, void 0, false, {
+                        fileName: "[project]/components/modules/House/House.js",
+                        lineNumber: 13,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/modules/House/House.js",
+                    lineNumber: 12,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__details,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__icon,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("use", {
+                                href: "img/sprite.svg#icon-map-pin"
+                            }, void 0, false, {
+                                fileName: "[project]/components/modules/House/House.js",
+                                lineNumber: 17,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 16,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__text,
+                            children: "مالدیو"
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 19,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__icon,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("use", {
+                                href: "img/sprite.svg#icon-profile-male"
+                            }, void 0, false, {
+                                fileName: "[project]/components/modules/House/House.js",
+                                lineNumber: 22,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 21,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__text,
+                            children: roomCount
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 24,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__icon,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("use", {
+                                href: "img/sprite.svg#icon-expand"
+                            }, void 0, false, {
+                                fileName: "[project]/components/modules/House/House.js",
+                                lineNumber: 27,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 26,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__text,
+                            children: [
+                                meterage,
+                                "  "
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 29,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__icon,
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("use", {
+                                href: "img/sprite.svg#icon-key"
+                            }, void 0, false, {
+                                fileName: "[project]/components/modules/House/House.js",
+                                lineNumber: 34,
+                                columnNumber: 25
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 33,
+                            columnNumber: 21
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].card__text,
+                            children: [
+                                price,
+                                "  "
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/modules/House/House.js",
+                            lineNumber: 36,
+                            columnNumber: 21
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/components/modules/House/House.js",
+                    lineNumber: 15,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                    href: `/Houses/${id}`,
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].btn_card} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].btn} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].btn_brown}`,
+                    children: "مشاهده ملک"
+                }, void 0, false, {
+                    fileName: "[project]/components/modules/House/House.js",
+                    lineNumber: 38,
+                    columnNumber: 17
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/components/modules/House/House.js",
+            lineNumber: 9,
+            columnNumber: 13
+        }, this)
+    }, void 0, false);
+}
+_c = House;
+var _c;
+__turbopack_refresh__.register(_c, "House");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/components/templates/Gallery/Gallery.module.css [client] (css module)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_export_value__({
+  "gallery": "Gallery-module__GS01ca__gallery",
+  "gallery__img": "Gallery-module__GS01ca__gallery__img",
+  "gallery_box__1": "Gallery-module__GS01ca__gallery_box__1",
+  "gallery_box__10": "Gallery-module__GS01ca__gallery_box__10",
+  "gallery_box__11": "Gallery-module__GS01ca__gallery_box__11",
+  "gallery_box__12": "Gallery-module__GS01ca__gallery_box__12",
+  "gallery_box__13": "Gallery-module__GS01ca__gallery_box__13",
+  "gallery_box__14": "Gallery-module__GS01ca__gallery_box__14",
+  "gallery_box__2": "Gallery-module__GS01ca__gallery_box__2",
+  "gallery_box__3": "Gallery-module__GS01ca__gallery_box__3",
+  "gallery_box__4": "Gallery-module__GS01ca__gallery_box__4",
+  "gallery_box__5": "Gallery-module__GS01ca__gallery_box__5",
+  "gallery_box__6": "Gallery-module__GS01ca__gallery_box__6",
+  "gallery_box__7": "Gallery-module__GS01ca__gallery_box__7",
+  "gallery_box__8": "Gallery-module__GS01ca__gallery_box__8",
+  "gallery_box__9": "Gallery-module__GS01ca__gallery_box__9",
+});
+}}),
+"[project]/components/templates/Gallery/Gallery.js [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>Gallery)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/index.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__ = __turbopack_import__("[project]/components/templates/Gallery/Gallery.module.css [client] (css module)");
+;
+;
+;
+function Gallery() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery,
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__1}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-1.jpeg",
+                        alt: "Galley house-1",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 9,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 8,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__2}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-2.jpeg",
+                        alt: "Galley house-2",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 12,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 11,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__3}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-3.jpeg",
+                        alt: "Galley house-3",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 15,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 14,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__4}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-4.jpeg",
+                        alt: "Galley house-4",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 18,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 17,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__5}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-5.jpeg",
+                        alt: "Galley house-5",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 21,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 20,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__6}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-6.jpeg",
+                        alt: "Galley house-6",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 24,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 23,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__7}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-7.jpeg",
+                        alt: "Galley house-7",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 27,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 26,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__8}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-8.jpeg",
+                        alt: "Galley house-8",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 30,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 29,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__9}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-9.jpeg",
+                        alt: "Galley house-9",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 33,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 32,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__10}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-10.jpeg",
+                        alt: "Galley house-10",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 36,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 35,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__11}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-11.jpeg",
+                        alt: "Galley house-11",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 39,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 38,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__12}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-12.jpeg",
+                        alt: "Galley house-12",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 42,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 41,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__13}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-13.jpeg",
+                        alt: "Galley house-13",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 45,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 44,
+                    columnNumber: 17
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("figure", {
+                    className: `${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__box} ${__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery_box__14}`,
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/gal-14.jpeg",
+                        alt: "Galley house-14",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].gallery__img
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Gallery/Gallery.js",
+                        lineNumber: 48,
+                        columnNumber: 21
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Gallery/Gallery.js",
+                    lineNumber: 47,
+                    columnNumber: 17
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/components/templates/Gallery/Gallery.js",
+            lineNumber: 7,
+            columnNumber: 13
+        }, this)
+    }, void 0, false);
+}
+_c = Gallery;
+var _c;
+__turbopack_refresh__.register(_c, "Gallery");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/components/templates/Features/Features.module.css [client] (css module)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_export_value__({
+  "featurs": "Features-module__oCSE0W__featurs",
+});
+}}),
+"[project]/components/templates/Feature/Feature.module.css [client] (css module)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_export_value__({
+  "feature": "Feature-module__0kol1q__feature",
+});
+}}),
+"[project]/components/templates/Feature/Feature.js [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>Feature)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__ = __turbopack_import__("[project]/components/templates/Feature/Feature.module.css [client] (css module)");
+;
+;
+function Feature({ paragraph, icon, heading }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].feature,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                children: [
+                    icon,
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                        className: "heading_dark",
+                        children: heading
+                    }, void 0, false, {
+                        fileName: "[project]/components/templates/Feature/Feature.js",
+                        lineNumber: 8,
+                        columnNumber: 17
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/templates/Feature/Feature.js",
+                lineNumber: 6,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                className: "paragraph",
+                children: paragraph
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Feature/Feature.js",
+                lineNumber: 12,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/templates/Feature/Feature.js",
+        lineNumber: 5,
+        columnNumber: 9
+    }, this);
+}
+_c = Feature;
+var _c;
+__turbopack_refresh__.register(_c, "Feature");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/components/templates/Features/Features.js [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "default": (()=>Features)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Features$2f$Features$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__ = __turbopack_import__("[project]/components/templates/Features/Features.module.css [client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/templates/Feature/Feature.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$fontawesome$2d$svg$2d$core$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@fortawesome/fontawesome-svg-core/index.mjs [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@fortawesome/react-fontawesome/index.es.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/@fortawesome/free-solid-svg-icons/index.mjs [client] (ecmascript)");
+;
+;
+;
+;
+;
+__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$fontawesome$2d$svg$2d$core$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["config"].autoAddCss = false;
+;
+;
+function Features() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Features$2f$Features$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].featurs,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faHouse"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 19,
+                    columnNumber: 27
+                }, void 0),
+                heading: "بهترین خانه های لوکس جهان",
+                paragraph: "   نکته بعدی در مورد متن ساختگی لورم ایپسوم این است که بعضی   از طراحان وبسایت و گرافیست کاران بعد از آنکه قالب و   محتوای مورد نظرشون را ایجاد کردند"
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 19,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faKey"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 25,
+                    columnNumber: 27
+                }, void 0),
+                heading: "خانه جدید در یک هفته ",
+                paragraph: "   ز آنجا که لورم ایپسوم، شباهت زیادی به متن های واقعی   دارد، طراحان معمولا از لورم ایپسوم استفاده میکنند تا فقط   به مشتری یا کار فرما نشان دهند که قالب طراحی شده   "
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 25,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faKey"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 33,
+                    columnNumber: 27
+                }, void 0),
+                heading: "خانه جدید در یک هفته ",
+                paragraph: "    ز آنجا که لورم ایپسوم، شباهت زیادی به متن های واقعی   دارد، طراحان معمولا از لورم ایپسوم استفاده میکنند تا فقط   به مشتری یا کار فرما نشان دهند که قالب طراحی شده   "
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 33,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faFilePowerpoint"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 41,
+                    columnNumber: 27
+                }, void 0),
+                heading: "فقط بهترین خواص",
+                paragraph: "تا فقط به مشتری یا کار فرما نشان دهند که قالب طراحی شده   بعد از اینکه متن در آن قرار میگرد چگونه خواهد بود و فونت   ها و اندازه ها چگونه در نظر گرفته شده است.   "
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 41,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faLock"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 49,
+                    columnNumber: 27
+                }, void 0),
+                heading: "فقط بهترین خواص",
+                paragraph: " تا فقط به مشتری یا کار فرما نشان دهند که قالب طراحی شده   بعد از اینکه متن در آن قرار میگرد چگونه خواهد بود و فونت   ها و اندازه ها چگونه در نظر گرفته شده است."
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 49,
+                columnNumber: 13
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Feature$2f$Feature$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$react$2d$fontawesome$2f$index$2e$es$2e$js__$5b$client$5d$__$28$ecmascript$29$__["FontAwesomeIcon"], {
+                    icon: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$fortawesome$2f$free$2d$solid$2d$svg$2d$icons$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["faAward"]
+                }, void 0, false, {
+                    fileName: "[project]/components/templates/Features/Features.js",
+                    lineNumber: 55,
+                    columnNumber: 27
+                }, void 0),
+                heading: " فقط بهترین خواص",
+                paragraph: " تا فقط به مشتری یا کار فرما نشان دهند که قالب طراحی شده   بعد از اینکه متن در آن قرار میگرد چگونه خواهد بود و فونت   ها و اندازه ها چگونه در نظر گرفته شده است.   "
+            }, void 0, false, {
+                fileName: "[project]/components/templates/Features/Features.js",
+                lineNumber: 55,
+                columnNumber: 13
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/templates/Features/Features.js",
+        lineNumber: 18,
+        columnNumber: 9
+    }, this);
+}
+_c = Features;
+var _c;
+__turbopack_refresh__.register(_c, "Features");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[project]/styles/Index.module.css [client] (css module)": ((__turbopack_context__) => {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_export_value__({
+  "btn": "Index-module__pXLh6W__btn",
+  "btn_brown": "Index-module__pXLh6W__btn_brown",
+  "container": "Index-module__pXLh6W__container",
+  "header": "Index-module__pXLh6W__header",
+  "homes": "Index-module__pXLh6W__homes",
+  "list": "Index-module__pXLh6W__list",
+  "seeon__box-img": "Index-module__pXLh6W__seeon__box-img",
+  "seeon__text": "Index-module__pXLh6W__seeon__text",
+  "sidebar": "Index-module__pXLh6W__sidebar",
+  "sidebar__label": "Index-module__pXLh6W__sidebar__label",
+  "story__content": "Index-module__pXLh6W__story__content",
+  "story__img_1": "Index-module__pXLh6W__story__img_1",
+  "story__img_2": "Index-module__pXLh6W__story__img_2",
+  "story__pictures": "Index-module__pXLh6W__story__pictures",
+  "story__text": "Index-module__pXLh6W__story__text",
+  "story_img__1": "Index-module__pXLh6W__story_img__1",
+  "story_img__2": "Index-module__pXLh6W__story_img__2",
+  "tors": "Index-module__pXLh6W__tors",
+  "tors__details": "Index-module__pXLh6W__tors__details",
+  "tors__list": "Index-module__pXLh6W__tors__list",
+  "u_heading_3": "Index-module__pXLh6W__u_heading_3",
+  "wrapper": "Index-module__pXLh6W__wrapper",
+});
+}}),
+"[project]/pages/index.js [client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, k: __turbopack_refresh__, m: module, z: __turbopack_require_stub__ } = __turbopack_context__;
+{
+__turbopack_esm__({
+    "__N_SSG": (()=>__N_SSG),
+    "default": (()=>Home)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/react/jsx-dev-runtime.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/modules/House/House.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/templates/Gallery/Gallery.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Features$2f$Features$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/templates/Features/Features.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__ = __turbopack_import__("[project]/styles/Index.module.css [client] (css module)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/swiper/swiper-react.mjs [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$index$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_import__("[project]/node_modules/swiper/modules/index.mjs [client] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$pagination$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pagination$3e$__ = __turbopack_import__("[project]/node_modules/swiper/modules/pagination.mjs [client] (ecmascript) <export default as Pagination>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$scrollbar$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Scrollbar$3e$__ = __turbopack_import__("[project]/node_modules/swiper/modules/scrollbar.mjs [client] (ecmascript) <export default as Scrollbar>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$a11y$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__A11y$3e$__ = __turbopack_import__("[project]/node_modules/swiper/modules/a11y.mjs [client] (ecmascript) <export default as A11y>");
+;
+;
+;
+;
+;
+;
+;
+;
+var __N_SSG = true;
+function Home({ data }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Features$2f$Features$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/pages/index.js",
+                lineNumber: 13,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].story__pictures,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/story-1.jpeg",
+                        alt: "Couple happy for new house",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].story_img__1
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 15,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                        src: "img/story-2.jpeg",
+                        alt: "New house",
+                        className: __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].story_img__2
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 16,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/pages/index.js",
+                lineNumber: 14,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].story__content,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].heading_light} ${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].heading_3}`,
+                        children: "مشتریان خوشحال"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 19,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].heading_dark}${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].heading_2}${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].my_small}`,
+                        children: "”بهترین تصمیم زندگی ما“"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 23,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].story__text}${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].mb_medium}`,
+                        children: "متنی ساختگی و بدون معنی است که برای امتحان فونت و یا پر کردن فضا در یک طراحی گرافیکی و یا صنعت چاپ استفاده میشود. طراحان وب و گرافیک از این متن برای پرکردن"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 27,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        className: `${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].btn} ${__TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].btn_brown}`,
+                        children: "خانه خود را پیدا کنید"
+                    }, void 0, false, {
+                        fileName: "[project]/pages/index.js",
+                        lineNumber: 33,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/pages/index.js",
+                lineNumber: 18,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: __TURBOPACK__imported__module__$5b$project$5d2f$styles$2f$Index$2e$module$2e$css__$5b$client$5d$__$28$css__module$29$__["default"].homes,
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["Swiper"], {
+                    style: {
+                        height: "550px",
+                        margin: "0 7rem"
+                    },
+                    modules: [
+                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$pagination$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pagination$3e$__["Pagination"],
+                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$scrollbar$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Scrollbar$3e$__["Scrollbar"],
+                        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$modules$2f$a11y$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__$3c$export__default__as__A11y$3e$__["A11y"]
+                    ],
+                    spaceBetween: 50,
+                    slidesPerView: 3,
+                    loop: true,
+                    pagination: {
+                        clickable: true
+                    },
+                    children: data.slice(1, 8).map((home, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$swiper$2f$swiper$2d$react$2e$mjs__$5b$client$5d$__$28$ecmascript$29$__["SwiperSlide"], {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$modules$2f$House$2f$House$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {
+                                ...home
+                            }, void 0, false, {
+                                fileName: "[project]/pages/index.js",
+                                lineNumber: 45,
+                                columnNumber: 15
+                            }, this)
+                        }, index, false, {
+                            fileName: "[project]/pages/index.js",
+                            lineNumber: 44,
+                            columnNumber: 13
+                        }, this))
+                }, void 0, false, {
+                    fileName: "[project]/pages/index.js",
+                    lineNumber: 37,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/pages/index.js",
+                lineNumber: 36,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$templates$2f$Gallery$2f$Gallery$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/pages/index.js",
+                lineNumber: 50,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true);
+}
+_c = Home;
+var _c;
+__turbopack_refresh__.register(_c, "Home");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_refresh__.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
+"[next]/entry/page-loader.ts { PAGE => \"[project]/pages/index.js [client] (ecmascript)\" } [client] (ecmascript)": (function(__turbopack_context__) {
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, m: module, e: exports, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+const PAGE_PATH = "/";
+(window.__NEXT_P = window.__NEXT_P || []).push([
+    PAGE_PATH,
+    ()=>{
+        return __turbopack_require__("[project]/pages/index.js [client] (ecmascript)");
+    }
+]);
+// @ts-expect-error module.hot exists
+if (module.hot) {
+    // @ts-expect-error module.hot exists
+    module.hot.dispose(function() {
+        window.__NEXT_P.push([
+            PAGE_PATH
+        ]);
+    });
+}
+}}),
+"[project]/pages/index (hmr-entry)": ((__turbopack_context__) => {
+"use strict";
+
+var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, m: module, t: __turbopack_require_real__ } = __turbopack_context__;
+{
+__turbopack_require__("[next]/entry/page-loader.ts { PAGE => \"[project]/pages/index.js [client] (ecmascript)\" } [client] (ecmascript)");
+}}),
+}]);
+
+//# sourceMappingURL=%5Broot%20of%20the%20server%5D__273e21._.js.map

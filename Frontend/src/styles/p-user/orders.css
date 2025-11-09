@@ -1,0 +1,21 @@
+.show-order {
+    padding: 1rem;
+    background-color: var(--primary-color)
+}
+
+.show-order:hover {
+    color: var(--white-color) !important;
+}
+
+
+.table th {
+    color: var(--primary-color);
+}
+
+.table td {
+    color: var(--dark-color);
+}
+
+.table svg {
+    font-size: 2.5rem;
+}

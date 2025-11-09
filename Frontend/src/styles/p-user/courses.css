@@ -1,0 +1,84 @@
+.course-buyed {
+    display: flex;
+    gap: 2rem;
+    margin: 2rem 0;
+    border-bottom: 2px solid var(--gray-color);
+    padding: 1rem 0;
+}
+
+
+.box-courses_buyed {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem;
+    margin: 1rem 0;
+
+}
+
+.course-buyed_box {
+    display: flex;
+    gap: 2rem;
+    margin: 2rem 0;
+    border-bottom: 2px solid var(--gray-color);
+    padding: 1rem 0;
+}
+
+
+.information_buyed {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+
+}
+
+.course-buyed_left {
+    margin-top: 1rem;
+}
+
+.course-buyed_left a {
+    font-size: 2rem;
+}
+
+.information_buyed span:nth-child(1) {
+    color: var(--primary-color);
+    font-size: 1.6rem;
+}
+
+.box-courses_buyed img {
+    width: 200px;
+    height: 100px;
+    border-radius: 5px;
+    transition: all 250ms ease-in;
+    transform: scale(1);
+}
+
+.box-courses_buyed img:hover {
+    transform: scale(1.07);
+
+}
+
+.courses-top-bar__selection-item {
+    padding: 0.8rem;
+    border-radius: 5px;
+    transition: all 250ms ease-in-out;
+    color: var(--dark-color);
+    font-size: 1.6rem;
+}
+
+.courses-top-bar__selection-item:hover {
+    background-color: var(--primary-color);
+}
+
+.courses-top-bar__selection-item:hover {
+    color: var(--white-color);
+}
+
+.courses-top-bar__selection-item_link {
+    color: var(--dark-color);
+}
+
+
+.courses-top-bar__selection-item.active {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}

@@ -1,0 +1,43 @@
+/* Start Course boxes styles */
+
+.course-boxes__box {
+    display: flex;
+    border-radius: 0.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.8rem 2rem;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+    margin: 1rem;
+    background-color: var(--white-color);
+    height: 100px;
+    border-radius: 5ox;
+}
+
+.course-boxes__box-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.course-boxes__box-right-icon {
+    font-size: 3.5rem;
+    color: var(--primary-color);
+}
+
+.course-boxes__box-left {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1.5rem;
+}
+
+.course-boxes__box-left-title {
+    font-size: 1.6rem;
+    color:var(--dark-color);
+}
+
+.course-boxes__box-left--subtitle {
+    font-size: 1.6rem;
+    color: var(--dark-color);
+}
+
+/* Finish Course boxes styles */

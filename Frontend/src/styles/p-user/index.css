@@ -1,0 +1,44 @@
+.user-ticket {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.check-user {
+    margin-bottom: 3rem;
+    color: var(--dark-color);
+}
+
+.user-edit {
+    margin-top: 3rem;
+    color: var(--dark-color);
+}
+
+.check-user a {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    display: inline-block;
+    padding: 0 1rem;
+}
+
+.user-ticket li {
+    width: 300px;
+    height: 60px;
+    border: 1px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background-color: var(--white-color);
+    transition: all 250ms ease-in-out;
+}
+
+.user-ticket li:hover {
+    background-color: var(--primary-color);
+}
+
+.user-ticket li:hover a {
+    color: var(--white-color);
+}

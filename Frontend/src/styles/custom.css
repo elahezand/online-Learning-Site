@@ -1,0 +1,54 @@
+/* Start Default Styles */
+
+
+:root {
+    --primary-font: "IRANSans";
+    --primary-color: #f97316;
+    --background-color: #faf9f7;
+    --white-color: #ffff;
+    --dark-color: #626365;
+    --rose-color: #fb7185;
+    --gray-color:#c5bebeee;
+}
+
+
+html {
+    box-sizing: border-box;
+    font-size: 62.5%;
+
+}
+
+.mt-25 {
+    margin-top: 10rem;
+}
+
+body {
+    line-height: 1.6;
+    font-size: 1.6rem;
+    font-family: 'Roboto Medium', sans-serif !important;
+    background: var(--background-color) !important;
+    overflow-x: hidden;
+}
+
+*,
+*::after,
+*::before {
+    outline: none;
+    box-sizing: inherit;
+}
+
+a {
+    text-decoration: none !important;
+    color: var(--primary-color);
+    transition: all 400ms ease;
+}
+
+a:hover {
+    color: var(--primary-color);
+}
+
+i {
+    user-select: none;
+}
+
+/* Finish Default Styles */

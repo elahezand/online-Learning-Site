@@ -1,0 +1,72 @@
+.panel-sidebar {
+    background-color: var(--white-color);
+    top: 0px;
+    position: sticky;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--primary-color);
+}
+
+.dashboard-header {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid var(--gray-color);
+    padding: 1rem;
+    background-color: var(--white-color);
+}
+
+.dashboard-header svg {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.dashboard-header p {
+    color: var(--dark-color);
+    font-size: 1.8rem;
+}
+
+
+.panel-sidebar ul {
+    display: flex;
+    flex-direction: column;
+    color: var(--primary-color) !important;
+    margin-top: 2rem;
+    margin-left: 2rem;
+}
+
+.panel-sidebar li {
+    padding: 1rem;
+    transition: all 250ms ease-in-out;
+    border-radius: 5px;
+    transform: translateX(0px);
+}
+
+.panel-sidebar a {
+    color: var(--dark-color);
+    font-size: 1.6rem;
+}
+
+.panel-sidebar li:hover {
+    background-color: var(--primary-color);
+    transform: translateX(10px);
+
+}
+
+.panel-sidebar li:hover a {
+    color: var(--white-color);
+}
+
+.logout-user {
+    border: none;
+    background-color: var(--white-color);
+    color: var(--dark-color);
+    width: 100px;
+    margin-top: 2rem;
+}
+
+.logout-user svg {
+    margin-right: 1rem;
+    color: var(--primary-color);
+    font-size: 2rem;
+}

@@ -1,0 +1,157 @@
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 22rem;
+}
+
+.register {
+    background-color: var(--background-color);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 4rem auto;
+    padding: 2.5rem 2rem 5rem 2rem;
+    box-shadow: 0 6px 20px rgba(168, 172, 185, 0.3);
+    border-radius: 5px;
+    width: 55rem;
+    height: 750px;
+    border-bottom: 5px solid var(--primary-color);
+}
+
+.register-title {
+    display: block;
+    color: var(--dark-color);
+    font-size: 2.2rem;
+}
+
+.register-subtitle {
+    font-size: 1.5rem;
+    color: var(--dark-color);
+    display: block;
+}
+
+.register__new-member {
+    background-color:#e6e6e6;
+    margin: 1.5rem 0;
+    border-radius: 5px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 0;
+}
+
+.register__new-member-text {
+    font-size: 1.4rem;
+    color: var(--dark-color);
+}
+
+.register__new-member a {
+    background-color:var(--dark-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    color: var(--white-color);
+    margin-left: 0.7rem;
+}
+
+.register-form {
+    width: 100%;
+}
+
+.register-form__username,
+.register-form__password {
+    position: relative;
+}
+
+.register-form__username-input,
+.register-form__password-input {
+    width: 100%;
+    border: 1px solid var(--white-color);
+    padding: 1rem 1.1rem;
+    margin: 0.8rem 0;
+    border-radius: 3px;
+    font-size: 1.4rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+.register-form__username-icon,
+.register-form__password-icon {
+    position: absolute;
+    top: 2rem;
+    right: 1.5rem;
+    font-size: 2.2rem;
+    color:var(--white-color);
+}
+
+
+.register-form__password-setting {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    margin: 1rem 0;
+}
+
+.register-form__password-remember {
+    display: flex;
+    align-items: center;
+}
+
+.register-form__password-checkbox {
+    margin-right: 1rem;
+}
+
+.register-form__password-text,
+.register-form__password-forget-link {
+    font-size: 1.4rem;
+    color:var(--gray-color);
+}
+
+.register-des {
+    margin-top: 3rem;
+    color: var(--dark-color);
+    font-size: 1.2rem;
+    width: 100%;
+}
+
+.register-des-list {
+    list-style-type: disc;
+    margin-right: 2rem;
+    margin-top: 1rem;
+}
+
+.register-container::before {
+    content: "";
+    position: absolute;
+    top: 14rem;
+    width: 150%;
+    height: 380px;
+    background-color:var(--primary-color);
+    z-index: -1;
+    transform: rotate(-4deg);
+}
+
+
+
+#textarea{
+    border:1px solid #e6e6e6;
+    width: 100%;
+    height:200px;
+    padding: 1rem;
+}
+
+/* start library custom styles */
+
+.swal-button-container{
+    display: flex;
+    justify-content: center;
+}
+
+
+
+
+/* finish library custom styles */
+

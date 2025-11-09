@@ -1,0 +1,81 @@
+.sidebarWrapper {
+    padding: 2rem 1rem;
+    background-color: var(--white-color);
+    top: 0px;
+    position: sticky;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem 0;
+}
+
+.sidebarWrapper span {
+    font-size: 1.8rem;
+    color: var(--dark-color);
+}
+
+.sidebarWrapper svg {
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+
+.dashboard-title,
+.Staff-title,
+.QuickMenu-title,
+.Notifications-title {
+    color: var(--primary-color);
+    font-size: 1.7rem;
+    font-weight: bold;
+}
+
+.dashboard-item,
+.QuickMenu-item,
+.Staff-item,
+.Notifications-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.6rem;
+    color: var(--dark-color);
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin: 0.5rem 2rem;
+    transition: all 250ms ease-in-out;
+    cursor: pointer;
+
+}
+
+.dashboard-item a,
+.QuickMenu-item a,
+.Staff-item a,
+.Notifications-item a {
+    color: var(--dark-color);
+}
+
+.active {
+    background-color: var(--gray-color);
+    font-weight: bold;
+}
+
+.dashboard-item:hover,
+.QuickMenu-item:hover,
+.Staff-item:hover,
+.Notifications-item:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.dashboard-item:hover a,
+.QuickMenu-item:hover a,
+.Staff-item:hover a,
+.Notifications-item:hover a {
+    color: var(--white-color);
+}
+
+.dashboard-item:hover svg,
+.QuickMenu-item:hover svg,
+.Staff-item:hover svg,
+.Notifications-item:hover svg {
+    color: var(--white-color);
+}

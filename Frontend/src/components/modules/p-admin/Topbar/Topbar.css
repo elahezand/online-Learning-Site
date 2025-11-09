@@ -1,0 +1,72 @@
+.topbar-wrapper {
+    width: 100%;
+    display: flex;
+    top: 0;
+    z-index: 999;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    position: sticky;
+    background-color:var(--primary-color);
+}
+
+.topbar-logo {
+    color: var(--white-color);
+    font-size: 3rem;
+    font-weight: bold;
+    transition: all 400ms ease-in-out;
+    transform: scale(1);
+}
+
+
+.topbar-logo:hover {
+    transform: scale(1.1);
+}
+
+
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.topbarIcon-container {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color:var(--gray-color);
+    justify-content: center;
+}
+
+.topbarIcon-container svg {
+    font-size: 2.5rem;
+    color: var(--white-color);
+}
+
+.topbarIcon-container span {
+    position: absolute;
+    background-color:var(--gray-color);
+    border-radius: 100%;
+    width: 16px;
+    font-size: 9px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-color);    ;
+    top: -5px;
+    right: -3px;
+}
+
+.topbar-name {
+    color: var(--white-color);
+}
+
+.topbar-right img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    cursor: pointer;
+}
