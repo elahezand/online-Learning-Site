@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const { createNewsletterValidator } = require("../validators/v1/newsletter");
-
 const newsLetterSchema = new mongoose.Schema(
   {
     email: {
@@ -11,11 +9,8 @@ const newsLetterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//* add yup validation method to mongoose statics
-newsLetterSchema.statics.createValidation = function (body) {
-  return createNewsletterValidator.validate(body, { abortEarly: false });
-};
 
-const model = mongoose.model("NewsLetter", newsLetterSchema);
 
-module.exports = model;
+const newsletterModel = mongoose.model("NewsLetter", newsLetterSchema);
+
+module.exports = newsletterModel;

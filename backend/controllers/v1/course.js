@@ -250,6 +250,55 @@ exports.getOne = async (req, res, next) => {
   }
 };
 
+exports.remove = async (req, res, next) => {
+  try {
+    await courseModel.removeCourseValidation(req).catch((err) => {
+      err.statusCode = 400;
+      throw err;
+    });
+
+    const deletedCourse = await courseModel.findOneAndRemove({
+      _id: req.params.id,
+    });
+
+    if (!deletedCourse) {
+      return res.status(404).json({ message: "Course Not Found!" });
+    }
+
+    const deletedComments = await commentModel.deleteMany({
+      course: deletedCourse._id,
+    });
+    console.log(deletedComments);
+
+    return res.json(deletedCourse);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getRelated = async (req, res, next) => {
+  try {
+    await courseModel.getRelatedValidation(req.params).catch((err) => {
+      err.statusCode = 400;
+      throw err;
+    });
+
+    const { shortName } = req.params;
+    const course = await courseModel.findOne({ shortName });
+    let relatedCourses = await courseModel.find({
+      categoryID: course.categoryID,
+    });
+
+    relatedCourses = relatedCourses.filter(
+      (course) => course.shortName !== shortName
+    );
+
+    res.json(relatedCourses.splice(0, 4));
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createSession = async (req, res, next) => {
   try {
     const { title, time, free } = req.body;
@@ -293,6 +342,64 @@ exports.getAllSessions = async (req, res, next) => {
       return res.status(404).json({ message: "No Session Available!" });
     }
     res.json(allSessions);
+  } catch (error) {
+    next(error);
+  }
+};
+exports.removeSession = async (req, res, next) => {
+  try {
+    await courseModel.removeSessionValidation(req).catch((err) => {
+      err.statusCode = 400;
+      throw err;
+    });
+
+    const deletedSession = await sessionModel.findOneAndRemove({
+      _id: req.params.id,
+    });
+    if (!deletedSession) {
+      return res.status(404).json({ message: "Session Not Found!" });
+    }
+
+    const videoPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "public",
+      "courses",
+      "covers",
+      deletedSession.video
+    );
+    fs.unlink(videoPath, async (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+
+    return res.json(deletedSession);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getSessionInfo = async (req, res, next) => {
+  try {
+    await courseModel.getSessionInfoValidation(req.params).catch((err) => {
+      err.statusCode = 400;
+      throw err;
+    });
+
+    const course = await courseModel
+      .findOne({ shortName: req.params.shortName })
+      .lean();
+
+    const session = await sessionModel.findOne({
+      course: course._id,
+      _id: req.params.sessionID,
+    });
+
+    const sessions = await sessionModel.find({ course: course._id });
+
+    res.json({ sessions, session });
   } catch (error) {
     next(error);
   }
@@ -377,114 +484,6 @@ exports.getCategoryCourses = async (req, res, next) => {
     } else {
       res.json([]);
     }
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.remove = async (req, res, next) => {
-  try {
-    await courseModel.removeCourseValidation(req).catch((err) => {
-      err.statusCode = 400;
-      throw err;
-    });
-
-    const deletedCourse = await courseModel.findOneAndRemove({
-      _id: req.params.id,
-    });
-
-    if (!deletedCourse) {
-      return res.status(404).json({ message: "Course Not Found!" });
-    }
-
-    const deletedComments = await commentModel.deleteMany({
-      course: deletedCourse._id,
-    });
-    console.log(deletedComments);
-
-    return res.json(deletedCourse);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.removeSession = async (req, res, next) => {
-  try {
-    await courseModel.removeSessionValidation(req).catch((err) => {
-      err.statusCode = 400;
-      throw err;
-    });
-
-    const deletedSession = await sessionModel.findOneAndRemove({
-      _id: req.params.id,
-    });
-    if (!deletedSession) {
-      return res.status(404).json({ message: "Session Not Found!" });
-    }
-
-    const videoPath = path.join(
-      __dirname,
-      "..",
-      "..",
-      "public",
-      "courses",
-      "covers",
-      deletedSession.video
-    );
-    fs.unlink(videoPath, async (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-
-    return res.json(deletedSession);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getSessionInfo = async (req, res, next) => {
-  try {
-    await courseModel.getSessionInfoValidation(req.params).catch((err) => {
-      err.statusCode = 400;
-      throw err;
-    });
-
-    const course = await courseModel
-      .findOne({ shortName: req.params.shortName })
-      .lean();
-
-    const session = await sessionModel.findOne({
-      course: course._id,
-      _id: req.params.sessionID,
-    });
-
-    const sessions = await sessionModel.find({ course: course._id });
-
-    res.json({ sessions, session });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.getRelated = async (req, res, next) => {
-  try {
-    await courseModel.getRelatedValidation(req.params).catch((err) => {
-      err.statusCode = 400;
-      throw err;
-    });
-
-    const { shortName } = req.params;
-    const course = await courseModel.findOne({ shortName });
-    let relatedCourses = await courseModel.find({
-      categoryID: course.categoryID,
-    });
-
-    relatedCourses = relatedCourses.filter(
-      (course) => course.shortName !== shortName
-    );
-
-    res.json(relatedCourses.splice(0, 4));
   } catch (error) {
     next(error);
   }
