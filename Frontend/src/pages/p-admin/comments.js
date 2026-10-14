@@ -231,7 +231,7 @@ export default function CommentsPanel() {
     return (
         <>
             <DataTable title="Comments">
-                <table style={{ width: "100%" }}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -259,37 +259,37 @@ export default function CommentsPanel() {
                                         {comment.creator.email}
                                     </td>
                                     <td>
-                                        <div className='course-box__star'>
-                                            <span>{`(${comment.score})`}</span>
-                                            <i className='fa fa-star'></i>
-                                        </div>
+                                        <span className='d-inline-flex align-items-center gap-1'>
+                                            <i className='fa fa-star text-star'></i>
+                                            {comment.score}
+                                        </span>
                                     </td>
                                     <td>
                                         <button
                                             onClick={(() => readComment(comment.body))}
-                                            className='edit-user'>Content</button>
+                                            className='btn btn-sm btn-primary'>Content</button>
                                     </td>
                                     <td>
                                         <button
                                             onClick={(() => removeComment(comment._id))}
-                                            className='remove-user'>Remove</button>
+                                            className='btn btn-sm btn-danger'>Remove</button>
                                         {comment.answer ?
                                             <button
                                                 onClick={(() => rejectComment(comment._id))}
-                                                className='edit-user'>Reject</button>
+                                                className='btn btn-sm btn-primary'>Reject</button>
                                             : <button
                                                 onClick={(() => acceptComment(comment._id))}
-                                                className='edit-user'>Accept</button>
+                                                className='btn btn-sm btn-primary'>Accept</button>
 
                                         }
                                         <button
                                             onClick={(() => answerComment(comment._id))}
-                                            className='edit-user'>Answer</button>
+                                            className='btn btn-sm btn-primary'>Answer</button>
                                         <button onClick={(() =>
                                             banUser(comment.creator._id,
                                                 comment.creator.email,
                                                 comment.creator.phone))}
-                                            className='remove-user'>Ban</button>
+                                            className='btn btn-sm btn-danger'>Ban</button>
                                     </td>
                                 </tr>
                             ))}

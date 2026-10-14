@@ -89,8 +89,8 @@ export default function TicketsAdmin() {
 
     return (
         <>
-            <DataTable ble title={"Tickets"}>
-                <table style={{ width: "100%" }}>
+            <DataTable title={"Tickets"}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -121,13 +121,13 @@ export default function TicketsAdmin() {
 
                                 <td>
                                     <button
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                         onClick={() => readTicket(item.body)}>Content</button>
                                 </td>
                                 <td>
                                     <button
                                         onClick={() => answerTicket(item._id)}
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                     >Answer</button>
 
                                 </td>

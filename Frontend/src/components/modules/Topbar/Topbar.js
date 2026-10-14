@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import "./Topbar.css"
 import authContext from '../../../context/authContext.js';
 import { Link } from 'react-router-dom';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
 
 
 export default function Topbar() {
-    const AuthContext = useContext(authContext)    
+    const AuthContext = useContext(authContext)
     const [topbarMenu, setTopbatMenu] = useState([])
 
     useEffect(() => {
@@ -14,41 +15,43 @@ export default function Topbar() {
             .then(data => {
                 setTopbatMenu(data.sort(() => 0.5 - Math.random()).slice(0, 5))
             })
+            .catch(() => setTopbatMenu([]))
     }, [])
+
     return (
-        <div className='top-bar' >
-            <div className="container-fluid">
-                <div className="top-bar__content">
-                    <div className="top-bar__left">
+        <div className='top-bar bg-surface border-bottom'>
+            <div className="container-fluid px-3 px-lg-4">
+                <div className="d-flex align-items-center justify-content-between gap-3 py-2">
+                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
                         {AuthContext.isLoggedIn ?
-                            <Link to="/my-account/" className="top-bar__profile">
-                                <span className="top-bar__profile-text">{AuthContext.userInfo.username}</span>
+                            <Link to="/my-account/" className="btn btn-outline-primary btn-sm text-truncate top-bar__profile">
+                                <i className="fa-solid fa-user me-2"></i>
+                                {AuthContext.userInfo.username}
                             </Link> :
-                            <Link to="/register" className="top-bar__profile">
-                                <span className="top-bar__profile-text">Login/Register</span>
+                            <Link to="/register" className="btn btn-outline-primary btn-sm top-bar__profile">
+                                <i className="fa-solid fa-right-to-bracket me-2"></i>
+                                <span className="d-none d-sm-inline">Login / Register</span>
+                                <span className="d-sm-none">Login</span>
                             </Link>}
 
-                        <Link href="#" className="top-bar__search-btn">
-                            <i className="fas fa-search top-bar__search-icon"></i>
+                        <Link to="#" className="icon-btn" aria-label="Search">
+                            <i className="fas fa-search"></i>
                         </Link>
-                        <Link href="#" className="top-bar__cart-btn">
-                            <i className="fas fa-shopping-cart top-bar__cart-icon"></i>
+                        <Link to="#" className="icon-btn" aria-label="Cart">
+                            <i className="fas fa-shopping-cart"></i>
                         </Link>
-
-                    </div>
-                    <div className="top-bar__right">
-                        <ul className="top-bar__menu">
-                            {topbarMenu.map(item => (
-                                <Link to={`/course-info/${item.href}/1`} key={item._id}
-                                    className="top-bar__item">
-                                    {item.title}
-                                </Link>))}
-                        </ul>
+                        <ThemeToggle />
                     </div>
 
+                    <nav className="top-bar__menu d-flex align-items-center gap-1 overflow-auto min-w-0" aria-label="Quick links">
+                        {topbarMenu.map(item => (
+                            <Link to={`/course-info/${item.href}/1`} key={item._id}
+                                className="top-bar__link text-nowrap">
+                                {item.title}
+                            </Link>))}
+                    </nav>
                 </div>
             </div>
         </div>
     )
 }
-

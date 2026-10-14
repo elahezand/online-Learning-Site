@@ -137,7 +137,7 @@ export default function Users() {
         <>
             <AddNewUser getAllUsers={getAllUsers} />
             <DataTable title="Users">
-                <table style={{ width: "100%" }}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -161,12 +161,12 @@ export default function Users() {
                                 <td>
                                     <button
                                         onClick={(() => removeUser(item._id))}
-                                        className='remove-user'>Remove</button>
+                                        className='btn btn-sm btn-danger'>Remove</button>
                                     <button
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                         onClick={() => editRole(item._id)}>Edit Role</button>
                                     <button
-                                        className='ban-user'
+                                        className='btn btn-sm btn-outline-danger'
                                         onClick={() => banUser(item._id)}>Ban</button>
                                 </td>
                             </tr>

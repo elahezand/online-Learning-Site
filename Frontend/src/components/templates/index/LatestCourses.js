@@ -1,27 +1,27 @@
 import { useEffect, useState } from 'react'
-import "./LatestCourses.css"
 import Course from '../../modules/Course/Course'
 import SectionHeader from '../../modules/SectionHeader/SectionHeader'
 import useFramer from '../../../Hooks/useFramer'
-export default function LateatCourses(props) {
+
+export default function LateatCourses() {
     const [isShowView, ref] = useFramer()
     const [allCourseData, SetAllCourseData] = useState([])
 
     const getLatestCourse = async () => {
-        const res = await fetch(`http://localhost:4000/v1/courses`)
-        if (res.status === 200) {
-            const data = await res.json()
-            SetAllCourseData(data.slice(0, 8))
-        }
+        try {
+            const res = await fetch(`http://localhost:4000/v1/courses`)
+            if (res.status === 200) {
+                const data = await res.json()
+                SetAllCourseData(data.slice(0, 8))
+            }
+        } catch (e) { }
     }
     useEffect(() => {
         getLatestCourse()
     }, [])
 
-
     return (
-
-        <div className='container' style={{ marginTop: "10rem" }}>
+        <section className='container page-section'>
             <SectionHeader
                 title="Latest Courses"
                 desc="Your Launchpad to Success"
@@ -29,21 +29,13 @@ export default function LateatCourses(props) {
                 btnHref="/courses/1" />
 
             <div ref={ref}
-                className='row'
-                style={{
-                    gap: "2rem 0", margin: "0 5rem",
-                    opacity: isShowView ? 1 : 0,
-                    transform: isShowView ? "translateY(0px)" : "translateY(80px)"
-                }}>
+                className={`row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4 reveal ${isShowView ? "is-visible" : ""}`}>
                 {allCourseData.map((course, index) => (
-                    <div key={index} className='col-3'>
-                        <Course  {...course} />
+                    <div key={index} className='col'>
+                        <Course {...course} />
                     </div>
                 ))}
             </div>
-
-        </div>
+        </section>
     )
 }
-
-

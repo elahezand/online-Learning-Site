@@ -11,7 +11,7 @@ export default function Category() {
   return (
     <>
       <Topbar />
-      <Suspense fallback={<div style={{ height: "700px" }}>loading....</div>}>
+      <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
         <Landing url="/images/blog/cute-freelance-girl-using-laptop-sitting-floor-smiling.jpg" />
       </Suspense>
       <CategoryMain />

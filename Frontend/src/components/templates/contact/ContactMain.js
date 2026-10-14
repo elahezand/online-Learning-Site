@@ -3,65 +3,63 @@ import Button from '../../modules/Form/Button'
 import Input from "../../modules/Form/Input"
 
 
-
 export default function ContactMain({ changeInputHandeler, formState, sendComment }) {
 
     let { name, phone, email, body } = formState.inputs
 
     return (
-        <>
-            <div className='container mt-5'>
-                <div className='contact'>
-                    <div className="row">
-                        <div className='col-6 contact-left'>
-                            <span className="contact-title"> Contact With US </span>
-                            <span className="contact-subtitle">Please send your review </span>
-                            <form action="#" className="contact-form">
-                                <div className="contact-form__username">
-                                    <Input
-                                        type="input"
-                                        onChangeInput={(e) =>
-                                            changeInputHandeler(e, "name",
-                                                [requiredValidator(),
-                                                minValidator(10),
-                                                maxValidator(20)])}
-                                        placeholder="Username"
-                                        className="contact-form__username-input"
-                                        isValid={name.isValid}
-                                    />
-                                    <i className="fa fa-user contact-form__username-icon"></i>
-                                </div>
-                                <div className="contact-form__password">
-                                    <Input
-                                        type="input"
-                                        onChangeInput={(e) =>
-                                            changeInputHandeler(e, "email", [
-                                                emailValidator()
-                                            ])}
-                                        placeholder="Email"
-                                        className="contact-form__password-input"
-                                        isValid={email.isValid}
-                                    />
-                                    <i className="fa fa-envelope contact-form__password-icon"></i>
-                                </div>
-                                <div className="contact-form__password">
-                                    <Input
-                                        type="input"
-                                        onChangeInput={(e) =>
-                                            changeInputHandeler(e, "phone", [
-                                                phoneValidator(),
-                                            ])}
-                                        placeholder="Phone number"
-                                        className="contact-form__password-input"
-                                        isValid={phone.isValid}
-                                    />
-                                    <i className="fa fa-phone contact-form__password-icon"></i>
-                                </div>
+        <section className='auth-section'>
+            <div className='container'>
+                <div className='card contact-card mx-auto'>
+                    <div className="row g-0">
+                        <div className='col-12 col-md-7'>
+                            <div className="card-body p-4 p-sm-5">
+                                <h1 className="h4 mb-1">Contact With US</h1>
+                                <p className="text-body-secondary mb-4">Please send your review</p>
+                                <form action="#" className="d-flex flex-column gap-3" onSubmit={(e) => e.preventDefault()}>
+                                    <div className="input-icon">
+                                        <Input
+                                            type="input"
+                                            onChangeInput={(e) =>
+                                                changeInputHandeler(e, "name",
+                                                    [requiredValidator(),
+                                                    minValidator(10),
+                                                    maxValidator(20)])}
+                                            placeholder="Username"
+                                            isValid={name.isValid}
+                                        />
+                                        <i className="fa fa-user input-icon__icon"></i>
+                                    </div>
+                                    <div className="input-icon">
+                                        <Input
+                                            type="input"
+                                            inputType="email"
+                                            onChangeInput={(e) =>
+                                                changeInputHandeler(e, "email", [
+                                                    emailValidator()
+                                                ])}
+                                            placeholder="Email"
+                                            isValid={email.isValid}
+                                        />
+                                        <i className="fa fa-envelope input-icon__icon"></i>
+                                    </div>
+                                    <div className="input-icon">
+                                        <Input
+                                            type="input"
+                                            inputType="tel"
+                                            onChangeInput={(e) =>
+                                                changeInputHandeler(e, "phone", [
+                                                    phoneValidator(),
+                                                ])}
+                                            placeholder="Phone number"
+                                            isValid={phone.isValid}
+                                        />
+                                        <i className="fa fa-phone input-icon__icon"></i>
+                                    </div>
 
-                                <div className="contact-form__password">
                                     <Input
                                         type="texterea"
-                                        className="texterea"
+                                        rows={6}
                                         placeholder="please send your comment"
                                         onChangeInput={(e) =>
                                             changeInputHandeler(e, "body", [
@@ -70,22 +68,21 @@ export default function ContactMain({ changeInputHandeler, formState, sendCommen
                                                 maxValidator(100)
                                             ])}
                                         isValid={body.isValid}
-
                                     />
-                                </div>
 
-                                <Button className={`register-form__btn ${formState.isFormValid ? "active" : null}`}
-                                    disabled={!formState.isFormValid} type="submit" actionForm={(e) => sendComment(e)}>
-                                    <span className="register-form__btn-text">Send</span>
-                                </Button>
-                            </form>
+                                    <Button className={`btn btn-lg w-100 ${formState.isFormValid ? "btn-primary" : "btn-secondary"}`}
+                                        disabled={!formState.isFormValid} type="submit" actionForm={(e) => sendComment(e)}>
+                                        Send
+                                    </Button>
+                                </form>
+                            </div>
                         </div>
-                        <div className='col-6'>
-                            <img className='contact-img' src="/images/blog/image_3.jpg.webp" alt="" />
+                        <div className='col-md-5 d-none d-md-block'>
+                            <img className='contact-card__img' src="/images/blog/image_3.jpg.webp" alt="" />
                         </div>
                     </div>
                 </div>
             </div>
-        </>
+        </section>
     )
 }

@@ -127,18 +127,17 @@ export default function Menu() {
 
   return (
     <>
-      <div className="form-container">
-        <div className='form-header'>
-          <i className="fa-solid fa-user-plus"></i>
-          <h1>Add New Menu</h1>
-        </div>
-        <form className="form">
-          <div className='row'>
-            <div className="col-6">
-              <div className="register-form__username">
+      <section className="card admin-form">
+        <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-user-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Menu</h2>
+                </div>
+        <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+          <div className='row g-3'>
+            <div className="col-12 col-md-6">
+              <div className="input-icon">
                 <Input
                   isValid={title.isValid}
-                  className="register-form__username-input"
                   placeholder="Title"
                   type="input"
                   onChangeInput={(e) =>
@@ -148,14 +147,13 @@ export default function Menu() {
                       maxValidator(18)
                     ])}
                 />
-                <i className="fa fa-user register-form__username-icon"></i>
+                <i className="fa fa-user input-icon__icon"></i>
               </div>
             </div>
-            <div className="col-6">
-              <div className="register-form__username">
+            <div className="col-12 col-md-6">
+              <div className="input-icon">
                 <Input
                   isValid={href.isValid}
-                  className="register-form__username-input"
                   placeholder="Href"
                   type="input"
                   onChangeInput={(e) =>
@@ -165,12 +163,12 @@ export default function Menu() {
                       maxValidator(18)
                     ])}
                 />
-                <i className="fa fa-user register-form__username-icon"></i>
+                <i className="fa fa-user input-icon__icon"></i>
               </div>
             </div>
-            <div className="col-6">
-              <div className="categories">
-                <select className="category-list"
+            <div className="col-12 col-md-6">
+              <div>
+                <select className="form-select"
                   onChange={(e) => setParentId(e.target.value)}>
                   <option value="-1">Please Select Parent </option>
                   {allMenus.length && allMenus.filter((item) => (
@@ -186,15 +184,15 @@ export default function Menu() {
           </div>
         </form>
         <Button
-          className={`form__btn ${formState.isFormValid ? "active" : null}`}
+          className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
           disabled={!formState.isFormValid} type="submit"
           actionForm={(e) => addNewMenu(e)}>
-          <span className="form__btn-text">Create</span>
-          <i className="fa fa-plus form__btn-icon"></i>
+          <span>Create</span>
+          <i className="fa fa-plus"></i>
         </Button>
-      </div>
+      </section>
       <DataTable title="Menus">
-        <table style={{ width: "100%" }}>
+        <table className="table table-hover align-middle mb-0">
           <thead>
             <tr>
               <th className='number'>#</th>
@@ -213,12 +211,12 @@ export default function Menu() {
                 </td>
                 <td>{item.href}</td>
                 <td>{item.parent ? item.parent.title :
-                  <span> <i className='fa fa-check'></i></span>}
+                  <span className='text-success'><i className='fa fa-check'></i></span>}
                 </td>
                 <td>
                   <button
                     onClick={(() => removeMenu(item._id))}
-                    className='remove-user'>Remove</button>
+                    className='btn btn-sm btn-danger'>Remove</button>
                 </td>
               </tr>
             ))}

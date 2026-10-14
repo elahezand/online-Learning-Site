@@ -1,9 +1,17 @@
 import "./SideBar.css"
-import { Link } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import authContext from '../../../../context/authContext.js'
-import { useNavigate } from 'react-router-dom'
 import swal from 'sweetalert'
+
+const links = [
+    { to: "/my-account", label: "Dashboard", icon: "fa-solid fa-gauge", end: true },
+    { to: "orders/1", label: "Orders", icon: "fa-solid fa-bag-shopping" },
+    { to: "wallet", label: "My wallet", icon: "fa-solid fa-wallet" },
+    { to: "detail", label: "Detail Account", icon: "fa-solid fa-user-gear" },
+    { to: "courses/1", label: "Courses", icon: "fa-solid fa-graduation-cap" },
+    { to: "tickets/1", label: "Tickets", icon: "fa-solid fa-ticket" },
+]
 
 export default function SideBar() {
     const AuthContext = useContext(authContext)
@@ -20,38 +28,31 @@ export default function SideBar() {
             }
         })
     }
+
     return (
-        <div className='col-3 panel-sidebar'>
-            <div className='dashboard-header'>
-                <i className="fa-solid fa-user-pen"></i>
-                <p className="name"> Welcome to your Dashboard </p>
+        <aside className='user-sidebar surface'>
+            <div className='user-sidebar__header d-flex align-items-center gap-3'>
+                <span className="icon-badge"><i className="fa-solid fa-user-pen"></i></span>
+                <p className="mb-0 fw-medium text-heading">Welcome to your Dashboard</p>
             </div>
-            <ul>
-                <li>
-                    <Link to={"/my-account"}>Dashboard</Link>
-                </li>
-                <li>
-                    <Link to={"orders/1"}> Orders</Link>
-                </li>
-                <li>
-                    <Link to={"wallet"}>My wallet</Link>
-                </li>
-                <li>
-                    <Link to={"Detail"}>Detail Account</Link>
-                </li>
-                <li>
-                    <Link to={"courses/1"}> Courses</Link>
-                </li>
-                <li>
-                    <Link to={"tickets/1"}> Tickets </Link>
-                </li>
-
-                <button className='logout-user' onClick={() => exitPanel()}>
-                    <i className="fa-solid fa-right-from-bracket"></i>
-                    Exit
-                </button>
-            </ul>
-
-        </div>
+            <nav aria-label="Account">
+                <ul className="nav nav-pills user-sidebar__nav">
+                    {links.map(link => (
+                        <li className="nav-item" key={link.to}>
+                            <NavLink to={link.to} end={link.end} className="nav-link">
+                                <i className={`${link.icon} user-sidebar__icon`}></i>
+                                {link.label}
+                            </NavLink>
+                        </li>
+                    ))}
+                    <li className="nav-item">
+                        <button type="button" className='nav-link user-sidebar__exit' onClick={() => exitPanel()}>
+                            <i className="fa-solid fa-right-from-bracket user-sidebar__icon"></i>
+                            Exit
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
     )
 }

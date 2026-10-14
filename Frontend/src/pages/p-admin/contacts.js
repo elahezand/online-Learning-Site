@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import "../../styles/p-admin/contacts.css"
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import getMe from '../../utils/auth'
@@ -123,8 +122,8 @@ export default function Contacts() {
 
     return (
         <>
-            <DataTable ble title={"Contacts"}>
-                <table style={{ width: "100%" }}>
+            <DataTable title={"Contacts"}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -148,15 +147,15 @@ export default function Contacts() {
                                 <td>{item.phone}</td>
                                 <td>
                                     <button
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                         onClick={() => readContact(item.body)}>Content</button>
                                 </td>
                                 <td>
                                     <button
                                         onClick={() => answerContact(item.email)}
-                                        className='edit-user' >Answer</button>
+                                        className='btn btn-sm btn-primary' >Answer</button>
                                     <button
-                                        className='remove-user'
+                                        className='btn btn-sm btn-danger'
                                         onClick={() => deleteContact(item._id)}>Delete</button>
                                 </td>
                             </tr>

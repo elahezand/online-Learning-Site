@@ -133,18 +133,17 @@ export default function Discounts() {
 
     return (
         <>
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Add New Discount</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Discount</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
+                            <div>
                                 <Input
                                     isValid={code.isValid}
-                                    className="register-form__username-input"
                                     placeholder="code"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -155,10 +154,9 @@ export default function Discounts() {
                                         ])} />
                             </div>
                         </div>
-                        <div className="col-6">
+                        <div className="col-12 col-md-6">
                             <Input
                                 isValid={percent.isValid}
-                                className="register-form__username-input"
                                 placeholder="Percent"
                                 type="input"
                                 onChangeInput={(e) =>
@@ -168,10 +166,9 @@ export default function Discounts() {
 
                                     ])} />
                         </div>
-                        <div className="col-6">
+                        <div className="col-12 col-md-6">
                             <Input
                                 isValid={max.isValid}
-                                className="register-form__username-input"
                                 placeholder="max"
                                 type="input"
                                 onChangeInput={(e) =>
@@ -182,32 +179,30 @@ export default function Discounts() {
 
                                     ])} />
                         </div>
-                        <div className="col-6">
-                            <div className="categories">
-                                <select
-                                    className="category-list"
+                        <div className="col-12 col-md-6">
+                            <div>
+                                <select className="form-select"
                                     onChange={(e) => setCourseId(e.target.value)}>
                                     <option value="-1">Please Select Course </option>
                                     {courses.length && courses.map((item, index) => (
                                         <option key={index} value={item._id}>{item.name}</option>
                                     ))}
                                 </select>
-                                <span className="error-message text-danger"></span>
                             </div>
                         </div>
                     </div>
                 </form>
                 <Button
-                    className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                    className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                     disabled={!formState.isFormValid}
                     type="submit"
                     actionForm={(e) => addNewDiscount(e)}>
-                    <span className="form__btn-text">Create New Discount</span>
-                    <i className="fa fa-plus form__btn-icon"></i>
+                    <span>Create New Discount</span>
+                    <i className="fa fa-plus"></i>
                 </Button>
-            </div>
+            </section>
             <DataTable title="Discounts">
-                <table style={{ width: "100%" }}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -236,7 +231,7 @@ export default function Discounts() {
                                     <button
                                         onClick={() =>
                                             removeCode(code._id)}
-                                        className='remove-user'>
+                                        className='btn btn-sm btn-danger'>
                                         Remove</button>
                                 </td>
                             </tr>

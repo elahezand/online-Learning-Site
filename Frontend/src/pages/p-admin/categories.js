@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
-import "../../styles/p-admin/categories.css"
 import { useParams } from 'react-router-dom'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import Input from '../../components/modules/Form/Input'
@@ -174,18 +173,17 @@ export default function Categories() {
 
     return (
         <>
-            <div className='form-container'>
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Add New Category</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Category</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={title.isValid}
-                                    className="register-form__username-input"
                                     placeholder="Title"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -194,14 +192,13 @@ export default function Categories() {
                                             maxValidator(20),
                                             minValidator(6),
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={shortName.isValid}
-                                    className="register-form__username-input"
                                     placeholder="shortName"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -210,22 +207,22 @@ export default function Categories() {
                                             maxValidator(20),
                                             minValidator(6),
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
                     </div>
                 </form>
 
                 <Button
-                    className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                    className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                     disabled={!formState.isFormValid} type="submit"
                     actionForm={(e) => addNewCategory(e)}>
-                    <span className="form__btn-text">Create</span>
-                    <i className="fa fa-plus form__btn-icon"></i>
+                    <span>Create</span>
+                    <i className="fa fa-plus"></i>
                 </Button>
-            </div>
+            </section>
             <DataTable title={"Categories"}>
-                <table style={{ width: "100%" }}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -242,12 +239,12 @@ export default function Categories() {
                                 <td>{item.title}</td>
                                 <td>
                                     <button
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                         onClick={() => editCategory(item._id, item.name)}>
                                         Edit</button>
                                     <button
                                         onClick={(() => removeCategory(item._id))
-                                        } className='remove-user'>Remove</button>
+                                        } className='btn btn-sm btn-danger'>Remove</button>
                                 </td>
                             </tr>
                         ))}

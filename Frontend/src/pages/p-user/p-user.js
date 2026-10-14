@@ -10,15 +10,19 @@ export default function UserPanel() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/bg_2.jpg.webp" />
             </Suspense>
-            <div className='row'>
-                <SideBar />
-                <div
-                    className='col-9 mt-3'
-                    style={{ padding: "0 2rem" }}>
-                    <Outlet />
+            <div className='container mt-4 mb-5'>
+                <div className='row g-4'>
+                    <div className='col-12 col-lg-3'>
+                        <SideBar />
+                    </div>
+                    <main className='col-12 col-lg-9'>
+                        <div className='surface p-3 p-sm-4 h-100'>
+                            <Outlet />
+                        </div>
+                    </main>
                 </div>
             </div>
             <Footer />

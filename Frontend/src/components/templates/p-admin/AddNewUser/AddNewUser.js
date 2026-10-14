@@ -1,6 +1,5 @@
 import Input from '../../../modules/Form/Input'
 import Button from '../../../modules/Form/Button'
-import "./AddNewUser.css"
 import { requiredValidator, emailValidator, maxValidator, phoneValidator, minValidator } from '../../../../validators/rules'
 import useForm from '../../../../Hooks/useForm'
 import swal from 'sweetalert'
@@ -85,18 +84,17 @@ export default function AddNewUser({ getAllUsers }) {
     return (
         <>
 
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-user-plus"></i>
-                    <h1>Add New User</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-user-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New User</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={name.isValid}
-                                    className="register-form__username-input"
                                     placeholder="name"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -106,14 +104,13 @@ export default function AddNewUser({ getAllUsers }) {
                                             minValidator(6),
 
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={username.isValid}
-                                    className="register-form__username-input"
                                     placeholder="username"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -123,31 +120,29 @@ export default function AddNewUser({ getAllUsers }) {
                                             minValidator(6),
 
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
 
-                        <div className="col-6">
-                            <div className="register-form__username">
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={email.isValid}
-                                    className="register-form__username-input"
                                     placeholder="Email"
                                     type="input"
                                     onChangeInput={(e) =>
                                         changeInputHandeler(e, "email", [
                                             emailValidator()
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
 
 
-                        <div className="col-6">
-                            <div className="register-form__username">
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={phone.isValid}
-                                    className="register-form__username-input"
                                     placeholder="Phone"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -155,15 +150,14 @@ export default function AddNewUser({ getAllUsers }) {
                                             phoneValidator()
 
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
 
-                        <div className="col-6">
-                            <div className="register-form__username">
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <Input
                                     isValid={password.isValid}
-                                    className="register-form__username-input"
                                     placeholder="Password"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -173,20 +167,20 @@ export default function AddNewUser({ getAllUsers }) {
                                             minValidator(6),
 
                                         ])} />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
                     </div>
                 </form>
                 <Button
-                    className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                    className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                     disabled={!formState.isFormValid} type="submit"
                     actionForm={(e) => registerNewUser(e)}>
-                    <span className="form__btn-text">Submit</span>
-                    <i className="fa fa-plus form__btn-icon"></i>
+                    <span>Submit</span>
+                    <i className="fa fa-plus"></i>
                 </Button>
 
-            </div>
+            </section>
 
 
         </>

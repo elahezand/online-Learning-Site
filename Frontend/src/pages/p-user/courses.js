@@ -19,13 +19,6 @@ export default function CoursesUser() {
 
     const [status, setStatus] = useState("")
 
-    const [isShowImage, setIsImageShow] = useState(false)
-    const [isShowError, setIsShowError] = useState(false)
-
-
-    const onImageLoaded = () => setIsImageShow(true)
-    const onImageError = () => setIsShowError(true)
-
     const getUserCourses = async () => {
         const token = await getMe()
         if (token) {
@@ -104,79 +97,76 @@ export default function CoursesUser() {
     const pageCount = Math.ceil(filteredData.length / pageSize)
     const paginatedData = filteredData.slice(firstChild, lastChild)
 
+    const filters = [
+        { status: "all", label: "All Courses" },
+        { status: "free", label: "Free Courses" },
+        { status: "price", label: "Paid Courses" },
+        { status: "completed", label: "Completed Courses" },
+        { status: "uncompleted", label: "Uncompleted Courses" },
+    ]
+
     return (
         <>
-            <ul className="course-buyed">
-                <li
-                    className={`courses-top-bar__selection-item ${status === "all" && "active"}`}
-                    onClick={() => setStatus("all")}>
-                    All Courses
-                </li>
-                <li
-                    className={`courses-top-bar__selection-item ${status === "free" && "active"}`}
-                    onClick={() => setStatus("free")}>
-                    Free Courses
-                </li>
-                <li
-                    className={`courses-top-bar__selection-item ${status === "price" && "active"}`}
-                    onClick={() => setStatus("price")}>
-                    Paid Courses
-                </li>
-                <li
-                    className={`courses-top-bar__selection-item ${status === "completed" && "active"}`}
-                    onClick={() => setStatus("comoleted")}>
-                    Completed Courses
-                </li>
-                <li
-                    className={`courses-top-bar__selection-item ${status === "uncompleted" && "active"}`}
-                    onClick={() => setStatus("uncompleted")}>
-                    Uncompleted Courses
-                </li>
+            <h1 className="h4 mb-3">My Courses</h1>
+            <ul className="nav nav-pills flex-nowrap overflow-auto gap-2 pb-2 mb-3 border-bottom">
+                {filters.map(filter => (
+                    <li className="nav-item" key={filter.status}>
+                        <button type="button"
+                            className={`nav-link text-nowrap ${(status || "all") === filter.status ? "active" : ""}`}
+                            onClick={() => setStatus(filter.status)}>
+                            {filter.label}
+                        </button>
+                    </li>
+                ))}
             </ul>
-            <div className='row m-4 box-courses_buyed'>
+            <div className='d-flex flex-column gap-3'>
                 {paginatedData.length ? paginatedData.map((course, index) =>
-                    <div className='course-buyed_box' key={index}>
-                        {!isShowError ?
-                            <img src={`http://localhost:4000/courses/covers/${course.course?.cover}`}
-                                alt="" loading='lazy'
-                                onLoad={onImageLoaded}
-                                onError={onImageError} /> :
-                            <BiSolidCameraOff
-                                style={{ fontSize: "5rem", color: "var(--gray-color)" }} />
-                        }
-                        {!isShowImage && !isShowError &&
-                            <div className='spinner'>
-                                <Spinner />
-                            </div>}
-                        <div className="course-buyed_left">
-                            <Link to={`/course-info/${course.course?.shortName}/1`}>
+                    <div className='surface d-flex flex-column flex-sm-row gap-3 p-3' key={index}>
+                        <BoughtCourseCover cover={course.course?.cover} />
+                        <div className="d-flex flex-column justify-content-center gap-2 min-w-0">
+                            <Link to={`/course-info/${course.course?.shortName}/1`} className="h5 mb-0 text-heading">
                                 {course.course?.name}</Link>
-                            <div className="information_buyed">
-                                <div>
-                                    <span> Price : </span>
-                                    <span>
-                                        {course.course?.price === 0 ? "Free" : course.course?.price}
-                                    </span>
-                                </div>
-
-                                <div>
-                                    <span> Status : </span>
-                                    <span>{
-                                        course.course?.isCompelete === 1 ? " Completed" : "Ongoing"}
-                                    </span>
-                                </div>
+                            <div className="d-flex flex-wrap gap-3 small">
+                                <span>
+                                    <span className="text-primary-strong fw-medium">Price : </span>
+                                    {course.course?.price === 0 ? "Free" : course.course?.price}
+                                </span>
+                                <span>
+                                    <span className="text-primary-strong fw-medium">Status : </span>
+                                    {course.course?.isCompelete === 1 ? " Completed" : "Ongoing"}
+                                </span>
                             </div>
                         </div>
                     </div>
                 ) : <div className='alert alert-danger'>
                     there isn't any courses</div>}
-                <Pageination
-                    data={paginatedData}
-                    pathName={`/my-account/courses`}
-                    pageCount={pageCount}
-                    currentPage={currentPage} />
-
             </div>
+            <Pageination
+                data={paginatedData}
+                pathName={`/my-account/courses`}
+                pageCount={pageCount}
+                currentPage={currentPage} />
         </>
+    )
+}
+
+function BoughtCourseCover({ cover }) {
+    const [isShowImage, setIsImageShow] = useState(false)
+    const [isShowError, setIsShowError] = useState(false)
+
+    return (
+        <div className="bought-course__cover">
+            {!isShowError ?
+                <img src={`http://localhost:4000/courses/covers/${cover}`}
+                    alt="" loading='lazy'
+                    onLoad={() => setIsImageShow(true)}
+                    onError={() => setIsShowError(true)} /> :
+                <div className="img-fallback"><BiSolidCameraOff /></div>
+            }
+            {!isShowImage && !isShowError &&
+                <div className='bought-course__spinner'>
+                    <Spinner animation="border" size="sm" />
+                </div>}
+        </div>
     )
 }

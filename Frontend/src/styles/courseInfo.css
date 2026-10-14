@@ -1,206 +1,111 @@
-.course-info__link {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    border-radius: 0.3rem;
-    padding: 0.4rem 1rem;
-    background-color: var(--lightBlue--color);
-    ;
-}
-
-.course-info__title {
-    margin: 2rem 0;
-    font-weight: bold;
-    font-size: 2.4rem;
-    color: #464749;
-}
-
-.course-info__text {
-    margin-bottom: 3rem;
-    font-size: 1.6rem;
-    color: var(--dark-color);
-}
-
-.course-info__social-media-item {
-    color: #b1bbbf;
-    margin-left: 1.7rem;
-    transition: all 400ms ease;
-}
-
-.course-info__icon {
-    font-size: 2rem;
-}
-
-.course-info__video {
+.course-hero__video {
     width: 100%;
-    height: 300px;
-    border-radius: 1rem;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface-alt);
+    box-shadow: var(--shadow-md);
 }
 
-/* Finish Course Info Styles */
-
-
-
-/* Start Course Progress Styles */
-
-.course-progress {
-    border-radius: 1rem;
-    margin: 3rem 0;
-    padding: 2rem 2rem 1.2rem 2rem;
-    background-color: var(--white-color);
-    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.2);
-
-
+.course-hero__category {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
 }
 
-.course-progress__header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-
+.course-hero__title {
+    margin: 1rem 0;
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
 }
 
-.course-progress__icon {
-    font-size: 2.5rem;
-    color: var(--dark-color);
+.info-card {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
-.course-progress__title {
-    margin-left: 1.5rem;
-    font-size: 1.5rem;
-    color: var(--dark-color);
-}
-
-.course-progress__bar {
-    border-radius: 10rem;
-    height: 1rem;
-}
-
-.progress-bar {
-    background-color: var(--primary-color);
-}
-
-/* Finish Course Progress Styles */
-
-/* Start Introduction styles */
-
-.introduction {
-    padding: 3rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.08);
-    background-color: var(--white-color);
-}
-
-.introduction__item {
-    margin: 2rem 0;
-}
-
-.introduction__img {
-    margin-top: 3rem;
+.info-card__title {
     display: block;
-    border-radius: 1rem;
-    margin-right: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    color: var(--color-heading);
 }
 
-.introduction__text {
-    margin-top: 2rem;
-    color: var(--dark-color);
-    font-size: 1.5rem;
+@media (min-width: 992px) {
+    .course-sidebar {
+        position: sticky;
+        top: 1rem;
+    }
 }
 
-.introduction__btns {
-    margin-top: 4rem;
-}
-
-.introduction__btns-item {
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    border-radius: 0.5rem;
-    padding: 0.8rem 1.5rem;
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
-.introduction__btns-item:hover {
-    color: var(--background-color);
-    background-color: var(--primary-color);
-}
-
-.introduction__topic {
-    margin-top: 4rem;
-}
-
-/* Finish Introduction styles */
-
-/* Start Teacher Details Styles */
-
-.techer-details {
-    border-radius: 0.5rem;
-    padding: 2rem;
-    margin-top: 2rem;
-    box-shadow: 0 0 13px 1px rgba(70, 72, 77, 0.08);
-    background-color: var(--white-color);
-}
-
-.techer-details__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-}
-
-.techer-details__header-right {
+.course-register {
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 1rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 700;
+    transition: background-color var(--transition);
 }
 
-.techer-details__header-img {
-    width: 62px;
-    height: 62px;
-    height: auto;
+button.course-register:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.course-register--done {
+    background-color: var(--color-success-subtle);
+    color: var(--color-success);
+}
+
+.course-short-url {
+    display: block;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px dashed var(--color-primary-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-primary-subtle);
+    color: var(--color-primary-text);
+    font-size: 0.875rem;
+    word-break: break-all;
+}
+
+.related-course {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+li:last-child > .related-course {
+    border-bottom: 0;
+}
+
+.related-course:hover {
+    color: var(--color-primary-text);
+}
+
+.related-course__img {
+    width: 5.5rem;
+    height: 3.25rem;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-alt);
+}
+
+.related-course__name {
+    font-size: 0.925rem;
+}
+
+.teacher__img {
+    width: 4rem;
+    height: 4rem;
     border-radius: 50%;
-    box-shadow: 0 5px 30px rgba(70, 72, 77, 0.3);
-    margin-right: 1rem;
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
 }
-
-.techer-details__header-titles {
-    display: flex;
-    flex-direction: column;
-    margin-right: 2rem;
-}
-
-.techer-details__header-link {
-    text-decoration: none;
-    color: var(--dark-color);
-}
-
-.techer-details__header-skill {
-    color: var(--dark-color);
-    font-size: 1.2rem;
-}
-
-.techer-details__header-left {
-    display: flex;
-    align-items: center;
-    color: var(--background-color);
-    background-color: var(--primary-color);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    gap: 1rem;
-}
-
-.techer-details__header-icon {
-    font-size: 1.8rem;
-}
-
-.techer-details__header-name {
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-right: 0.4rem;
-}
-
-.techer-details__footer {
-    margin-top: 1rem;
-    color: var(--dark-color);
-    font-size: 14px;
-}
-
-/* Finish Teacher Details Styles */

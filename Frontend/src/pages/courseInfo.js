@@ -10,7 +10,7 @@ export default function CourseInfo() {
   return (
     <>
       <Topbar />
-      <Suspense fallback={<span>loading....</span>}>
+      <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
         <Landing url="/images/blog/bg_2.jpg.webp" />
       </Suspense>
       <MainCourseInfo />

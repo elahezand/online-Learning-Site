@@ -1,72 +1,51 @@
-.panel-sidebar {
-    background-color: var(--white-color);
-    top: 0px;
-    position: sticky;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid var(--primary-color);
-}
-
-.dashboard-header {
-    display: flex;
-    gap: 1rem;
-    border-bottom: 1px solid var(--gray-color);
+.user-sidebar {
     padding: 1rem;
-    background-color: var(--white-color);
 }
 
-.dashboard-header svg {
-    font-size: 2.5rem;
-    color: var(--primary-color);
+.user-sidebar__header {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
 }
 
-.dashboard-header p {
-    color: var(--dark-color);
-    font-size: 1.8rem;
+/* Mobile: horizontal scrolling pills */
+.user-sidebar__nav {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
 }
 
-
-.panel-sidebar ul {
+.user-sidebar__nav .nav-link {
     display: flex;
-    flex-direction: column;
-    color: var(--primary-color) !important;
-    margin-top: 2rem;
-    margin-left: 2rem;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
 }
 
-.panel-sidebar li {
-    padding: 1rem;
-    transition: all 250ms ease-in-out;
-    border-radius: 5px;
-    transform: translateX(0px);
+.user-sidebar__icon {
+    width: 1.1rem;
+    text-align: center;
 }
 
-.panel-sidebar a {
-    color: var(--dark-color);
-    font-size: 1.6rem;
+.user-sidebar__nav .nav-link:not(.active):hover {
+    background-color: var(--color-primary-subtle);
 }
 
-.panel-sidebar li:hover {
-    background-color: var(--primary-color);
-    transform: translateX(10px);
-
+.user-sidebar__exit:hover {
+    color: var(--color-danger) !important;
+    background-color: var(--color-danger-subtle) !important;
 }
 
-.panel-sidebar li:hover a {
-    color: var(--white-color);
-}
+/* Desktop: vertical sticky menu */
+@media (min-width: 992px) {
+    .user-sidebar {
+        position: sticky;
+        top: 1rem;
+    }
 
-.logout-user {
-    border: none;
-    background-color: var(--white-color);
-    color: var(--dark-color);
-    width: 100px;
-    margin-top: 2rem;
-}
-
-.logout-user svg {
-    margin-right: 1rem;
-    color: var(--primary-color);
-    font-size: 2rem;
+    .user-sidebar__nav {
+        flex-direction: column;
+        overflow: visible;
+    }
 }

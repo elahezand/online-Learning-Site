@@ -27,7 +27,7 @@ export default function Search() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/hero_1.jpg.webp" />
             </Suspense>
             <SearchMain

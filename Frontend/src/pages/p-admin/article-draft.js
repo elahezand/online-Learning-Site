@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import "../../styles/p-admin/article-draft.css"
 import Button from "../../components/modules/Form/Button"
 import Editor from "../../components/modules/Form/Editor"
 import swal from 'sweetalert'
@@ -101,48 +100,42 @@ export default function ArticlesPanel() {
     return (
         <>
 
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Add New Article</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Article</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
                             <input
                                 value={title}
-                                className="register-form__username-input"
+                                className="form-control"
                                 placeholder="Title"
+                                aria-label="Title"
                                 onChange={(e) => setTitle(e.target.value)}
                             />
                         </div>
-                        <div className="col-6">
+                        <div className="col-12 col-md-6">
                             <input
                                 value={shortName}
-                                className="register-form__username-input"
+                                className="form-control"
                                 placeholder="Link"
+                                aria-label="Link"
                                 type="input"
                                 onChange={(e) => setShortName(e.target.value)}
                             />
                         </div>
 
-                        <div className='col-6'>
-                            <div className="file">
-                                <label style={{ color: "var(--dark-color)" }}
-                                    className="input-title" htmlFor='cover-course'>
-                                    <i className='fa fa-plus'
-                                        style={{ marginRight: "2rem", display: "inline-block" }} />
-                                    {cover.name}</label>
-                                <input type="file"
-                                    id="cover-course" style={{ display: "none" }}
-                                    onChange={(e) => setCover(e.target.files[0])} />
-                            </div>
+                        <div className="col-12 col-md-6">
+                            <input type="file" className="form-control" id="cover-course" aria-label="Upload file" onChange={(e) => setCover(e.target.files[0])} />
                         </div>
 
                         <div className="col-12">
                             <textarea
                                 value={description}
-                                className="description-article"
+                                className="form-control"
+                                rows={5}
                                 placeholder="writte...."
                                 onChange={(e) => setDescription(e.target.value)}
                             />
@@ -152,23 +145,23 @@ export default function ArticlesPanel() {
                         </div>
                     </div>
                 </form>
-                <div className='container-buttons'>
+                <div className='d-flex flex-wrap gap-2'>
                     <Button
-                        className="form__btn active"
+                        className="btn btn-primary d-inline-flex align-items-center gap-2"
                         type="submit"
                         actionForm={(e) => addNewArticle(e)}>
-                        <span className="form__btn-text">Create New Article</span>
-                        <i className="fa fa-plus form__btn-icon"></i>
+                        <span>Create New Article</span>
+                        <i className="fa fa-plus"></i>
                     </Button>
                     <Button
-                        className="form__btn active"
+                        className="btn btn-primary d-inline-flex align-items-center gap-2"
                         type="submit"
                         actionForm={(e) => addNewDraft(e)}>
-                        <span className="form__btn-text">Create New Draft</span>
-                        <i className="fa fa-plus form__btn-icon"></i>
+                        <span>Create New Draft</span>
+                        <i className="fa fa-plus"></i>
                     </Button>
                 </div>
-            </div>
+            </section>
         </>
     )
 }

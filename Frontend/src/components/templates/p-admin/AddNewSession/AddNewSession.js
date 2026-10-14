@@ -76,18 +76,17 @@ export default function AddNewSession({ getAllSessions }) {
     }
     return (
         <>
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Add New Session</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Session</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
+                            <div>
                                 <Input
                                     isValid={title.isValid}
-                                    className="register-form__username-input"
                                     placeholder="Title"
                                     type="input"
                                     onChangeInput={(e) =>
@@ -97,21 +96,19 @@ export default function AddNewSession({ getAllSessions }) {
                                 />
                             </div>
                         </div>
-                        <div className="col-6">
-                            <div className="categories register-form__username-input">
-                                <select className="category-list" onChange={(e) => setCourseId(e.target.value)}>
+                        <div className="col-12 col-md-6">
+                            <div>
+                                <select className="form-select" onChange={(e) => setCourseId(e.target.value)}>
                                     <option value="-1">Please Select Course </option>
                                     {allCourses.length && allCourses.map((item, index) => (
                                         <option key={index} value={item._id}>{item.name} </option>
                                     ))}
                                 </select>
-                                <span className="error-message text-danger"></span>
                             </div>
                         </div>
-                        <div className="col-6">
+                        <div className="col-12 col-md-6">
                             <Input
                                 isValid={time.isValid}
-                                className="register-form__username-input"
                                 placeholder="Time"
                                 type="input"
                                 onChangeInput={(e) =>
@@ -121,52 +118,36 @@ export default function AddNewSession({ getAllSessions }) {
 
                             />
                         </div>
-                        <div className='col-6'>
-                            <div className="file register-form__username-input">
-                                <label style={{ color: "var(--dark-color)" }}
-                                    className="input-title" htmlFor='cover-course'>
-                                    <i className='fa fa-plus'
-                                        style={{ marginRight: "2rem", display: "inline-block" }}>
-                                    </i>{video.name}</label>
-                                <input type="file" id="cover-course"
-                                    style={{ display: "none" }}
-                                    onChange={(e) => setVideo(e.target.files[0])} />
-                            </div>
+                        <div className="col-12 col-md-6">
+                            <input type="file" className="form-control" id="cover-course" aria-label="Upload file" onChange={(e) => setVideo(e.target.files[0])} />
                         </div>
 
-                        <div className="col-6">
-                            <div className="presell">
-                                <label className="input-title">Session Status:</label>
-                                <div className="radios">
-                                    <div className="presell-true">
-                                        <label>
-                                            <span>Free</span>
-                                            <input type="radio" value="0" name="condition"
-                                                onInput={(e) => setStatus(e.target.value)} />
-                                        </label>
-                                    </div>
-                                    <div className="presell-false">
-                                        <label>
-                                            <span>Price</span>
-                                            <input type="radio" value="1" name="condition"
-                                                onInput={(e) => setStatus(e.target.value)} />
-                                        </label>
-                                    </div>
-
+                        <div className="col-12 col-md-6">
+                            <fieldset className="d-flex flex-wrap align-items-center gap-3 h-100">
+                                <legend className="form-label fs-6 mb-0 w-auto float-none">Session Status:</legend>
+                                <div className="form-check form-check-inline">
+                                    <input className="form-check-input" type="radio" value="0" name="session-status" id="session-status-0"
+                                        onInput={(e) => setStatus(e.target.value)} />
+                                    <label className="form-check-label" htmlFor="session-status-0">Free</label>
                                 </div>
-                            </div>
+                                <div className="form-check form-check-inline">
+                                    <input className="form-check-input" type="radio" value="1" name="session-status" id="session-status-1"
+                                        onInput={(e) => setStatus(e.target.value)} />
+                                    <label className="form-check-label" htmlFor="session-status-1">Price</label>
+                                </div>
+                            </fieldset>
                         </div>
                     </div>
                 </form>
                 <Button
-                    className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                    className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                     disabled={!formState.isFormValid}
                     type="submit"
                     actionForm={(e) => addNewSession(e)}>
-                    <span className="form__btn-text">Create New Course</span>
-                    <i className="fa fa-plus form__btn-icon"></i>
+                    <span>Create New Course</span>
+                    <i className="fa fa-plus"></i>
                 </Button>
-            </div>
+            </section>
         </>
     )
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import "../../styles/p-admin/sessions.css"
 import AddNewSession from '../../components/templates/p-admin/AddNewSession/AddNewSession'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import Pageination from '../../components/modules/Pageination/Pageination'
@@ -80,8 +79,8 @@ export default function Sessions() {
     return (
         <>
             <AddNewSession getAllSessions={getAllSessions} />
-            <DataTable>
-                <table style={{ width: "100%" }}>
+            <DataTable title="Sessions">
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -103,7 +102,7 @@ export default function Sessions() {
                                 <td>
                                     <button
                                         onClick={(() => removeSession(item._id))}
-                                        className='remove-user'>Remove</button>
+                                        className='btn btn-sm btn-danger'>Remove</button>
                                 </td>
                             </tr>
                         ))}
@@ -112,7 +111,7 @@ export default function Sessions() {
             </DataTable>
             <Pageination
                 data={paginatedData}
-                pathName={`/p-admin/sessioدس`}
+                pathName={`/p-admin/sessions`}
                 pageCount={pageCount}
                 currentPage={currentPage} />
         </>

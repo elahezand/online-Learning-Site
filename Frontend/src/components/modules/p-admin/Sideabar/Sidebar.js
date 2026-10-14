@@ -2,10 +2,49 @@ import { useContext } from 'react'
 import "./Sidebar.css"
 import authContext from '../../../../context/authContext.js';
 import { FaChartLine } from "react-icons/fa";
-import { useLocation } from 'react-router-dom';
 import { GiChart } from "react-icons/gi";
-import { Link, useNavigate } from 'react-router-dom';
-export default function Sidebar() {
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+
+const groups = [
+    {
+        title: "Dashboard",
+        items: [
+            { to: "", label: "Home", icon: <i className='fa fa-home'></i>, isActive: (p) => p === "/p-admin" || p === "/p-admin/" },
+            { to: "#", label: "Analystic", icon: <FaChartLine />, isActive: (p) => p.includes("/analystic") },
+            { to: "#", label: "Sales", icon: <GiChart />, isActive: (p) => p.includes("/sales") },
+        ]
+    },
+    {
+        title: "QuickMenu",
+        items: [
+            { to: "users/1", label: "Users", icon: <i className='fa fa-users'></i>, isActive: (p) => p.includes("users") },
+            { to: "new-user", label: "New Users", icon: <i className="fa-solid fa-user-plus"></i>, isActive: (p) => p.includes("new-user") },
+            { to: "courses/1", label: "Courses", icon: <i className="fa-solid fa-graduation-cap"></i>, isActive: (p) => p.includes("courses") },
+            { to: "categories/1", label: "Categories", icon: <i className='fa fa-layer-group'></i>, isActive: (p) => p.includes("categories") },
+            { to: "articles/1", label: "Articles", icon: <i className="fa-solid fa-newspaper"></i>, isActive: (p) => p.includes("articles") || p.includes("article-draft") },
+            { to: "sessions/1", label: "Sessions", icon: <i className="fa-solid fa-video"></i>, isActive: (p) => p.includes("sessions") },
+        ]
+    },
+    {
+        title: "Notifications",
+        items: [
+            { to: "comments/1", label: "Comments", icon: <i className="fa-solid fa-comments"></i>, isActive: (p) => p.includes("comments") },
+            { to: "contacts/1", label: "Messages", icon: <i className="fa-solid fa-message"></i>, isActive: (p) => p.includes("contacts") },
+            { to: "tickets/1", label: "Tickets", icon: <i className="fa-solid fa-ticket"></i>, isActive: (p) => p.includes("tickets") },
+        ]
+    },
+    {
+        title: "Staff",
+        items: [
+            { to: "menu/1", label: "Menu", icon: <i className="fa-solid fa-bars"></i>, isActive: (p) => p.includes("menu") },
+            { to: "discounts/1", label: "Discounts", icon: <i className='fas fa-ticket-alt'></i>, isActive: (p) => p.includes("/discounts") },
+            { to: "siteWide-discounts", label: "SiteWide-Discounts", icon: <i className='fas fa-percent'></i>, isActive: (p) => p.toLowerCase().includes("sitewide") },
+        ]
+    },
+]
+
+export default function Sidebar({ show, onHide }) {
     const AuthoContext = useContext(authContext)
     const navigate = useNavigate()
     const pathname = useLocation().pathname
@@ -14,122 +53,35 @@ export default function Sidebar() {
         AuthoContext.logout()
         navigate("/login")
     }
+
     return (
-        <div className='col-2'>
-            <div className='sidebarWrapper'>
-                <ul className='dashboard'>
-                    <h3 className='dashboard-title'>Dashboard</h3>
-                    <li className={`dashboard-item
-                    ${pathname === "/p-admin" && "active"}`}>
-                        <i className='fa fa-home'></i>
-                        <Link to="" className='link'>
-                            Home
-                        </Link>
-                    </li>
-                    <li className={`dashboard-item 
-                    ${pathname.includes("/analystic") && "active"}`}>
-                        <FaChartLine></FaChartLine>
-                        <Link className='link'>
-                            Analystic
-                        </Link>
-                    </li>
-                    <li className={`dashboard-item
-                    ${pathname.includes("/sales") && "active"}`}>
-                        <GiChart></GiChart>
-                        <Link className='link'>
-                            Sales
-                        </Link>
-                    </li>
-                </ul>
-                <ul className='QuickMenu'>
-                    <h3 className='QuickMenu-title'>QuickMenu</h3>
-                    <li className={`QuickMenu-item ${pathname.includes("users") && 'active'}`}>
-                        <i className='fa fa-users'></i>
-                        <Link className='link' to="users/1">
-                            Users
-                        </Link>
-                    </li>
-                    <li className={`QuickMenu-item ${pathname.includes("new-user") && 'active'}`}>
-                        <i className="fa-solid fa-user-plus"></i>
-                        <Link className='link' to="new-user">
-                            New Users
-                        </Link>
-                    </li>
-                    <li className={`QuickMenu-item ${pathname.includes("courses") && 'active'}`}>
-                        <i className="fa-solid fa-graduation-cap"></i>
-                        <Link to="courses/1" className='link'>
-                            Courses
-                        </Link>
-                    </li>
-                    <li className={`QuickMenu-item ${pathname.includes("categories") && 'active'}`}>
-                        <i className='fa fa-layer-group'></i>
-                        <Link className='link' to="categories/1">
-                            Categories
-                        </Link>
-                    </li>
-                    <li className={`QuickMenu-item ${pathname.includes("articles") && 'active'}`}>
-                        <i className="fa-solid fa-newspaper"></i>
-                        <Link className='link' to={"articles/1"}>
-                            Articles
-                        </Link>
-                    </li>
-
-                    <li className={`QuickMenu-item ${pathname.includes("sessions") && 'active'}`}>
-                        <i className="fa-solid fa-video"></i>
-                        <Link className='link' to={"sessions/1"}>
-                            Sessions
-                        </Link>
-                    </li>
-                </ul>
-
-                <ul className='Notifications'>
-                    <h3 className='Notifications-title'>Notifications</h3>
-                    <li className='Notifications-item'>
-                        <i className="fa-solid fa-comments"></i>
-                        <Link className='link' to={"comments/1"}>
-                            Comments
-                        </Link>
-                    </li>
-                    <li className='QuickMenu-item'>
-                        <i className="fa-solid fa-message"></i>
-                        <Link className='link' to={"contacts/1"}>
-                            Messages
-                        </Link>
-                    </li>
-                    <li className='QuickMenu-item'>
-                        <i className="fa-solid fa-ticket"></i>
-                        <Link className='link' to={"tickets/1"}>
-                            Tickets
-                        </Link>
-                    </li>
-                </ul>
-
-                <ul className='Staff'>
-                    <h3 className='Staff-title'>Staff</h3>
-                    <li className='Staff-item'>
-                        <i className="fa-solid fa-bars"></i>
-                        <Link className='link' to={"menu"}>
-                            Menu
-                        </Link>
-                    </li>
-                    <li className='Staff-item'>
-                        <i className='fas fa-ticket-alt'></i>
-                        <Link className='link' to={"discounts/1"}>
-                            Discounts
-                        </Link>
-                    </li>
-                    <li className='Staff-item'>
-                        <i className='fas fa-ticket-alt'></i>
-                        <Link className='link' to={"sitewide-discounts"}>
-                            SiteWide-Discounts
-                        </Link>
-                    </li>
-                    <li className='Staff-item' onClick={() => exitPanel()}>
-                        <i className="fa-solid fa-right-from-bracket"></i>
-                        Exit
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <Offcanvas show={show} onHide={onHide} responsive="lg" placement="start"
+            className="admin-sidebar" aria-labelledby="admin-sidebar-title">
+            <Offcanvas.Header closeButton>
+                <Offcanvas.Title id="admin-sidebar-title" className="fw-bold text-primary-strong">ACADEMIA</Offcanvas.Title>
+            </Offcanvas.Header>
+            <Offcanvas.Body className="flex-column gap-4 p-3">
+                {groups.map(group => (
+                    <nav key={group.title} aria-label={group.title}>
+                        <h3 className='admin-sidebar__title'>{group.title}</h3>
+                        <ul className="nav flex-column gap-1">
+                            {group.items.map(item => (
+                                <li key={item.label} className="nav-item">
+                                    <Link to={item.to} onClick={onHide}
+                                        className={`admin-sidebar__link ${item.isActive(pathname) ? "active" : ""}`}>
+                                        <span className="admin-sidebar__icon">{item.icon}</span>
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                ))}
+                <button type="button" className='admin-sidebar__link admin-sidebar__exit' onClick={() => exitPanel()}>
+                    <span className="admin-sidebar__icon"><i className="fa-solid fa-right-from-bracket"></i></span>
+                    Exit
+                </button>
+            </Offcanvas.Body>
+        </Offcanvas>
     )
 }

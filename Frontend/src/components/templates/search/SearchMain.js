@@ -4,26 +4,26 @@ import Article from '../../modules/Article/Article'
 
 export default function SearchMain({ allSearchArticles, allSearchCourses, }) {
     return (
-        <>
-            <div className='container mt-5'>
-                <SectionHeader title="Search Courses" desc="" />
-                <div className='row mb-5' style={{ gap: "1rem 0" }}>
-                    {allSearchCourses.length > 0 ? allSearchCourses.map((course, index) =>
-                        <div className='col-4'>
-                            <Course key={index} {...course} />
+        <div className='container mt-4 mb-5'>
+            <SectionHeader title="Search Courses" desc="" />
+            {allSearchCourses.length > 0 ?
+                <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4'>
+                    {allSearchCourses.map((course, index) =>
+                        <div className='col' key={index}>
+                            <Course {...course} />
                         </div>
-                    ) : <div className='alert alert-warning'>Not Found</div>}
+                    )}
+                </div> : <div className='alert alert-warning'>Not Found</div>}
 
-                    <SectionHeader title="Search Articles" desc="" />
-                    {allSearchArticles.length > 0 ? allSearchArticles.map((article, index) =>
-                        <div className='col-4'>
-                            <Article key={index} {...article} />
+            <SectionHeader title="Search Articles" desc="" />
+            {allSearchArticles.length > 0 ?
+                <div className='row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4'>
+                    {allSearchArticles.map((article, index) =>
+                        <div className='col' key={index}>
+                            <Article {...article} />
                         </div>
-                    ) : <div className='alert alert-warning'>Not Found</div>}
-
-                </div>
-
-            </div>
-        </>
+                    )}
+                </div> : <div className='alert alert-warning'>Not Found</div>}
+        </div>
     )
 }

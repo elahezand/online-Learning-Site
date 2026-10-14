@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useContext } from 'react'
 import authContext from '../../context/authContext.js'
-import "../../styles/p-user/user-detail.css"
 import swal from 'sweetalert'
 import getMe from '../../utils/auth.js'
 
@@ -60,95 +59,54 @@ export default function UserDetail() {
 
   return (
     <>
-      <div className="edit">
-        <form className="edit__form">
-          <div className="edit__personal">
-            <div className="row">
-              <div className="col-12">
-                <label className="edit__label"> Name *</label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  value={name}
-                  onChange={event => setName(event.target.value)}
-                  placeholder=" Please send your Name  "
-                />
-              </div>
-              <div className="col-12">
-                <label className="edit__label">Username *</label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  value={username}
-                  onChange={event => setUsername(event.target.value)}
-                  placeholder=" Please send your Username"
-                />
-
-              </div>
-              <div className="col-12">
-                <label className="edit__label"> Email *</label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  value={email}
-                  onChange={event => setEmail(event.target.value)}
-                  placeholder="Plaese send your Email"
-                />
-              </div>
-              <div className="col-12">
-                <label className="edit__label"> Phone Number *</label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  value={phone}
-                  onChange={event => setPhone(event.target.value)}
-                  placeholder=" Please send your Phone Number  "
-                />
-              </div>
-
-            </div>
+      <h1 className="h4 mb-4">Account details</h1>
+      <form className="d-flex flex-column gap-4" onSubmit={(e) => EditDetail(e)}>
+        <fieldset className="row g-3">
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="detail-name">Name *</label>
+            <input id="detail-name" className="form-control" type="text" value={name}
+              onChange={event => setName(event.target.value)} placeholder="Please send your Name" />
           </div>
-          <div className="edit__password">
-            <span className="edit__password-title">change your password</span>
-            <div className="row">
-              <div className="col-12">
-                <label className="edit__label">
-                  Previous Password
-                </label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  placeholder=" "
-                />
-              </div>
-              <div className="col-12">
-                <label className="edit__label">
-                  New Password
-                </label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  placeholder=""
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="col-12">
-                <label className="edit__label"> Repeat New Password</label>
-                <input
-                  className="edit__input"
-                  type="text"
-                  placeholder=""
-                />
-              </div>
-            </div>
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="detail-username">Username *</label>
+            <input id="detail-username" className="form-control" type="text" value={username}
+              onChange={event => setUsername(event.target.value)} placeholder="Please send your Username" />
           </div>
-          <button className="edit__btn" type='submit'
-            onClick={(e) => EditDetail(e)} >
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="detail-email">Email *</label>
+            <input id="detail-email" className="form-control" type="email" value={email}
+              onChange={event => setEmail(event.target.value)} placeholder="Plaese send your Email" />
+          </div>
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="detail-phone">Phone Number *</label>
+            <input id="detail-phone" className="form-control" type="tel" value={phone}
+              onChange={event => setPhone(event.target.value)} placeholder="Please send your Phone Number" />
+          </div>
+        </fieldset>
+
+        <fieldset className="row g-3">
+          <legend className="h6 fw-bold text-primary-strong border-bottom pb-2 mb-1">change your password</legend>
+          <div className="col-12 col-md-4">
+            <label className="form-label" htmlFor="detail-old-pass">Previous Password</label>
+            <input id="detail-old-pass" className="form-control" type="password" />
+          </div>
+          <div className="col-12 col-md-4">
+            <label className="form-label" htmlFor="detail-new-pass">New Password</label>
+            <input id="detail-new-pass" className="form-control" type="password"
+              value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <div className="col-12 col-md-4">
+            <label className="form-label" htmlFor="detail-repeat-pass">Repeat New Password</label>
+            <input id="detail-repeat-pass" className="form-control" type="password" />
+          </div>
+        </fieldset>
+
+        <div>
+          <button className="btn btn-primary px-4" type='submit'>
             Save Changes
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </>
   )
 }

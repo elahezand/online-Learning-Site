@@ -1,33 +1,37 @@
+.about-us__img {
+    min-height: 18rem;
+    max-height: 32rem;
+}
+
 .enroll {
+    position: relative;
+    isolation: isolate;
     background-repeat: no-repeat;
     background-size: cover;
-    background-attachment: fixed;
-    position: relative;
-    background-position: top center;
-    margin: 10rem 0;
-    width: 100%;
-    padding: 7rem;
+    background-position: center;
+    color: var(--color-on-media);
 }
 
-.enroll a {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 10px;
-    background-color: var(--primary-color);
-    color: var(--white-color);
-    margin-top: 2rem;
-
+.enroll::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, var(--color-overlay-strong) 0%, var(--color-overlay) 60%, transparent 100%);
 }
 
-.enroll p {
-    color: var(--white-color);
-    font-size: 1.8rem;
-    font-weight: bold;
-    width: 400px;
-    margin-top: 2rem;
-    padding: 1rem;
-    border-radius: 10px;
-    background-color:rgba(241, 162, 109, 0.34);
+.enroll__title {
+    font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.25rem);
+    color: var(--color-on-media);
 }
 
+.enroll__text {
+    max-width: 32rem;
+    color: var(--color-on-media-muted);
+}
 
+@media (min-width: 992px) {
+    .enroll {
+        background-attachment: fixed;
+    }
+}

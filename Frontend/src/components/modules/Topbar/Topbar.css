@@ -1,109 +1,29 @@
-/* Start Top-Bar Styles */
-
-.top-bar {
-    color: var(--primary-color);
-    background-color:var(--background-color);
-    height: 60px;
-    padding: 0.5rem 0;
-
-}
-
-.top-bar__content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-.top-bar__right {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.top-bar__profile {
+    max-width: 12rem;
 }
 
 .top-bar__menu {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-
+    scrollbar-width: none;
 }
 
-
-.top-bar__left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    width: 400px;
+.top-bar__menu::-webkit-scrollbar {
+    display: none;
 }
 
-.top-bar__search-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4.3rem;
-    height: 4.3rem;
-    border-radius: 0.5rem;
-    background-color: var(--primary-color);
+.top-bar__link {
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    color: var(--color-muted);
 }
 
-.top-bar__left svg {
-    font-size: 2.2rem;
-    color: var(--white-color);
+.top-bar__link:hover {
+    color: var(--color-primary-text);
+    background-color: var(--color-primary-subtle);
 }
 
-.top-bar__cart-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4.3rem;
-    height: 4.3rem;
-    border-radius: 0.5rem;
-    margin-right: 1rem;
-    background-color:var(--gray-color);
+@media (max-width: 575.98px) {
+    .top-bar__menu {
+        display: none !important;
+    }
 }
-
-.top-bar__cart-btn:hover {
-    color: var(--dark-color);
-}
-
-.top-bar__cart-icon {
-    color: var(--dark-color);
-    font-size: 2.2rem;
-    transition: all 400ms ease;
-}
-
-.top-bar__profile {
-    display: flex;
-    align-items: center;
-    padding: 0 1.5rem;
-    border: 2px solid var(--primary-color);
-    border-radius: 0.5rem;
-    margin-right: 1rem;
-    transition: all 400ms ease;
-    color: var(--primary-color);
-    height: 4.3rem;
-    font-size: 1.6rem;
-}
-
-.top-bar__profile:hover {
-    background-color: var(--primary-color);
-    color: var(--background-color);
-}
-
-.top-bar__item {
-    transition: all 400ms ease-in-out;
-    padding: 1rem 1.3rem;
-    font-size: 1.6rem;
-    color: var(--dark-color);
-}
-
-.top-bar__item:hover {
-    color: var(--background-color);
-    background-color: var(--primary-color);
-    border-radius: 5px;
-}
-
-
-
-/* Finish Top-Bar Styles */

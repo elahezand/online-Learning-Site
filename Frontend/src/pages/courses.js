@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { useParams } from 'react-router-dom'
-import "../styles/courses.css"
 import Topbar from '../components/modules/Topbar/Topbar'
 import CoursesMain from "../components/templates/courses/CoursesMain"
 import Pageination from '../components/modules/Pageination/Pageination'
@@ -36,7 +35,7 @@ export default function Courses() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/cute-freelance-girl-using-laptop-sitting-floor-smiling.jpg" />
             </Suspense>
             <CoursesMain

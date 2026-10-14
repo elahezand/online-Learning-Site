@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import useForm from '../../../../Hooks/useForm'
 import Input from '../../../modules/Form/Input'
-import "./AddNewArticle.css"
 import Button from '../../../modules/Form/Button'
 import { requiredValidator, minValidator, maxValidator } from '../../../../validators/rules'
 import swal from 'sweetalert'
@@ -110,17 +109,16 @@ export default function AddNewArticle({ getAllArticles }) {
 
     return (
         <>
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Add New Article</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Add New Article</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
                             <Input
                                 isValid={title.isValid}
-                                className="register-form__username-input"
                                 placeholder="Title"
                                 type="input"
                                 onChangeInput={(e) =>
@@ -132,10 +130,9 @@ export default function AddNewArticle({ getAllArticles }) {
                                     ])}
                             />
                         </div>
-                        <div className="col-6">
+                        <div className="col-12 col-md-6">
                             <Input
                                 isValid={shortName.isValid}
-                                className="register-form__username-input"
                                 placeholder="Link"
                                 type="input"
                                 onChangeInput={(e) =>
@@ -148,9 +145,9 @@ export default function AddNewArticle({ getAllArticles }) {
 
                             />
                         </div>
-                        <div className="col-6">
-                            <div className="categories">
-                                <select className="category-list" onChange={(e) => setCategoryId(e.target.value)}>
+                        <div className="col-12 col-md-6">
+                            <div>
+                                <select className="form-select" onChange={(e) => setCategoryId(e.target.value)}>
                                     <option value="-1">Please Select Category </option>
                                     {categories.length && categories.map((item, index) => (
                                         <option key={index} value={item._id}>{item.title} </option>
@@ -158,19 +155,14 @@ export default function AddNewArticle({ getAllArticles }) {
 
                                     }
                                 </select>
-                                <span className="error-message text-danger"></span>
                             </div>
                         </div>
-                        <div className='col-6'>
-                            <div className="file">
-                                <label style={{ color: "var(--dark-color)" }} className="input-title" htmlFor='cover-course'><i className='fa fa-plus' style={{ marginRight: "2rem", display: "inline-block" }}></i>{cover.name}</label>
-                                <input type="file" id="cover-course" style={{ display: "none" }} onChange={(e) => setCover(e.target.files[0])} />
-                            </div>
+                        <div className="col-12 col-md-6">
+                            <input type="file" className="form-control" id="cover-course" aria-label="Upload file" onChange={(e) => setCover(e.target.files[0])} />
                         </div>
                         <div className="col-12">
                             <Input
                                 isValid={description.isValid}
-                                className="description-course"
                                 placeholder="writte...."
                                 onChangeInput={(e) =>
                                     changeInputHandeler(e, "description", [
@@ -187,25 +179,25 @@ export default function AddNewArticle({ getAllArticles }) {
                         </div>
                     </div>
                 </form>
-                <div className='container-buttons'>
+                <div className='d-flex flex-wrap gap-2'>
                     <Button
-                        className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                        className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                         disabled={!formState.isFormValid}
                         type="submit"
                         actionForm={(e) => addNewArticle(e)}>
-                        <span className="form__btn-text">Create New Article</span>
-                        <i className="fa fa-plus form__btn-icon"></i>
+                        <span>Create New Article</span>
+                        <i className="fa fa-plus"></i>
                     </Button>
                     <Button
-                        className={`form__btn ${formState.isFormValid ? "active" : null}`}
+                        className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
                         disabled={!formState.isFormValid}
                         type="submit"
                         actionForm={(e) => addNewDraft(e)}>
-                        <span className="form__btn-text">Create New Draft</span>
-                        <i className="fa fa-plus form__btn-icon"></i>
+                        <span>Create New Draft</span>
+                        <i className="fa fa-plus"></i>
                     </Button>
                 </div>
-            </div>
+            </section>
         </>
     )
 }

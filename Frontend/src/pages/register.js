@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import "../styles/register.css"
+import "../styles/auth.css"
 import Topbar from '../components/modules/Topbar/Topbar.js';
 import swal from 'sweetalert';
 import { useContext } from 'react';
@@ -94,7 +94,7 @@ export default function Register() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<div style={{ height: "700px" }}>loading....</div>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/hero_1.jpg.webp" />
             </Suspense>
             <RegisterMain

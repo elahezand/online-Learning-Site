@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
-import "../../styles/p-user/orders.css"
 import getMe from '../../utils/auth'
 
 export default function Orders() {
@@ -47,7 +46,9 @@ export default function Orders() {
     <>
       {orders.length ?
         <>
-          <table className="table table-striped">
+          <h1 className="h4 mb-3">Orders</h1>
+          <div className="table-responsive">
+          <table className="table table-hover align-middle">
             <thead>
               <tr>
                 <th>#</th>
@@ -60,22 +61,27 @@ export default function Orders() {
             <tbody>
               {paginatedData.length ? paginatedData.map((order, index) => (
                 <tr key={index}>
-                  <td className='number'>{index + 1}</td>
-                  <td className='course-name'>
+                  <td className='fw-bold text-body-secondary'>{index + 1}</td>
+                  <td className='fw-medium text-heading'>
                     {order.course?.name}
                   </td>
                   <td>
                     {order.createdAt.slice(0, 10)}
                   </td>
-                  <td>{order.isComplete ? "completed" : "uncompleted"}</td>
+                  <td>
+                    <span className={`badge rounded-pill ${order.isComplete ? "text-bg-success" : "bg-primary-subtle-token text-primary-strong"}`}>
+                      {order.isComplete ? "completed" : "uncompleted"}
+                    </span>
+                  </td>
                   <td>{order.price === 0 ? "Free" :
                     `${order.price.toLocaleString()}$`}</td>
                 </tr>
               )
-              ) : <div className='alert alert-danger'>
-                there isn't any orders</div>}
+              ) : <tr><td colSpan={5}><div className='alert alert-danger mb-0'>
+                there isn't any orders</div></td></tr>}
             </tbody>
           </table>
+          </div>
           <Pageination
             data={paginatedData}
             pathName={`/my-account/orders`}

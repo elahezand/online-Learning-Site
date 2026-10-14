@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react'
+import "../styles/auth.css"
 import "../styles/contact.css"
 import { useNavigate } from 'react-router-dom'
 import Topbar from '../components/modules/Topbar/Topbar';
@@ -76,7 +77,7 @@ export default function Contact() {
         <>
 
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/hero_1.jpg.webp" />
             </Suspense>
             <ContactMain

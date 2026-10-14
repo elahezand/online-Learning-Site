@@ -1,4 +1,3 @@
-import React from 'react'
 import Accordion from 'react-bootstrap/Accordion';
 import "./AccordionItem.css"
 import { Link, useParams } from 'react-router-dom';
@@ -7,34 +6,20 @@ import { Link, useParams } from 'react-router-dom';
 export default function AccordionItem(props) {
     const params = useParams()
     return (
-        <>
-            <Accordion.Body>
+        <Accordion.Body className='session-row'>
+            <div className='d-flex align-items-center gap-3 min-w-0'>
+                <span className={`session-row__number ${props.free ? "is-free" : ""}`}>{props.number}</span>
+                <i className={`fa-brands fa-youtube session-row__icon ${props.free ? "is-free" : ""}`}></i>
                 {props.free ?
-                    <div className='acordion-body'>
-                        <div className='acordion-body_right' >
-                            <i className='fa-brands fa-youtube active'></i>
-                            <span className='active'>{props.number}</span>
-                            <Link
-                                to={`/${params.courseName}/${props._id}`}>
-                                {props.title}</Link>
-                        </div>
-                        <div className='acordion-body_left'>
-                            <span>{props.time}</span>
-                        </div>
-                    </div> :
-                    <div className='acordion-body'>
-                        <div className='acordion-body_right' >
-                            <i className='fa-brands fa-youtube'></i>
-                            <span>{props.number}</span>
-                            <p style={{ color: "#b1adad" }}>{props.title}</p>
-                        </div>
-                        <div className='acordion-body_left'>
-                            <span>{props.time}</span>
-                            <i className="fa fa-lock"></i>
-                        </div>
-                    </div>
-                }
-            </Accordion.Body>
-        </>
+                    <Link className="session-row__title text-truncate"
+                        to={`/${params.courseName}/${props._id}`}>
+                        {props.title}</Link> :
+                    <span className="session-row__title is-locked text-truncate">{props.title}</span>}
+            </div>
+            <div className='d-flex align-items-center gap-2 text-body-secondary small flex-shrink-0'>
+                <span>{props.time}</span>
+                {!props.free && <i className="fa fa-lock"></i>}
+            </div>
+        </Accordion.Body>
     )
 }

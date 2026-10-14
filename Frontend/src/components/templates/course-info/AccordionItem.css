@@ -1,71 +1,49 @@
-.acordion {
-    background-color: var(--primary-color);
-}
-
-.acordion-body {
+.session-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
-    background-color: var(--white-color);
-}
-
-.acordion-body_right {
-    display: flex;
-    align-items: center;
     gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--color-border);
 }
 
-.acordion-body_right svg {
-    font-size: 3rem;
-    color:#b1adad;
-
-}
-
-.acordion-body_right svg.active {
-    color: var(--primary-color);
-}
-
-.acordion-body_right a {
-    color: var(--dark-color);
-    transition: all 200ms ease-in-out;
-    font-size: 1.8rem;
-}
-
-.acordion-body_right a:hover {
-    color: var(--primary-color);
-}
-
-
-.acordion-body_right span {
-    display: flex;
+.session-row__number {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 35px;
-    height: 35px;
-    border-radius: 100%;
-    color: var(--white-color);
-    font-weight: bold;
-    background-color: #b1adad;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: var(--color-surface-alt);
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
 }
 
-.acordion-body_right span.active {
-    background-color: var(--primary-color);
+.session-row__number.is-free {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
 }
 
-.acordion-body_left svg,
-.acordion-body_left span {
-    font-size: 1.8rem;
-    color: var(--dark-color);
-    margin-left: 0.5rem;
+.session-row__icon {
+    font-size: 1.4rem;
+    color: var(--color-subtle);
+    flex-shrink: 0;
 }
 
-.accordion-button {
-    background-color: var(--primary-color);
-    padding: 2rem;
-    border: none;
-    font-size: 1.5rem;
-    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-    color: var(--white-color);
+.session-row__icon.is-free {
+    color: var(--color-primary);
 }
 
+.session-row__title {
+    color: var(--color-heading);
+}
+
+.session-row__title:hover {
+    color: var(--color-primary-text);
+}
+
+.session-row__title.is-locked {
+    color: var(--color-subtle);
+}

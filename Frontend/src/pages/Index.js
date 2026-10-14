@@ -18,18 +18,22 @@ export default function Index() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<div style={{ height: "800px" }}>loading....</div>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="images/blog/happy-woman-holding-laptop.jpg" />
             </Suspense>
             <LateatCourses />
             <AboutUs />
             <PopularCourses />
-            <div className='enroll' style={{ backgroundImage: 'url("images/blog/enroll.jpg")' }} >
-                <Link to={"/register"}>Enroll NOW</Link>
-                <p>Education for Tomorrow's Leaders</p>
-                <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-            </div>
-            <PreSaleCourses/>
+            <section className='enroll page-section' style={{ backgroundImage: 'url("images/blog/enroll.jpg")' }}>
+                <div className="container py-5">
+                    <div className="py-lg-5">
+                        <h2 className="enroll__title mb-3">Education for Tomorrow's Leaders</h2>
+                        <p className="enroll__text mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+                        <Link to={"/register"} className="btn btn-primary btn-lg px-4">Enroll NOW</Link>
+                    </div>
+                </div>
+            </section>
+            <PreSaleCourses />
             <LatestArticle />
             <NewsLetter />
             <Footer />

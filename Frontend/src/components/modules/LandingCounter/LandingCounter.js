@@ -16,6 +16,6 @@ export default function LandingCounter({ value }) {
         return (() => clearInterval(timer.current))
     }, [value])
 
-    return <span className="landing-status__count" id="courses-count">{counter}</span>
+    return <span className="landing__stat-count" id="courses-count">{counter}</span>
 
 }

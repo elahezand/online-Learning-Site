@@ -7,16 +7,15 @@ import swal from 'sweetalert';
 
 const inputreducer = (state, action) => {
     switch (action.type) {
-        default: {
-            return state
-        }
         case "CHANGE": {
             return {
                 ...state,
                 value: action.value,
                 isvalid: action.isvalid
             }
-
+        }
+        default: {
+            return state
         }
     }
 }
@@ -42,7 +41,6 @@ export default function NewsLetter() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
-
             },
             body: JSON.stringify(
                 { email: emailUser.value }
@@ -53,33 +51,33 @@ export default function NewsLetter() {
                 title: "You have subscribed to the newsletter :)",
                 icon: "success",
                 buttons: "ok"
-            }).then(result => {
-
             })
-
         }
     }
+
     return (
-        <>
-            <div className='newsletter-container'>
-                <div className='newsletter-right'>
-                    <p>Newsletter - Stay tune and get the latest update
-                    </p>
-                    <span>Far far away, behind the word mountains
-                    </span>
+        <section className='newsletter mt-5'>
+            <div className="container py-5">
+                <div className="row align-items-center g-4">
+                    <div className='col-12 col-lg-6'>
+                        <h2 className="newsletter__title">Newsletter - Stay tune and get the latest update</h2>
+                        <p className="newsletter__text mb-0">Far far away, behind the word mountains</p>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <form action="#" className='newsletter__form ms-lg-auto' onSubmit={(e) => sendRequest(e)}>
+                            <input type="email" placeholder='Enter email address' aria-label="Email address"
+                                onChange={(e) => emailuserHandeler(e)} />
+                            <Button
+                                type="submit"
+                                className="newsletter__btn"
+                                ariaLabel="Subscribe"
+                                disabled={!emailUser.isvalid}>
+                                <i className="fa fa-paper-plane" />
+                            </Button>
+                        </form>
+                    </div>
                 </div>
-                <form action="#" className='newsletter-left'>
-                    <input type="text" placeholder='Enter email adrress'
-                        onChange={(e) => emailuserHandeler(e)} />
-
-                    <Button
-                        disabled={!emailUser.isvalid}
-                        actionForm={(e) => sendRequest(e)}>
-                        <i className="fa fa-paper-plane" />
-                    </Button>
-                </form>
             </div>
-
-        </>
+        </section>
     )
 }

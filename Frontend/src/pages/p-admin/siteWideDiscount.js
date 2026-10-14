@@ -35,33 +35,34 @@ export default function SiteWideDiscount() {
 
     return (
         <>
-            <div className="form-container">
-                <div className='form-header'>
-                    <i className="fa-solid fa-plus"></i>
-                    <h1>Running New Campaign</h1>
+            <section className="card admin-form">
+                <div className="admin-form__header">
+                    <span className="icon-badge"><i className="fa-solid fa-plus"></i></span>
+                    <h2 className="h5 fw-bold mb-0">Running New Campaign</h2>
                 </div>
-                <form className="form">
-                    <div className='row'>
-                        <div className="col-6">
-                            <div className="register-form__username">
+                <form className="admin-form__body" onSubmit={(e) => e.preventDefault()}>
+                    <div className='row g-3'>
+                        <div className="col-12 col-md-6">
+                            <div className="input-icon">
                                 <input
-                                    className="register-form__username-input"
-                                    placeholder="Please send sitewide Discount"
+                                                                        className="form-control"
+                                                                        placeholder="Please send sitewide Discount"
+                                                                        aria-label="Sitewide discount"
                                     type="input"
                                     onChange={(e) => setDiscount(e.target.value)}
                                 />
-                                <i className="fa fa-user register-form__username-icon"></i>
+                                <i className="fa fa-user input-icon__icon"></i>
                             </div>
                         </div>
                     </div>
                 </form>
                 <Button
-                    className='form__btn active'
+                    className="btn btn-primary d-inline-flex align-items-center gap-2"
                     actionForm={(e) => addNewDiscount(e)}>
-                    <span className="form__btn-text">Create</span>
-                    <i className="fa fa-plus form__btn-icon"></i>
+                    <span>Create</span>
+                    <i className="fa fa-plus"></i>
                 </Button>
-            </div>
+            </section>
 
         </>
     )

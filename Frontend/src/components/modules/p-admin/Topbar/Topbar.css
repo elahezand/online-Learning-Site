@@ -1,72 +1,70 @@
-.topbar-wrapper {
-    width: 100%;
-    display: flex;
+.admin-topbar {
+    position: sticky;
     top: 0;
-    z-index: 999;
+    z-index: 1030;
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem;
-    position: sticky;
-    background-color:var(--primary-color);
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
 }
 
-.topbar-logo {
-    color: var(--white-color);
-    font-size: 3rem;
-    font-weight: bold;
-    transition: all 400ms ease-in-out;
-    transform: scale(1);
+.admin-topbar__logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-on-primary);
+    transition: opacity var(--transition);
 }
 
-
-.topbar-logo:hover {
-    transform: scale(1.1);
+.admin-topbar__logo:hover {
+    color: var(--color-on-primary);
+    opacity: 0.85;
 }
 
-
-
-.topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.topbarIcon-container {
-    position: relative;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color:var(--gray-color);
-    justify-content: center;
-}
-
-.topbarIcon-container svg {
-    font-size: 2.5rem;
-    color: var(--white-color);
-}
-
-.topbarIcon-container span {
+.admin-topbar__badge {
     position: absolute;
-    background-color:var(--gray-color);
-    border-radius: 100%;
-    width: 16px;
-    font-size: 9px;
-    height: 16px;
-    display: flex;
+    top: -0.4rem;
+    right: -0.4rem;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.25rem;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--white-color);    ;
-    top: -5px;
-    right: -3px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-primary-text);
+    font-size: 0.7rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
 }
 
-.topbar-name {
-    color: var(--white-color);
+.admin-topbar__avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-on-primary-border);
 }
 
-.topbar-right img {
-    width: 40px;
-    height: 40px;
-    border-radius: 100%;
-    cursor: pointer;
+.admin-topbar__avatar--empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface);
+    color: var(--color-primary-text);
+}
+
+.admin-topbar__name {
+    color: var(--color-on-primary);
+    font-weight: 500;
+}
+
+@media (min-width: 992px) {
+    .admin-topbar {
+        padding: 0.75rem 1.5rem;
+    }
 }

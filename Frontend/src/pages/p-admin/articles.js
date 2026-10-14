@@ -89,7 +89,7 @@ export default function ArticlesPanel() {
             <>
                 <AddNewArticle getAllArticles={getAllArticles} />
                 <DataTable title={"Articles"}>
-                    <table style={{ width: "100%" }}>
+                    <table className="table table-hover align-middle mb-0">
                         <thead>
                             <tr>
                                 <th className='number'>#</th>
@@ -112,7 +112,7 @@ export default function ArticlesPanel() {
                                             src={`http://localhost:4000/courses/covers/${item.cover}`}
                                             alt="" loading='lazy' />
                                     </td>
-                                    <td className='course-name'>
+                                    <td className='fw-medium text-heading'>
                                         {item.title}
                                     </td>
                                     <td>{item.creator.username}</td>
@@ -121,10 +121,10 @@ export default function ArticlesPanel() {
                                     <td>
                                         <button
                                             onClick={(() => removeArticle(item._id))}
-                                            className='remove-user'>Remove</button>
+                                            className='btn btn-sm btn-danger'>Remove</button>
 
                                         {!item.publish ?
-                                            <Link className='continue-article'
+                                            <Link className='btn btn-sm btn-primary'
                                                 to={`/p-admin/article-draft/${item.shortName}`}>Continue...</Link>
                                             : null}
                                     </td>

@@ -1,0 +1,368 @@
+/* =====================================================================
+   Global base + shared helpers + third-party theming.
+   All colors come from tokens in theme.css.
+   ===================================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color var(--transition), color var(--transition);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-heading);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+a {
+    text-decoration: none;
+    transition: color var(--transition), background-color var(--transition);
+}
+
+img,
+video {
+    max-width: 100%;
+}
+
+::selection {
+    background-color: rgba(var(--color-primary-rgb), 0.3);
+}
+
+/* ---------- Shared helpers ---------- */
+
+.text-heading { color: var(--color-heading) !important; }
+.text-primary-strong { color: var(--color-primary-text) !important; }
+.text-star { color: var(--color-star) !important; }
+.bg-surface { background-color: var(--color-surface) !important; }
+.bg-surface-alt { background-color: var(--color-surface-alt) !important; }
+.bg-sunken { background-color: var(--color-surface-sunken) !important; }
+.bg-primary-subtle-token { background-color: var(--color-primary-subtle) !important; }
+.border-token { border: 1px solid var(--color-border) !important; }
+.fs-7 { font-size: 0.8125rem !important; }
+.min-w-0 { min-width: 0; }
+
+/* A themed card surface used across the site */
+.surface {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.hover-lift {
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Square icon button (theme toggle, search, cart…) */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-surface);
+    color: var(--color-heading);
+    font-size: 1.05rem;
+    transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+    background-color: var(--color-primary-subtle);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary-text);
+}
+
+.icon-btn--on-media {
+    background-color: var(--color-on-media-soft);
+    border-color: var(--color-on-media-border);
+    color: var(--color-on-media);
+}
+
+.icon-btn--on-media:hover,
+.icon-btn--on-media:focus-visible {
+    background-color: var(--color-on-media-soft-hover);
+    border-color: var(--color-on-media-border-hover);
+    color: var(--color-on-media);
+}
+
+/* Icon button placed on a primary (orange) bar */
+.icon-btn--on-primary {
+    background-color: var(--color-on-primary-soft);
+    border-color: var(--color-on-primary-border);
+    color: var(--color-on-primary);
+}
+
+.icon-btn--on-primary:hover,
+.icon-btn--on-primary:focus-visible {
+    background-color: var(--color-surface);
+    border-color: var(--color-surface);
+    color: var(--color-primary-text);
+}
+
+/* Round icon badge (feature boxes, stats) */
+.icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-subtle);
+    color: var(--color-primary-text);
+    font-size: 1.35rem;
+}
+
+.icon-badge--lg {
+    width: 4rem;
+    height: 4rem;
+    font-size: 1.75rem;
+}
+
+/* Section title with an accent underline */
+.section-title {
+    position: relative;
+    display: inline-block;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.75rem);
+    font-weight: 700;
+    color: var(--color-heading);
+    padding-bottom: 0.35rem;
+    margin-bottom: 0.25rem;
+}
+
+.section-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3rem;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-primary);
+}
+
+/* Cover image fallback when the image fails to load */
+.img-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-surface-alt);
+    color: var(--color-subtle);
+    font-size: 2.5rem;
+}
+
+/* Field validation states used by <Input /> */
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: var(--color-success);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--color-danger);
+}
+
+/* Input with a trailing icon */
+.input-icon {
+    position: relative;
+}
+
+.input-icon > .form-control {
+    padding-left: 2.75rem;
+}
+
+.input-icon > .input-icon__icon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--color-subtle);
+    pointer-events: none;
+}
+
+/* Smaller viewport: keep content off the screen edges */
+@media (max-width: 575.98px) {
+    .container,
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* ---------- Third-party theming ---------- */
+
+/* SweetAlert */
+.swal-overlay {
+    background-color: var(--color-overlay);
+}
+
+.swal-modal {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    max-width: calc(100% - 2rem);
+}
+
+.swal-title {
+    color: var(--color-heading);
+    font-size: 1.25rem;
+}
+
+.swal-text {
+    color: var(--color-text);
+}
+
+.swal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.swal-button-container {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.swal-button {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.swal-button:not([disabled]):hover {
+    background-color: var(--color-primary-hover);
+}
+
+.swal-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--color-primary-rgb), 0.3);
+}
+
+.swal-button--cancel {
+    background-color: var(--color-surface-alt);
+    color: var(--color-heading);
+}
+
+.swal-button--cancel:not([disabled]):hover {
+    background-color: var(--color-border);
+}
+
+.swal-content__input {
+    background-color: var(--color-surface);
+    color: var(--color-heading);
+    border-color: var(--color-border-strong);
+}
+
+.swal-content__input:focus {
+    border-color: var(--color-primary);
+}
+
+.swal-icon--success:before,
+.swal-icon--success:after,
+.swal-icon--success__hide-corners {
+    background-color: var(--color-surface);
+}
+
+/* Swiper */
+.swiper {
+    --swiper-theme-color: var(--color-primary);
+    --swiper-pagination-color: var(--color-primary);
+    --swiper-pagination-bullet-inactive-color: var(--color-subtle);
+    --swiper-pagination-bullet-size: 10px;
+    padding-bottom: 2.75rem !important;
+}
+
+/* CKEditor */
+.ck {
+    --ck-color-base-background: var(--color-surface);
+    --ck-color-base-foreground: var(--color-surface-alt);
+    --ck-color-base-border: var(--color-border-strong);
+    --ck-color-text: var(--color-heading);
+    --ck-color-toolbar-background: var(--color-surface-alt);
+    --ck-color-toolbar-border: var(--color-border-strong);
+    --ck-color-button-default-hover-background: var(--color-border);
+    --ck-color-button-on-background: var(--color-primary-subtle);
+    --ck-color-button-on-color: var(--color-primary-text);
+    --ck-color-focus-border: var(--color-primary);
+    --ck-color-dropdown-panel-background: var(--color-surface);
+    --ck-color-panel-background: var(--color-surface);
+    --ck-color-panel-border: var(--color-border);
+    --ck-color-list-background: var(--color-surface);
+    --ck-color-list-button-hover-background: var(--color-surface-alt);
+    --ck-color-input-background: var(--color-surface);
+    --ck-color-input-border: var(--color-border-strong);
+    --ck-color-input-text: var(--color-heading);
+    --ck-color-labeled-field-label-background: var(--color-surface);
+}
+
+.ck.ck-content {
+    min-height: 260px;
+    color: var(--color-heading);
+}
+
+/* Scroll-in reveal used with the useFramer() hook */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 600ms ease, transform 600ms ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal,
+    .hover-lift,
+    .hover-lift:hover {
+        transition: none;
+        transform: none;
+    }
+
+    .reveal {
+        opacity: 1;
+    }
+}
+
+/* Equal-height cards inside sliders */
+.swiper-slide {
+    height: auto;
+}
+
+/* Vertical rhythm between homepage sections */
+.page-section {
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+}
+
+/* Placeholder while the lazy hero loads */
+.landing-fallback {
+    min-height: min(100vh, 760px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-sunken);
+    color: var(--color-muted);
+}

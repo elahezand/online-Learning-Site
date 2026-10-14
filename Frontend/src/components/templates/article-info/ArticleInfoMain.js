@@ -49,100 +49,92 @@ export default function ArticleInfoMain() {
 
 
     return (
-        <>
-            <div className='container mt-5'>
-                <div className='row'>
-                    <ArticleInfoSidebar />
-                    <div className="col-8">
-                        <div className="article">
-                            <h1 className="article__title">
-                                {articleData.title}
-                            </h1>
-                            <div className="article__header">
-                                <div className="article-header__category article-header__item">
-                                    <i className="far fa-folder article-header__icon"></i>
-                                    <Link href="#" className="article-header__text">{categoryId.name}</Link>
-                                </div>
-
-                                <div className="article-header__category article-header__item">
-                                    <i className="far fa-clock article-header__icon"></i>
-                                    <span className="article-header__text">Posted by : {articleCreator.name}</span>
-                                </div>
-
-                                <div className="article-header__category article-header__item">
-                                    <i className="far fa-clock article-header__icon"></i>
-                                    <span className="article-header__text">Posted :{createdAt.slice(0, 10)}</span>
-                                </div>
-
-                                <div className="article-header__category article-header__item">
-                                    <i className="far fa-eye article-header__icon"></i>
-                                    <span className="article-header__text">Views :1.4k</span>
-                                </div>
-                            </div>
-                            <img src={`http://localhost:4000/courses/covers/${articleCover}`}
-                                alt="Article Cover" className="article__banner"></img>
-
-                            <div className="article__score">
-                                <div className="article__score-icons">
-                                    <i className="fa-solid fa-star"></i>
-                                    <i className="fa-solid fa-star"></i>
-                                    <i className="fa-solid fa-star"></i>
-                                    <i className="fa-solid fa-star"></i>
-                                    <i className="fa-solid fa-star"></i>
-                                </div>
-                                <span className="article__score-text">5/5 - (5 score)</span>
-                            </div>
-
-                            <div className="article-section">
-                                <div
-                                    dangerouslySetInnerHTML={{ __html: DOMPpurify.sanitize(articleData.body) }}
-                                    className="paragraph article-section__text">
-                                </div>
-
-                            </div>
-
-                            <div className="article-social-media">
-                                <span className="article-social-media__text"> Share :</span>
-                                <Link href="#" className="article-social-media__link">
-                                    <i className="fab fa-telegram-plane article-social-media__icon"></i>
-                                </Link>
-                                <Link href="#" className="article-social-media__link">
-                                    <i className="fab fa-twitter article-social-media__icon"></i>
-                                </Link>
-                                <Link href="#" className="article-social-media__link">
-                                    <i className="fab fa-facebook-f article-social-media__icon"></i>
-                                </Link>
-                            </div>
-
+        <div className='container mt-4'>
+            <div className='row g-4'>
+                <ArticleInfoSidebar />
+                <div className="col-12 col-lg-8 order-1 order-lg-2">
+                    <article className="card article-detail p-3 p-sm-4">
+                        <h1 className="article-detail__title">
+                            {articleData.title}
+                        </h1>
+                        <div className="d-flex flex-wrap gap-3 small text-body-secondary py-3">
+                            <span className="d-inline-flex align-items-center gap-2">
+                                <i className="far fa-folder"></i>
+                                <Link to="#" className="text-body-secondary">{categoryId.name}</Link>
+                            </span>
+                            <span className="d-inline-flex align-items-center gap-2">
+                                <i className="far fa-user"></i>
+                                Posted by : {articleCreator.name}
+                            </span>
+                            <span className="d-inline-flex align-items-center gap-2">
+                                <i className="far fa-clock"></i>
+                                Posted : {createdAt.slice(0, 10)}
+                            </span>
+                            <span className="d-inline-flex align-items-center gap-2">
+                                <i className="far fa-eye"></i>
+                                Views : 1.4k
+                            </span>
                         </div>
-                        <div className="suggestion-articles">
-                            <div className="row">
-                                <div className="col-6">
-                                    <div className="suggestion-articles__right suggestion-articles__content">
-                                        <Link href="#" className="suggestion-articles__icon-link">
-                                            <i className="fas fa-arrow-left suggestion-articles__icon"></i>
-                                        </Link>
-                                        <Link href="#" className="suggestion-articles__link">
-                                            Lorem ipsum dolor sit amet consectetur,
-                                            adipisicing elit. Voluptatibus sequi repellendus iste consectetur aspernatur beatae!
-                                        </Link>
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="suggestion-articles__left suggestion-articles__content">
-                                        <Link href="#" className="suggestion-articles__icon-link">
-                                            <i className="fas fa-arrow-right suggestion-articles__icon"></i>
-                                        </Link>
-                                        <Link href="#" className="suggestion-articles__link">
-                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, quia?
-                                        </Link>
-                                    </div>
-                                </div>
+                        <img src={`http://localhost:4000/courses/covers/${articleCover}`}
+                            alt="Article Cover" className="article-detail__banner"></img>
+
+                        <div className="d-flex align-items-center gap-3 my-3">
+                            <div className="text-star d-inline-flex gap-1">
+                                <i className="fa-solid fa-star"></i>
+                                <i className="fa-solid fa-star"></i>
+                                <i className="fa-solid fa-star"></i>
+                                <i className="fa-solid fa-star"></i>
+                                <i className="fa-solid fa-star"></i>
                             </div>
+                            <span className="small text-body-secondary">5/5 - (5 score)</span>
+                        </div>
+
+                        <div
+                            dangerouslySetInnerHTML={{ __html: DOMPpurify.sanitize(articleData.body) }}
+                            className="article-detail__body my-4">
+                        </div>
+
+                        <div className="d-flex align-items-center gap-2 border-top pt-3">
+                            <span className="small text-body-secondary me-1">Share :</span>
+                            <Link to="#" className="icon-btn" aria-label="Telegram">
+                                <i className="fab fa-telegram-plane"></i>
+                            </Link>
+                            <Link to="#" className="icon-btn" aria-label="Twitter">
+                                <i className="fab fa-twitter"></i>
+                            </Link>
+                            <Link to="#" className="icon-btn" aria-label="Facebook">
+                                <i className="fab fa-facebook-f"></i>
+                            </Link>
+                        </div>
+                    </article>
+
+                    <div className="row g-3 mt-2">
+                        <div className="col-12 col-md-6">
+                            <Link to="#" className="surface hover-lift d-flex align-items-center gap-3 p-3 h-100 article-nav">
+                                <i className="fas fa-arrow-left text-primary-strong"></i>
+                                <span className="d-flex flex-column">
+                                    <span className="small text-body-secondary">Older</span>
+                                    <span className="text-heading">
+                                        Lorem ipsum dolor sit amet consectetur,
+                                        adipisicing elit. Voluptatibus sequi repellendus iste consectetur aspernatur beatae!
+                                    </span>
+                                </span>
+                            </Link>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <Link to="#" className="surface hover-lift d-flex flex-row-reverse align-items-center gap-3 p-3 h-100 text-end article-nav">
+                                <i className="fas fa-arrow-right text-primary-strong"></i>
+                                <span className="d-flex flex-column">
+                                    <span className="small text-body-secondary">Newer</span>
+                                    <span className="text-heading">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, quia?
+                                    </span>
+                                </span>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }

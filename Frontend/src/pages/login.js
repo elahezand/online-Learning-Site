@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import "../styles/login.css"
+import "../styles/auth.css"
 import { useContext } from 'react'
 import authContext from '../context/authContext.js'
 import { useNavigate } from 'react-router-dom'
@@ -80,7 +80,7 @@ export default function Login() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/hero_1.jpg.webp" />
             </Suspense>
             <LoginMain

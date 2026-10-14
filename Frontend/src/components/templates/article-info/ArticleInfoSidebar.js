@@ -1,122 +1,57 @@
 import "./ArticleInfoSidebar.css"
+import { Link } from 'react-router-dom'
+
+const topCourses = [
+    { img: "/images/courses/js_project.png", title: "Lorem ipsum dolor sit amet." },
+    { img: "/images/courses/fareelancer.png", title: "Lorem ipsum dolor sit amet." },
+    { img: "/images/courses/nodejs.png", title: "Lorem ipsum dolor sit." },
+    { img: "/images/courses/jango.png", title: "Lorem ipsum dolor sit." },
+]
+const quickAccess = ["Home", "Frontend", "Security", "Python", "Soft skills"]
+const newArticles = Array(6).fill("How to install a library in Python|Tutorial on installing Python libraries")
 
 export default function ArticleInfoSidebar() {
     return (
-        <>
+        <aside className="col-12 col-lg-4 order-2 order-lg-1">
+            <div className="article-sidebar d-flex flex-column gap-3">
+                <div className="card sidebar-card p-3">
+                    <h2 className="sidebar-card__title">Highest-rated courses</h2>
+                    <ul className="list-unstyled mb-0">
+                        {topCourses.map((course, index) => (
+                            <li key={index}>
+                                <Link to="#" className="sidebar-course">
+                                    <img src={course.img} alt="" className="sidebar-course__img" />
+                                    <span>{course.title}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-            <div className="col-4">
-                <div className="courses-info">
-                    <div className="course-info">
-                        <span className="course-info__courses-title">Highest-rated courses</span>
-                        <ul className="course-info__courses-list">
-                            <li className="course-info__courses-list-item">
-                                <a href="#" className="course-info__courses-link">
-                                    <img src="/images/courses/js_project.png" alt="Course Cover" className="course-info__courses-img"></img>
-                                    <span className="course-info__courses-text">
-                                        Lorem ipsum dolor sit amet.
-                                    </span>
-                                </a>
-                            </li>
-                            <li className="course-info__courses-list-item">
-                                <a href="#" className="course-info__courses-link">
-                                    <img src="/images/courses/fareelancer.png" alt="Course Cover" className="course-info__courses-img"></img>
-                                    <span className="course-info__courses-text">
-                                        Lorem ipsum dolor sit amet.
-                                    </span>
-                                </a>
-                            </li>
-                            <li className="course-info__courses-list-item">
-                                <a href="#" className="course-info__courses-link">
-                                    <img src="/images/courses/nodejs.png" alt="Course Cover" className="course-info__courses-img"></img>
-                                    <span className="course-info__courses-text">
-                                        Lorem ipsum dolor sit.
-                                    </span>
-                                </a>
-                            </li>
-                            <li className="course-info__courses-list-item">
-                                <a href="#" className="course-info__courses-link">
-                                    <img src="/images/courses/jango.png" alt="Course Cover" className="course-info__courses-img"></img>
-                                    <span className="course-info__courses-text">
-                                        Lorem ipsum dolor sit.
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
+                <div className="card sidebar-card p-3">
+                    <h2 className="sidebar-card__title">Quick access</h2>
+                    <div className="list-group list-group-flush">
+                        {quickAccess.map(item => (
+                            <Link to="#" key={item}
+                                className="list-group-item list-group-item-action d-flex align-items-center justify-content-between px-2">
+                                {item}
+                                <i className="fas fa-angle-right text-primary-strong"></i>
+                            </Link>
+                        ))}
                     </div>
+                </div>
 
-
-                    <div className="course-info">
-                        <span className="course-info__courses-title">Quick access</span>
-                        <ul className="sidebar-articles__list">
-                            <li className="sidebar-articles__item">
-                                <a href="#" className="sidebar-articles__link"> Home</a>
-                                <i className="fas fa-angle-right sidebar-articles__icon"></i>
+                <div className="card sidebar-card p-3">
+                    <h2 className="sidebar-card__title">New articles</h2>
+                    <ul className="list-unstyled mb-0">
+                        {newArticles.map((article, index) => (
+                            <li key={index} className="border-bottom py-2">
+                                <Link to="#" className="sidebar-link">{article}</Link>
                             </li>
-                            <li className="sidebar-articles__item">
-                                <a href="#" className="sidebar-articles__link"> Frontend</a>
-                                <i className="fas fa-angle-right sidebar-articles__icon"></i>
-                            </li>
-                            <li className="sidebar-articles__item">
-                                <a href="#" className="sidebar-articles__link">Security</a>
-                                <i className="fas fa-angle-right sidebar-articles__icon"></i>
-                            </li>
-                            <li className="sidebar-articles__item">
-                                <a href="#" className="sidebar-articles__link">Python</a>
-                                <i className="fas fa-angle-right sidebar-articles__icon"></i>
-                            </li>
-                            <li className="sidebar-articles__item">
-                                <a href="#" className="sidebar-articles__link"> Soft skills </a>
-                                <i className="fas fa-angle-right sidebar-articles__icon"></i>
-                            </li>
-                        </ul>
-                    </div>
-
-
-                    <div className="course-info">
-                        <span className="course-info__courses-title"> New articles </span>
-                        <ul className="last-articles__list">
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                            <li className="last-articles__item">
-                                <a href="#" className="last-articles__link">
-                                    How to install a library in Python|Tutorial on installing Python libraries
-
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-
+                        ))}
+                    </ul>
                 </div>
             </div>
-        </>
+        </aside>
     )
 }

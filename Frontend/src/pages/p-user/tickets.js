@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
-import "../../styles/p-user/tickets.css"
 import swal from 'sweetalert'
 import getMe from '../../utils/auth'
 
@@ -58,15 +57,17 @@ export default function Tickets() {
 
   return (
     <>
-      <div className="ticket-header">
-        <span className="ticket-header__title"> All Tickets</span>
-        <Link className="ticket-header__link" to="/my-account/Add-newTicket">
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <h1 className="h4 mb-0">All Tickets</h1>
+        <Link className="btn btn-primary" to="/my-account/add-newTicket">
+          <i className="fa fa-plus me-2"></i>
           Add New Ticket
         </Link>
       </div>
       {paginatedData.length ?
         <>
-          <table className="table table-striped">
+          <div className="table-responsive">
+          <table className="table table-hover align-middle">
             <thead>
               <tr>
                 <th>#</th>
@@ -82,8 +83,7 @@ export default function Tickets() {
             <tbody>
               {paginatedData.map((item, index) => (
                 <tr key={index}>
-                  <td
-                    className={`number ${item.answer && 'active'}`}>
+                  <td className={`fw-bold ${item.answer ? "text-primary-strong" : "text-body-secondary"}`}>
                     {index + 1}
                   </td>
                   <td>
@@ -95,18 +95,19 @@ export default function Tickets() {
                   <td>{item.departmentID}</td>
                   <td>{item.createdAt.slice(0, 10)}</td>
                   <td>
-                    {item.answer > 0 ? <i className="fa-solid fa-check"></i>
+                    {item.answer > 0 ? <i className="fa-solid fa-check text-success"></i>
                       : null}
                   </td>
                   <td>
                     <button
                       onClick={() => showTicket(item.body)}
-                      className='edit-user'>Content</button>
+                      className='btn btn-sm btn-outline-primary'>Content</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </>
         :
         <div
@@ -116,7 +117,7 @@ export default function Tickets() {
       }
       <Pageination
         data={paginatedData}
-        pathName={`/my-accounts/tickets`}
+        pathName={`/my-account/tickets`}
         pageCount={pageCount}
         currentPage={currentPage} />
     </>

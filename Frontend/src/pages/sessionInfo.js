@@ -18,7 +18,7 @@ export default function SessionInfo() {
         fetch(`http://localhost:4000/v1/courses/${params.courseName}/${params.sessionId}`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${getFromLocalStorage.token}`
+                "Authorization": `Bearer ${getFromLocalStorage?.token}`
             }
         }).then(res => res.json())
             .then(data => {
@@ -26,42 +26,42 @@ export default function SessionInfo() {
                 setMainSession(data.session)
 
             })
-    }, [params, getFromLocalStorage.token])
+    }, [params, getFromLocalStorage?.token])
 
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>loading....</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/bg_2.jpg.webp" />
             </Suspense>
-            <div className='row'>
-                <div className='col-3'>
-                    <div className='session-wrapper'>
-                        <ul className='session-wrapper_list'>
-                            <h3 className='sessions-header'>Course List</h3>
-                            {allSessions.map((session, index) => (
-                                <div className='session-container'>
-                                    <div className='session-item' >
-                                        <i className="fa-brands fa-google-play"></i>
-                                        <Link key={index} to={`/${params.courseName}/${session._id}`}
-                                            className='session-item_link link' >
-                                            {session.title}
-                                        </Link>
-                                    </div>
-                                    <span className='session-time'>{session.time}</span>
-                                </div>
-                            ))}
-                        </ul>
+            <div className='container-fluid px-3 px-lg-4 mt-4'>
+                <div className='row g-4'>
+                    <div className='col-12 col-lg-8 order-1 order-lg-2'>
+                        <video
+                            controls
+                            className='session-video'
+                            src={`${mainSession.video}`}>
+                        </video>
+                        {mainSession.title && <h1 className="h4 mt-3">{mainSession.title}</h1>}
+                    </div>
+                    <div className='col-12 col-lg-4 order-2 order-lg-1'>
+                        <aside className='session-list surface'>
+                            <h2 className='session-list__title'>Course List</h2>
+                            <div className='list-group list-group-flush'>
+                                {allSessions.map((session, index) => (
+                                    <Link key={index} to={`/${params.courseName}/${session._id}`}
+                                        className={`list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-3 ${session._id === params.sessionId ? "active" : ""}`}>
+                                        <span className='d-flex align-items-center gap-2 min-w-0'>
+                                            <i className="fa-brands fa-google-play session-list__icon"></i>
+                                            <span className="text-truncate">{session.title}</span>
+                                        </span>
+                                        <span className='small flex-shrink-0'>{session.time}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </aside>
                     </div>
                 </div>
-                <div className='col-8'>
-                    <video
-                        controls
-                        className='episode-content_video'
-                        src={`${mainSession.video}`}>
-                    </video>
-                </div>
-
             </div>
             <NewsLetter />
             <Footer />

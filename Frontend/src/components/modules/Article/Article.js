@@ -5,39 +5,33 @@ import { BiSolidCameraOff } from "react-icons/bi";
 import { Link } from 'react-router-dom';
 
 
-
-
 export default function Article(props) {
     const [isShowImage, setIsImageShow] = useState(false)
     const [isShowError, setIsShowError] = useState(false)
 
-    const onImageLoaded = () => setIsImageShow(true)
-    const onImageError = () => setIsShowError(true)
-
     return (
-        <>
-            <div className='container-article'>
-                <div className='article-img'>
-                    {!isShowError ?
-                        <img src={`http://localhost:4000/courses/covers/${props.cover}`} alt=""
-                            onLoad={onImageLoaded} onError={onImageError} loading='lazy' /> :
-                        <BiSolidCameraOff style={{ fontSize: "4rem", color: "#eeee" }} />
-                    }
-                </div>
-                    {!isShowImage && !isShowError &&
-                        <div className='spinner'>
-                            <Spinner animation='grow' style={{ marginTop: "2rem" }} />
-                        </div>}
-                <div>
-                    <h2 className='article-title'>{props.title}</h2>
-                    <p className='article-body'>
-                        {props.description.slice(0, 100)} </p>
-                    <Link to={`/article-info/${props.shortName}`}>
-                        <button className='btn-article'>Read more</button>
-                    </Link>
-                </div>
+        <article className='card article-card hover-lift h-100'>
+            <div className='article-card__cover'>
+                {!isShowError ?
+                    <img src={`http://localhost:4000/courses/covers/${props.cover}`} alt=""
+                        onLoad={() => setIsImageShow(true)}
+                        onError={() => setIsShowError(true)} loading='lazy' /> :
+                    <div className="img-fallback"><BiSolidCameraOff /></div>
+                }
+                {!isShowImage && !isShowError &&
+                    <div className='article-card__spinner'>
+                        <Spinner animation='grow' size="sm" />
+                    </div>}
             </div>
-
-        </>
+            <div className="card-body d-flex flex-column">
+                <h3 className='card-title h5 fw-bold'>{props.title}</h3>
+                <p className='card-text text-body-secondary small'>
+                    {props.description?.slice(0, 100)}
+                </p>
+                <Link to={`/article-info/${props.shortName}`} className='btn btn-outline-primary btn-sm align-self-start mt-auto'>
+                    Read more
+                </Link>
+            </div>
+        </article>
     )
 }

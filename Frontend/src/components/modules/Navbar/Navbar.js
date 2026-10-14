@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import "./Navbar.css"
 import { Link } from 'react-router-dom'
+import BsNavbar from 'react-bootstrap/Navbar'
+import Container from 'react-bootstrap/Container'
+import Offcanvas from 'react-bootstrap/Offcanvas'
 
 
 export default function Navbar({ email, phone }) {
@@ -12,70 +15,77 @@ export default function Navbar({ email, phone }) {
       .then(data => {
         setNavbarData(data)
       })
+      .catch(() => setNavbarData([]))
   }, [])
 
   return (
-    <>
-      <div className='main-header'>
-        <div className="container-fluid">
-          <div className="main-header__content">
-            <div className="main-header__left">
-              <div className='main-header_logo'>
-                <Link to={"/"}>ACADEMIA</Link>
-                <span>Online Education & Learning</span>
-              </div>
-              <div className='main-header_information'>
-                <div className="main-header__email">
-                  <i className="fas fa-envelope top-bar__email-icon"></i>
-                  <Link to={"/"} className="main-header__email-text main-header__link">
-                    {email}
-                  </Link>
-                </div>
-                <div className="main-header__phone">
-                  <i className="fas fa-phone main-header__phone-icon"></i>
-                  <Link to={"/"} className="main-header__phone-text main-header__link">
-                    {phone}
-                  </Link>
-                </div>
-                <Link to={"/contact-Us"} className="main-header__contact">
-                  Cantact
-                </Link>
-              </div>
-            </div>
-            <div className="main-header__right">
-              <ul className="main-header__menu">
-                <Link to={"/"} className="main-header__item">
-                  Home
-                </Link>
-                {navbarData.map((item, index) => (
+    <BsNavbar expand="lg" className='main-header' collapseOnSelect>
+      <Container fluid className="px-3 px-lg-4 py-2">
+        <div className="d-flex align-items-center gap-4 min-w-0">
+          <Link to={"/"} className='main-header__brand'>
+            <span className="main-header__logo">ACADEMIA</span>
+            <span className="main-header__tagline">Online Education & Learning</span>
+          </Link>
 
-                  item.submenus.length ?
-                    <div key={index} className="main-header__item">
-                      <Link key={index} to={`/category-info/${item.href}/1`}
-                       >{item.title}
-                      </Link>
-                      <i className="fas fa-angle-down main-header__link-icon" />
-                      <ul className="main-header__dropdown">
-                        {item.submenus.map(sub => (
-                          <Link key={sub._id}
-                            to={`/course-info/${sub.href}/1`}
-                            className="main-header__dropdown-item">{sub.title}</Link>
-                        ))}
-                      </ul>
-                    </div>
-                    :
-                    <Link key={index} to={`/category-info/${item.href}/1`}
-                      className="main-header__item">{item.title}
-                    </Link>
-                ))}
-              </ul>
-            </div>
+          <div className='main-header__info d-none d-xl-flex flex-column gap-1'>
+            {email &&
+              <span className="d-flex align-items-center gap-2">
+                <i className="fas fa-envelope"></i>{email}
+              </span>}
+            {phone &&
+              <span className="d-flex align-items-center gap-2">
+                <i className="fas fa-phone"></i>{phone}
+              </span>}
           </div>
         </div>
-      </div>
-    </>
+
+        <BsNavbar.Toggle aria-controls="main-nav" className="main-header__toggler">
+          <i className="fa-solid fa-bars"></i>
+        </BsNavbar.Toggle>
+
+        <BsNavbar.Offcanvas id="main-nav" placement="end" aria-labelledby="main-nav-title">
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title id="main-nav-title" className="fw-bold text-primary-strong">ACADEMIA</Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body className="align-items-lg-center">
+            <ul className="navbar-nav ms-lg-auto gap-lg-1 main-header__menu">
+              <li className="nav-item">
+                <Link to={"/"} className="nav-link">Home</Link>
+              </li>
+              {navbarData.map((item, index) => (
+                item.submenus.length ?
+                  <li key={index} className="nav-item main-header__item">
+                    <Link to={`/category-info/${item.href}/1`} className="nav-link d-flex align-items-center gap-1">
+                      {item.title}
+                      <i className="fas fa-angle-down main-header__caret" />
+                    </Link>
+                    <ul className="dropdown-menu main-header__dropdown">
+                      {item.submenus.map(sub => (
+                        <li key={sub._id}>
+                          <Link to={`/course-info/${sub.href}/1`} className="dropdown-item">{sub.title}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                  :
+                  <li key={index} className="nav-item">
+                    <Link to={`/category-info/${item.href}/1`} className="nav-link">{item.title}</Link>
+                  </li>
+              ))}
+            </ul>
+
+            <div className="d-flex flex-column flex-lg-row gap-3 mt-4 mt-lg-0 ms-lg-3">
+              <div className="d-lg-none small text-body-secondary d-flex flex-column gap-2">
+                {email && <span><i className="fas fa-envelope me-2"></i>{email}</span>}
+                {phone && <span><i className="fas fa-phone me-2"></i>{phone}</span>}
+              </div>
+              <Link to={"/contact-Us"} className="btn btn-primary">
+                Contact
+              </Link>
+            </div>
+          </Offcanvas.Body>
+        </BsNavbar.Offcanvas>
+      </Container>
+    </BsNavbar>
   )
 }
-
-
-

@@ -11,14 +11,16 @@ export default function ArticleInfo() {
   return (
     <>
       <Topbar />
-      <Suspense fallback={<span>loading....</span>}>
+      <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
         <Landing url="/images/blog/bg_2.jpg.webp" />
       </Suspense>
-      <BreadCrumb links={[
-        { id: 1, title: "Home", to: "/" },
-        { id: 2, title: "Artcles", to: "/article-info/frontend/1" },
-        { id: 3, title: "Html", to: "/article-info/Html" },
-      ]} />
+      <div className="container mt-4">
+        <BreadCrumb links={[
+          { id: 1, title: "Home", to: "/" },
+          { id: 2, title: "Articles", to: "/articles/1" },
+          { id: 3, title: "Html", to: "/article-info/Html" },
+        ]} />
+      </div>
       <ArticleInfoMain />
       <NewsLetter />
       <Footer />

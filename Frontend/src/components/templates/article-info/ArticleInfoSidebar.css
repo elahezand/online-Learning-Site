@@ -1,94 +1,63 @@
-/* Start Sidebar Styles */
-
-.course-info {
-    overflow: hidden;
-    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-    background-color: var(--white-color);
-
+.sidebar-card {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
-.course-info__courses-title {
+.sidebar-card__title {
     position: relative;
+    padding-left: 0.85rem;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
-.course-info__courses-title::after {
+.sidebar-card__title::before {
     content: "";
     position: absolute;
-    width: 22px;
-    height: 39px;
-    background-color: var(--primary-color);
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 12px;
-    left: -34px;
-    top: -5px;
-    transform: skewX(10deg);
+    left: 0;
+    top: 0.1em;
+    bottom: 0.1em;
+    width: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-primary);
 }
 
-.sidebar-articles__list {
-    margin-top: 2rem;
-}
-
-.course-info__courses-link {
+.sidebar-course {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--dark-color);
-    padding: 0.9rem 1.3rem 0.9rem 1rem;
-    transition: all 400ms ease;
-    gap: 1rem;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.925rem;
 }
 
-.course-info__courses-link span {
-    color: var(--dark-color);
-    transition: all 400ms ease-in-out;
+li:last-child > .sidebar-course {
+    border-bottom: 0;
 }
 
-.course-info__courses-link span:hover {
-    color: var(--primary-color);
+.sidebar-course:hover,
+.sidebar-link:hover {
+    color: var(--color-primary-text);
 }
 
-.course-info__courses-link img {
-    width: 100px;
-    height: 50px;
+.sidebar-course__img {
+    width: 5.5rem;
+    height: 3.25rem;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-alt);
 }
 
-.sidebar-articles__item:hover {
-    padding-right: 2rem;
-    background-color: var(--background-color);
+.sidebar-link {
+    color: var(--color-text);
+    font-size: 0.925rem;
 }
 
-.sidebar-articles__item:hover .sidebar-articles__icon {
-    color: var(--primary-color);
+@media (min-width: 992px) {
+    .article-sidebar {
+        position: sticky;
+        top: 1rem;
+    }
 }
-
-.sidebar-articles__icon {
-    font-size: 1.4rem;
-    color: var(--primary-color);
-    ;
-    transition: all 400ms ease;
-}
-
-.sidebar-articles__link {
-    font-size: 1.5rem;
-    margin-right: 0.5rem;
-}
-
-.last-articles__list {
-    margin-top: 2rem;
-}
-
-.last-articles__item {
-    border-bottom: 1px solid var(--dark-color);
-    padding: 1rem 0;
-}
-
-.last-articles__link {
-    font-size: 1.5rem;
-    color: var(--dark-color);
-    transition: all 400ms ease-in-out;
-}
-
-.last-articles__link:hover {
-    color: var(--primary-color);
-}
-
-/* Finish Sidebar Styles */

@@ -40,7 +40,7 @@ export default function Articles() {
     return (
         <>
             <Topbar />
-            <Suspense fallback={<span>landing...</span>}>
+            <Suspense fallback={<div className="landing-fallback">Loading…</div>}>
                 <Landing url="/images/blog/cute-freelance-girl-using-laptop-sitting-floor-smiling.jpg" />
             </Suspense>
             <ArticlesMain

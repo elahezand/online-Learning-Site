@@ -1,12 +1,4 @@
-@import "./styles/reset.css";
-@import "./styles/custom.css";
-
-
-body {
-  margin: 0;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* Order matters: tokens first, then global base. Bootstrap itself is
+   imported before this file in index.js. */
+@import "./styles/theme.css";
+@import "./styles/base.css";

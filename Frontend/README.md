@@ -68,3 +68,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Styling, theme & dark mode
+
+- **Bootstrap 5.3** is installed from npm (`bootstrap`) and imported in `src/index.js`; layouts use Bootstrap's grid, utilities and components (`react-bootstrap` for Navbar/Offcanvas, Modal, Dropdown, Accordion).
+- **All colors live in `src/styles/theme.css`** as `:root` tokens (`--color-primary`, `--color-surface`, `--color-text` …) with a matching `[data-bs-theme="dark"]` block. Bootstrap's own variables (`--bs-primary`, `--bs-body-bg` …) point at these tokens, so every Bootstrap class follows the theme. To change the brand color, edit the tokens there only.
+- `src/styles/base.css` holds global base styles, shared helpers (`.surface`, `.icon-btn`, `.icon-badge`, `.section-title`, `.reveal`) and theming for SweetAlert, Swiper and CKEditor.
+- **Dark mode**: `src/Hooks/useTheme.js` + `<ThemeToggle />` (site top bar and admin bar). The choice is saved in `localStorage`; with no saved choice the OS setting is followed. `public/index.html` applies it before first paint.

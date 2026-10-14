@@ -72,7 +72,7 @@ export default function CoursesPanel() {
         <>
             <AddNewCourse getAllCourses={getAllCourses} />
             <DataTable title={"Courses"}>
-                <table style={{ width: "100%" }}>
+                <table className="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th className='number'>#</th>
@@ -90,7 +90,7 @@ export default function CoursesPanel() {
                         {paginatedData.map((item, index) => (
                             <tr key={index}>
                                 <td className='number'>{index + 1}</td>
-                                <td className='course-name'>
+                                <td className='fw-medium text-heading'>
                                     {item.name}
                                 </td>
                                 <td>{item.categoryID.title}</td>
@@ -103,9 +103,9 @@ export default function CoursesPanel() {
                                 <td>
                                     <button
                                         onClick={(() => removeCourses(item._id))}
-                                        className='remove-user'>Remove</button>
+                                        className='btn btn-sm btn-danger'>Remove</button>
                                     <button
-                                        className='edit-user'
+                                        className='btn btn-sm btn-primary'
                                         onClick={() => editCourses(item._id)}>Edit</button>
                                 </td>
                             </tr>

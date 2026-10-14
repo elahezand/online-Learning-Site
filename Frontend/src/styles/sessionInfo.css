@@ -1,72 +1,35 @@
-.session-wrapper {
-    width: 100%;
-    padding: 1rem 2rem;
-    background-color: var(--white-color);
-    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.2);
-    position: sticky;
-    top: 0px;
-    height: 100vh;
-    border-radius: 0px 5px 5px 0px;
-}
-
-.session-wrapper_list {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.session-container {
-    transition: all 250ms ease-in-out;
-    padding: 1.5rem 0.5rem;
-    border-bottom: 1px solid #c0bbbb;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.session-container a {
-    color: var(--dark-color);
-}
-
-.session-container:hover {
-    background-color: var(--primary-color);
-    border-radius: 5px;
-    color: var(--white-color);
-}
-
-.session-container:hover svg {
-    color: var(--white-color);
-}
-
-.session-item_link {
-    color: var(--dark-color);
-    font-size: 1.6rem;
-    margin-left: 1rem;
-
-
-}
-
-.session-item svg {
-    color: var(--primary-color);
-}
-
-.session-container:hover .session-item_link {
-    color: var(--white-color);
-}
-
-.sessions-header {
-    font-size: 2rem;
-    color: var(--primary-color);
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.session-time {
+.session-video {
     display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    background-color: var(--color-media-bg);
+    box-shadow: var(--shadow-md);
 }
 
-.episode-content_video {
-    width: 100%;
-    height:500px;
-    margin: 3rem 2rem 0rem 2rem;
+.session-list {
+    padding: 1rem;
+}
+
+.session-list__title {
+    font-size: 1.15rem;
+    color: var(--color-primary-text);
+    margin-bottom: 0.75rem;
+}
+
+.session-list__icon {
+    color: var(--color-primary-text);
+}
+
+.session-list .list-group-item.active .session-list__icon {
+    color: var(--color-on-primary);
+}
+
+@media (min-width: 992px) {
+    .session-list {
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+    }
 }

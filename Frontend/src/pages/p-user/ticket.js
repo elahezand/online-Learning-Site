@@ -31,71 +31,44 @@ export default function Ticket() {
     }, [])
 
     return (
-        <>
-            <div className="ticket">
-                <div className="ticket-header">
-                    <Link className="ticket-header__link" to="/my-account/add-newTicket">
-                        Add New Ticket
-                    </Link>
+        <div className="ticket">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+                <h1 className="h4 mb-0">Ticket</h1>
+                <Link className="btn btn-primary" to="/my-account/add-newTicket">
+                    <i className="fa fa-plus me-2"></i>
+                    Add New Ticket
+                </Link>
+            </div>
+
+            <div className="ticket-divider"><span><i className="fa fa-paper-plane me-2"></i>Send Answer</span></div>
+            <div className="ticket-message">
+                <div className="ticket-bubble">
+                    <p className="mb-0">{answerTicket.ticket}</p>
                 </div>
-
-                <div className="ticket-send">
-                    <div className="ticket-send__title">
-                        <span className="ticket-send__title-text">
-                            <i className="ticket-send__title-icon fa fa-plus"></i>
-                            Send Answer
-                        </span>
-                    </div>
-                    <div className="ticket-send__answer">
-                        <div className="ticket-send__answer-box">
-                            <p className="ticket-send__answer-text">{answerTicket.ticket}</p>
-                        </div>
-                        <div className="ticket-send__answer-bottom">
-                            <span className="ticket-send__answer-name ticket-send__answer-span">
-                                Elaheh karimkhanzand
-                            </span>
-                            <span className="ticket-send__answer-date ticket-send__answer-span">
-                                2022-11-29
-                            </span>
-                            <span className="ticket-send__answer-time ticket-send__answer-span">
-                                14:28
-                            </span>
-                        </div>
-                    </div>
-                    <div className="ticket-send__title">
-                        <span className="ticket-send__title-text">
-                            <i className="ticket-send__title-icon fa fa-plus"></i>
-                            Ansewr
-                        </span>
-                    </div>
-
-                    {answerTicket.answer === null ? (
-                        <div className="alert alert-danger">
-                            there isn;t any answer
-                        </div>
-                    ) : (
-                        <div className="ticket-send__answer-user">
-                            <div className="ticket-send__answer-user-box">
-                                <p className="ticket-send__answer-user-text">
-                                    {answerTicket.answer}
-                                </p>
-                            </div>
-                            <div className="ticket-send__answer-user-bottom">
-                                <span className="ticket-send__answer-user-name ticket-send__answer-user-span">
-                                    Elaheh karimkhanzand
-                                </span>
-                                <span className="ticket-send__answer-user-date ticket-send__answer-user-span">
-                                    2022-11-29
-                                </span>
-                                <span className="ticket-send__answer-user-time ticket-send__answer-user-span">
-                                    14:28
-                                </span>
-                            </div>
-                        </div>
-                    )}
+                <div className="ticket-meta">
+                    <span>Elaheh karimkhanzand</span>
+                    <span>2022-11-29</span>
+                    <span>14:28</span>
                 </div>
             </div>
-        </>
+
+            <div className="ticket-divider"><span><i className="fa fa-reply me-2"></i>Answer</span></div>
+            {answerTicket.answer === null ? (
+                <div className="alert alert-danger">
+                    there isn't any answer
+                </div>
+            ) : (
+                <div className="ticket-message ticket-message--reply">
+                    <div className="ticket-bubble">
+                        <p className="mb-0">{answerTicket.answer}</p>
+                    </div>
+                    <div className="ticket-meta">
+                        <span>Elaheh karimkhanzand</span>
+                        <span>2022-11-29</span>
+                        <span>14:28</span>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }
-
