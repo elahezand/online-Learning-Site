@@ -3,8 +3,11 @@ import Button from '../../../modules/Form/Button'
 import { requiredValidator, emailValidator, maxValidator, phoneValidator, minValidator } from '../../../../validators/rules'
 import useForm from '../../../../Hooks/useForm'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { authApi, queryKeys } from '../../../../api'
+import { notifyError } from '../../../../utils/notify'
 
-export default function AddNewUser({ getAllUsers }) {
+export default function AddNewUser() {
     const [formState, changeInputHandeler] = useForm(
         {
             name:
@@ -37,46 +40,27 @@ export default function AddNewUser({ getAllUsers }) {
 
     let { name, username, phone, email, password } = formState.inputs
 
+    const queryClient = useQueryClient()
+
     const registerNewUser = async (e) => {
         e.preventDefault()
-        const res = await fetch(`http://localhost:4000/v1/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+        try {
+            const data = await authApi.register({
                 name: name.value,
                 username: username.value,
                 email: email.value,
                 phone: phone.value,
                 password: password.value,
                 confirmPassword: password.value
-
             })
-
-        })
-        if (res.ok) {
-            const data = await res.json()
-            if (data.accessToken) {
-                swal({
-                    title: "this User was added successfuly",
-                    icon: "success",
-                    buttons: "ok"
-                })
+            if (data?.accessToken) {
+                swal({ title: "this User was added successfuly", icon: "success", buttons: "ok" })
+                queryClient.invalidateQueries({ queryKey: queryKeys.users })
             } else {
-                swal({
-                    title: "your phonenumber has been banned",
-                    icon: "warning",
-                    buttons: "ok"
-                })
+                swal({ title: "your phonenumber has been banned", icon: "warning", buttons: "ok" })
             }
-        }
-        else {
-            swal({
-                title: "Username and name are dublicated",
-                icon: "error",
-                buttons: "ok"
-            })
+        } catch (err) {
+            notifyError(err, "Username and name are dublicated")
         }
     }
 

@@ -6,15 +6,19 @@ import useForm from '../../Hooks/useForm'
 import { requiredValidator, minValidator, maxValidator } from '../../validators/rules'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
-import getMe from '../../utils/auth'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, menusApi, useMenus } from '../../api'
 
 export default function Menu() {
   const param = useParams()
   const { page } = param
 
   const [parentId, setParentId] = useState("-1")
-  const [allMenus, setAllMenus] = useState([])
+  const { data: allMenus = [] } = useMenus()
+  const queryClient = useQueryClient()
+  // Public menus (navbar/topbar) are invalidated too, so the site shows the change
+  const getAllMenu = () => queryClient.invalidateQueries({ queryKey: ['menus'] })
   const [currentPage, setCurrentPage] = useState(1)
 
   const pageSize = 10
@@ -34,23 +38,7 @@ export default function Menu() {
 
   const { title, href } = formState.inputs
 
-  const getAllMenu = async () => {
-    const token = await getMe()
-    const res = await fetch("http://localhost:4000/v1/menus/all", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-    if (res.ok) {
-      const data = await res.json()
-      setAllMenus(data)
-    }
-  }
 
-  useEffect(() => {
-    getAllMenu()
-  }, [])
 
 
   useEffect(() => {
@@ -58,19 +46,13 @@ export default function Menu() {
   }, [page, currentPage])
 
   const removeMenu = async (menuId) => {
-    const token = await getMe()
     swal({
       title: "Are you sure to remove this menu?",
       icon: "warning",
       buttons: ["No", "yes"]
     }).then(result => {
       if (result) {
-        fetch(`http://localhost:4000/v1/menus/${menuId}`, {
-          method: "DELETE",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        }).then(res => {
+        attempt(menusApi.remove(menuId)).then(res => {
           if (res.ok) {
             swal({
               title: "the menu was removed successfully",
@@ -87,34 +69,19 @@ export default function Menu() {
   }
 
   const addNewMenu = async () => {
-    const token = await getMe()
-    if (token) {
-      const res = await fetch(`http://localhost:4000/v1/menus/`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-
-
-        },
-        body: JSON.stringify({
-          title: title.value,
-          href: href.value,
-          parent: parentId === "-1" ? undefined : parentId
-        })
-      })
-      if (res.ok) {
-        swal({
-          title: "the menu was created successfully",
-          icon: "success",
-          buttons: "ok"
-        }).then(result => {
-          if (result) {
-            getAllMenu()
-          }
-        })
+  const res = await attempt(menusApi.create({ title: title.value, href: href.value, parent: parentId === "-1" ? undefined : parentId }))
+  if (res.ok) {
+    swal({
+      title: "the menu was created successfully",
+      icon: "success",
+      buttons: "ok"
+    }).then(result => {
+      if (result) {
+        getAllMenu()
       }
-    }
+    })
+  }
+
 
   }
 

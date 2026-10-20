@@ -1,7 +1,6 @@
 import "./SideBar.css"
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useContext } from 'react'
-import authContext from '../../../../context/authContext.js'
+import { useAuth } from '../../../../context/AuthContext'
 import swal from 'sweetalert'
 
 const links = [
@@ -14,7 +13,7 @@ const links = [
 ]
 
 export default function SideBar() {
-    const AuthContext = useContext(authContext)
+    const AuthContext = useAuth()
     const navigate = useNavigate()
     const exitPanel = () => {
         swal({

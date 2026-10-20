@@ -1,23 +1,9 @@
-import { useState, useEffect } from 'react'
+import { usePopularCourses } from '../../../api'
 import SectionHeader from '../../modules/SectionHeader/SectionHeader';
 import CourseSlider from './CourseSlider';
 
 export default function PopularCourses() {
-    const [popularCourses, setPopularCourses] = useState([])
-
-    const getPopularCourses = async () => {
-        try {
-            const res = await fetch(`http://localhost:4000/v1/courses/popular`)
-            if (res.status === 200) {
-                const data = await res.json()
-                setPopularCourses(data)
-            }
-        } catch (e) { }
-    }
-
-    useEffect(() => {
-        getPopularCourses()
-    }, [])
+    const { data: popularCourses = [] } = usePopularCourses()
 
     return (
         <section className='container page-section'>

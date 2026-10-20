@@ -1,7 +1,8 @@
-import React, { useEffect, useState, Suspense } from 'react'
+import React, { Suspense } from 'react'
 import Topbar from '../components/modules/Topbar/Topbar'
 import Footer from '../components/modules/Footer/Footer'
 import { useParams } from 'react-router-dom'
+import { useSearch } from '../api'
 import SearchMain from '../components/templates/search/SearchMain'
 
 const Landing = React.lazy(() =>
@@ -9,20 +10,9 @@ const Landing = React.lazy(() =>
 
 export default function Search() {
     const param = useParams()
-    const [allSearchCourses, setAllSearchCourses] = useState([])
-    const [allSearchArticles, setAllSearchArticles] = useState([])
-
-
-    useEffect(() => {
-        if (param.value) {
-            fetch(`http://localhost:4000/v1/search/${param.value}`)
-                .then(res => res.json())
-                .then(data => {
-                    setAllSearchCourses(data.allResultCourses)
-                    setAllSearchArticles(data.allResultArticles)
-                })
-        }
-    }, [param.value])
+    const { data } = useSearch(param.value)
+    const allSearchCourses = data?.allResultCourses ?? []
+    const allSearchArticles = data?.allResultArticles ?? []
 
     return (
         <>

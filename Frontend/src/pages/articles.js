@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Suspense } from 'react'
 import { useParams } from 'react-router-dom'
+import { useArticles } from '../api'
 import Topbar from "../components/modules/Topbar/Topbar"
 import ArticlesMain from "../components/templates/articles/ArticlesMain"
 import NewsLetter from '../components/modules/NewsLetter/NewsLetter'
@@ -12,20 +13,11 @@ export default function Articles() {
     const { page } = param
 
     const pageSize = 3
-    const [articles, setarticles] = useState([])
+    const { data: allArticles = [] } = useArticles()
+    const articles = allArticles.filter(article => article.publish === 1)
     const [currentPage, setCurrentPage] = useState(1)
 
-    const getArticles = async () => {
-        const res = await fetch(`http://localhost:4000/v1/articles`)
-        if (res.status === 200) {
-            const data = await res.json()
-            setarticles(data.filter(article => article.publish === 1))
-        }
-    }
 
-    useEffect(() => {
-        getArticles()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)

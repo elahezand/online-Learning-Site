@@ -3,7 +3,8 @@ import DataTable from "../../components/modules/p-admin/DataTable/DataTable"
 import { useParams } from 'react-router-dom'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, commentsApi, queryKeys, useComments, usersApi } from '../../api'
 
 export default function CommentsPanel() {
     const param = useParams()
@@ -11,29 +12,12 @@ export default function CommentsPanel() {
 
     const pageSize = 10
 
-    const [allComments, setAllComments] = useState([])
+    const { data: allComments = [] } = useComments()
+    const queryClient = useQueryClient()
+    const getAllComments = () => queryClient.invalidateQueries({ queryKey: queryKeys.comments })
     const [currentPage, setCurrentPage] = useState(1)
 
-    const getAllComments = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/comments", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setAllComments(data)
-            }
-        }
 
-    }
-
-    useEffect(() => {
-        getAllComments()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -47,135 +31,102 @@ export default function CommentsPanel() {
 
 
     const removeComment = async (commentId) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "Are you sure to remove this comment?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/comments/${commentId}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
+        swal({
+            title: "Are you sure to remove this comment?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(commentsApi.remove(commentId))
+                if (res.ok) {
+                    swal({
+                        title: "the comment was removed successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllComments()
                         }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the comment was removed successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllComments()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     const acceptComment = async (commentId) => {
-        const token = await getMe()
 
-        if (token) {
-            swal({
-                title: "Are you sure to accept this comment?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/comments/accept/${commentId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
+        swal({
+            title: "Are you sure to accept this comment?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(commentsApi.accept(commentId))
+                if (res.ok) {
+                    swal({
+                        title: "the comment was accepted successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllComments()
                         }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the comment was accepted successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllComments()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     const rejectComment = async (commentId) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "Are you sure to reject this comment?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/comments/reject/${commentId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
+        swal({
+            title: "Are you sure to reject this comment?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(commentsApi.reject(commentId))
+                if (res.ok) {
+                    swal({
+                        title: "the comment was rejected successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllComments()
                         }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the comment was rejected successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllComments()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     const banUser = async (userId, userEmail, userPhone) => {
-        const token = await getMe()
-        if (token) {
-            swal(
-                {
-                    title: "Are you sure to Ban this user?",
-                    icon: "warning",
-                    buttons: ["No", "yes"]
-                }
-            ).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/users/ban/${userId}`, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-
-                        },
-                        body: JSON.stringify({
-                            phone: userPhone,
-                            email: userEmail
-                        })
+        swal(
+            {
+                title: "Are you sure to Ban this user?",
+                icon: "warning",
+                buttons: ["No", "yes"]
+            }
+        ).then(async result => {
+            if (result) {
+                const res = await attempt(usersApi.ban(userId, { phone: userPhone, email: userEmail }))
+                if (res.ok) {
+                    swal({
+                        title: "this user Banned successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllComments()
+                        }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "this user Banned successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllComments()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     const readComment = (commentBody) => {
@@ -186,45 +137,33 @@ export default function CommentsPanel() {
     }
 
     const answerComment = async (commentId) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "Please send your answer",
-                content: "input",
-                buttons: "Submit"
-            }).then(async result => {
-                if (result?.trim().length) {
-                    const res = await fetch(`http://localhost:4000/v1/comments/answer/${commentId}`, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-
-
-                        },
-                        body: JSON.stringify({ body: result })
-
-                    })
-                    if (res.ok) {
-                        swal({
-                            title: "your answer was sended successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllComments()
-                            }
-                        })
-                    }
-                } else {
+        swal({
+            title: "Please send your answer",
+            content: "input",
+            buttons: "Submit"
+        }).then(async result => {
+            if (result?.trim().length) {
+                const res = await attempt(commentsApi.answer(commentId, result))
+                if (res.ok) {
                     swal({
-                        title: "Plaese inter Your ANSWER",
-                        icon: "warning",
+                        title: "your answer was sended successfully",
+                        icon: "success",
                         buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllComments()
+                        }
                     })
                 }
-            })
-        }
+            } else {
+                swal({
+                    title: "Plaese inter Your ANSWER",
+                    icon: "warning",
+                    buttons: "ok"
+                })
+            }
+        })
+    
 
     }
 

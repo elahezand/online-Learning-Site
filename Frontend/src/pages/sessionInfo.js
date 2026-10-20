@@ -1,32 +1,19 @@
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { Suspense } from 'react'
 import Topbar from '../components/modules/Topbar/Topbar'
 import NewsLetter from '../components/modules/NewsLetter/NewsLetter'
 import Footer from '../components/modules/Footer/Footer'
 import { Link, useParams } from 'react-router-dom'
 import "../styles/sessionInfo.css"
+import { useSession } from '../api'
 
 const Landing = React.lazy(() =>
     import('../components/modules/Landing/Landing'))
 
 export default function SessionInfo() {
-    const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
     const params = useParams()
-    const [allSessions, setAllSessions] = useState([])
-    const [mainSession, setMainSession] = useState([])
-
-    useEffect(() => {
-        fetch(`http://localhost:4000/v1/courses/${params.courseName}/${params.sessionId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${getFromLocalStorage?.token}`
-            }
-        }).then(res => res.json())
-            .then(data => {
-                setAllSessions(data.sessions)
-                setMainSession(data.session)
-
-            })
-    }, [params, getFromLocalStorage?.token])
+    const { data } = useSession(params.courseName, params.sessionId)
+    const allSessions = data?.sessions ?? []
+    const mainSession = data?.session ?? {}
 
     return (
         <>
@@ -40,7 +27,7 @@ export default function SessionInfo() {
                         <video
                             controls
                             className='session-video'
-                            src={`${mainSession.video}`}>
+                            src={mainSession.video || undefined}>
                         </video>
                         {mainSession.title && <h1 className="h4 mt-3">{mainSession.title}</h1>}
                     </div>

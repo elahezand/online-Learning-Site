@@ -3,8 +3,9 @@ import AddNewSession from '../../components/templates/p-admin/AddNewSession/AddN
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
-import getMe from '../../utils/auth'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, coursesApi, queryKeys, useSessions } from '../../api'
 
 export default function Sessions() {
     const param = useParams()
@@ -13,28 +14,11 @@ export default function Sessions() {
     const pageSize = 10
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [sessions, setSessions] = useState([])
+    const { data: sessions = [] } = useSessions()
+    const queryClient = useQueryClient()
+    const getAllSessions = () => queryClient.invalidateQueries({ queryKey: queryKeys.sessions })
 
-    const getAllSessions = async () => {
-        const token = await getMe()
-        const res = await fetch("http://localhost:4000/v1/courses/sessions", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
 
-        if (res.ok) {
-            const data = await res.json()
-            setSessions(data)
-        }
-
-    }
-
-    useEffect(() => {
-
-        getAllSessions()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -47,38 +31,30 @@ export default function Sessions() {
     const paginatedData = sessions.slice(firstChild, lastChild)
 
     const removeSession = async (sessionId) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "are you sure to remove this session?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/courses/sessions/${sessionId}`, {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`
-
-                        }
+        swal({
+            title: "are you sure to remove this session?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(coursesApi.removeSession(sessionId))
+                if (res.ok) {
+                    swal({
+                        title: "the session was removed suuccessfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        getAllSessions()
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the session was removed suuccessfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            getAllSessions()
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
 
     }
     return (
         <>
-            <AddNewSession getAllSessions={getAllSessions} />
+            <AddNewSession />
             <DataTable title="Sessions">
                 <table className="table table-hover align-middle mb-0">
                     <thead>

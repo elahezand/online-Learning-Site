@@ -10,7 +10,7 @@ import Contact from "./pages/contact"
 import Search from "./pages/search"
 import SessionInfo from "./pages/sessionInfo"
 
-import AdminPanelProtection from "./utils/AdminPanelProtection"
+import { RequireAuth, RequireRole, GuestOnly } from "./components/routing/RouteGuards"
 import AdminPanel from "./pages/p-admin/p-admin"
 import Users from "./pages/p-admin/users"
 import PanelAdminIndex from "./pages/p-admin/index"
@@ -44,17 +44,17 @@ const routes = [
     { path: "/article-info/:articleName", element: <ArticleInfo /> },
     { path: "/course-info/:courseName/:page", element: <CourseInfo /> },
     { path: "/courses/:page", element: <Courses /> },
-    { path: "/register", element: <Register /> },
-    { path: "/login", element: <Login /> },
+    { path: "/register", element: <GuestOnly><Register /></GuestOnly> },
+    { path: "/login", element: <GuestOnly><Login /></GuestOnly> },
     { path: "/contact-Us", element: <Contact /> },
     { path: "/search/:value", element: <Search /> },
     { path: "/:courseName/:sessionId", element: <SessionInfo /> },
 
     {
         path: "/p-admin", element:
-            <AdminPanelProtection>
+            <RequireRole role="ADMIN">
                 <AdminPanel />
-            </AdminPanelProtection>,
+            </RequireRole>,
         children: [
             { path: "", element: <PanelAdminIndex /> },
             { path: "users/:page", element: <Users /> },
@@ -75,7 +75,7 @@ const routes = [
         ]
     },
     {
-        path: "/my-account", element: <UserPanel />,
+        path: "/my-account", element: <RequireAuth><UserPanel /></RequireAuth>,
         children: [
             { path: "", element: <UserPanelIndex /> },
             { path: "courses/:page", element: <CoursesUser /> },

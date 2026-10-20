@@ -8,23 +8,19 @@ const formReducer = (state, action) => {
             return state
         }
         case "CHANGE": {
-            let isFormValid = true
-            for (const inputID in state.inputs) {
-                if (!state.inputs[inputID].isValid) {
-                    isFormValid = false
-                    break
+            // Validity must be computed from the inputs *after* this change;
+            // using the previous state made the form lag one keystroke behind.
+            const inputs = {
+                ...state.inputs,
+                [action.id]: {
+                    value: action.value,
+                    isValid: action.isValid
                 }
             }
             return {
                 ...state,
-                inputs: {
-                    ...state.inputs,
-                    [action.id]: {
-                        value: action.value,
-                        isValid: action.isValid
-                    }
-                },
-                isFormValid: isFormValid
+                inputs,
+                isFormValid: Object.values(inputs).every(input => input.isValid)
             };
         }
 

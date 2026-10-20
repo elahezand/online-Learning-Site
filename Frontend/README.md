@@ -1,3 +1,30 @@
+# ACADEMIA — frontend
+
+## Setup
+
+```bash
+npm install
+cp .env.example .env.development   # point REACT_APP_API_URL at your backend
+npm start
+npm test
+```
+
+## How data flows
+
+- **`src/api/client.js`** is the only place that calls `fetch`. It adds the base URL from `.env`
+  and the Bearer token, sends JSON or `FormData`, and throws `ApiError` for non-2xx responses.
+  A 401 logs the user out everywhere.
+- **`src/api/<domain>.js`** (`coursesApi`, `usersApi`, …) holds one function per endpoint. Pages never write URLs.
+- **`src/api/queries.js`** has the TanStack Query hooks (`useCourses()`, `useUsers()`, …) and the `queryKeys`.
+  Reads are cached and deduplicated, and they are cancelled when a component unmounts.
+  After a change, call `queryClient.invalidateQueries({ queryKey: queryKeys.users })`.
+- **`attempt(promise)`** runs an action without throwing, returns `{ ok, data, error }` and shows the error to the user.
+- **`src/context/AuthContext.js`** has `useAuth()` → `{ user, status, isLoggedIn, isAdmin, login, logout, refreshUser }`.
+- **`src/components/routing/RouteGuards.js`** has `RequireAuth`, `RequireRole role="ADMIN"` and `GuestOnly`.
+  They wait while the session is loading, then redirect, and send the user back to where they were after login.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

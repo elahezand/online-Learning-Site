@@ -1,54 +1,32 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import "./Topbar.css"
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import ThemeToggle from '../../ThemeToggle/ThemeToggle';
+import { useAuth } from '../../../../context/AuthContext';
+import { notificationsApi } from '../../../../api';
 
 
 export default function Topbar({ onMenuClick }) {
-    const [adminInfo, setAdminInfo] = useState([])
-    const [notifications, setNotifications] = useState([])
+    // The admin's profile (and notifications) already live in the auth
+    // context, so there is no second /auth/me request here.
+    const { userInfo: adminInfo, refreshUser } = useAuth()
+    const notifications = adminInfo.notifications ?? []
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
 
-    const localStorageData = JSON.parse(localStorage.getItem("userData"))
-
-    const getAdminInfo = useCallback(() => {
-        fetch(`http://localhost:4000/v1/auth/me`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorageData.token}`
-            }
-        }).then(res => res.json())
-            .then(data => {
-                setAdminInfo(data)
-                setNotifications(data.notifications)
-            })
-    }, [localStorageData.token])
-
-    useEffect(() => {
-        getAdminInfo()
-    }, [getAdminInfo])
-
-
-    const readMsg = (e, id) => {
-        if (e.target.checked) {
-            fetch(`http://localhost:4000/v1/notifications/see/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${localStorageData.token}`
-                },
-                body: JSON.stringify({ email: adminInfo.email })
-
-            }).then(res => res.json())
-                .then(data => {
-                    getAdminInfo()
-                })
+    const readMsg = async (e, id) => {
+        if (!e.target.checked) return
+        try {
+            await notificationsApi.markSeen(id)
+            refreshUser()
+        } catch {
+            e.target.checked = false
         }
     }
 
-    const notificationCount = adminInfo.notifications ? adminInfo.notifications.length : 0
+    const notificationCount = notifications.length
 
     return (
         <header className='admin-topbar'>

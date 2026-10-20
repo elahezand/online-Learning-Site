@@ -36,10 +36,12 @@ export const phoneValidator = () => {
 }
 
 
-export default {
+const rules = {
     requiredValue,
     minValue,
     maxValue,
     emailValue,
     phoneValue
 }
+
+export default rules

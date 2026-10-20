@@ -6,7 +6,8 @@ import Topbar from '../components/modules/Topbar/Topbar';
 import Footer from '../components/modules/Footer/Footer';
 import NewsLetter from '../components/modules/NewsLetter/NewsLetter';
 import ContactMain from "../components/templates/contact/ContactMain"
-import swal from 'sweetalert';
+import swal from 'sweetalert'
+import { attempt, contactsApi } from '../api';
 import useForm from '../Hooks/useForm'
 
 const Landing = React.lazy(() =>
@@ -46,21 +47,9 @@ export default function Contact() {
 
     const sendComment = async (e) => {
         e.preventDefault()
-        const res = await fetch(`http://localhost:4000/v1/contact`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        const res = await attempt(contactsApi.send({ name: name.value, email: email.value, phone: phone.value, body: body.value }))
 
-            },
-            body: JSON.stringify({
-                name: name.value,
-                email: email.value,
-                phone: phone.value,
-                body: body.value
-            })
-        })
-
-        if (res.status === 200) {
+        if (res.ok) {
             swal({
                 title: "Your comment was sended!",
                 icon: "success",

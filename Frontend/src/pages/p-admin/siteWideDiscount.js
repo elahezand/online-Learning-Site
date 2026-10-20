@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Button from '../../components/modules/Form/Button'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth'
+import { attempt, discountsApi } from '../../api'
 import { useNavigate } from 'react-router-dom'
 
 export default function SiteWideDiscount() {
@@ -9,17 +9,7 @@ export default function SiteWideDiscount() {
     const navigate = useNavigate()
    
     const addNewDiscount = async () => {
-        const token = await getMe()
-        const res = await fetch(`http://localhost:4000/v1/offs/all`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                discount: discount,
-            })
-        })
+        const res = await attempt(discountsApi.setSiteWide(discount))
         if (res.ok) {
             swal({
                 title: "the Discount was created successfully",
@@ -27,7 +17,7 @@ export default function SiteWideDiscount() {
                 buttons: "ok"
             }).then(result => {
                 if (result) {
-                    navigate("/p-admin/discounts")
+                    navigate("/p-admin/discounts/1")
                 }
             })
         }

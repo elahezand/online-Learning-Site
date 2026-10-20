@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useContext } from 'react'
-import authContext from '../../context/authContext.js'
+import { useAuth } from '../../context/AuthContext'
 
 const shortcuts = [
     { to: "orders/1", label: "Orders", icon: "fa-solid fa-bag-shopping" },
@@ -11,7 +10,7 @@ const shortcuts = [
 ]
 
 export default function UserPanelIndex() {
-    const AuthContext = useContext(authContext)
+    const AuthContext = useAuth()
 
     return (
         <div>

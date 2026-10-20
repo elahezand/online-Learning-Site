@@ -1,14 +1,16 @@
-import  { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { coursesApi, queryKeys, useCourses } from '../../../../api'
 import useForm from '../../../../Hooks/useForm'
 import Input from '../../../modules/Form/Input'
 import Button from '../../../modules/Form/Button'
 import { minValidator} from "../../../../validators/rules"
 import swal from 'sweetalert'
+import { notifyError } from '../../../../utils/notify'
 
-export default function AddNewSession({ getAllSessions }) {
+export default function AddNewSession() {
     const [status, setStatus] = useState(0)
     const [video, setVideo] = useState("")
-    const [allCourses, setAllCourses] = useState([])
     const [courseId, setCourseId] = useState("")
 
     const [formState, changeInputHandeler] = useForm(
@@ -30,49 +32,25 @@ export default function AddNewSession({ getAllSessions }) {
 
     let { title, time } = formState.inputs
 
-    useEffect(() => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
+    const { data: allCourses = [] } = useCourses()
+    const queryClient = useQueryClient()
 
-        fetch("http://localhost:4000/v1/courses", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${getFromLocalStorage.token}`
-            }
-        }).then(res => res.json())
-            .then(data => {
-                setAllCourses(data)
-            })
-    }, [])
-
-
-    const formData = new FormData()
-    formData.append("title", title.value)
-    formData.append("time", time.value)
-    formData.append("free", status)
-    formData.append("video", video)
+    const createSession = useMutation({
+        mutationFn: ({ courseId, formData }) => coursesApi.createSession(courseId, formData),
+        onSuccess: () => {
+            swal({ title: "the session was created successfully", icon: "success", buttons: "ok" })
+            queryClient.invalidateQueries({ queryKey: queryKeys.sessions })
+        },
+        onError: (err) => notifyError(err, "The session could not be created"),
+    })
 
     const addNewSession = () => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
-
-        fetch(`http://localhost:4000/v1/courses/${courseId}/sessions`, {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${getFromLocalStorage.token}`
-            },
-            body: formData
-        }).then(res => {
-            if (res.ok) {
-                swal({
-                    title: "the session was created successfully",
-                    icon: "success",
-                    buttons: "ok"
-                }).then(result => {
-
-                })
-                getAllSessions()
-            }
-        })
-
+        const formData = new FormData()
+        formData.append("title", title.value)
+        formData.append("time", time.value)
+        formData.append("free", status)
+        formData.append("video", video)
+        createSession.mutate({ courseId, formData })
     }
     return (
         <>
@@ -141,7 +119,7 @@ export default function AddNewSession({ getAllSessions }) {
                 </form>
                 <Button
                     className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
-                    disabled={!formState.isFormValid}
+                    disabled={!formState.isFormValid || createSession.isPending}
                     type="submit"
                     actionForm={(e) => addNewSession(e)}>
                     <span>Create New Course</span>

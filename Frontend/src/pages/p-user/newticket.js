@@ -1,101 +1,45 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Button from '../../components/modules/Form/Button'
 import { useNavigate } from 'react-router-dom'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, queryKeys, ticketsApi, useDepartments, useDepartmentSubs, useMyCourses } from '../../api'
 import { Link } from 'react-router-dom'
-import getMe from '../../utils/auth'
 
 
 export default function AddNewTicket() {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
-    const [departments, setDepartments] = useState([])
-    const [departmentSub, setDepartmentSub] = useState([])
 
     const [departmentId, setDepartmentId] = useState("")
     const [departmentSubId, setDepartmentSubId] = useState("")
     const [courseId, setCourseId] = useState("")
 
-    const [coursesUser, setCoursesUser] = useState([])
     const [title, setTitle] = useState("")
     const [body, setBody] = useState("")
     const [priority, setPriority] = useState("")
 
-    const getSubDepartment = async (e) => {
-        if (!e) return
-        const res = await fetch(`http://localhost:4000/v1/tickets/departments-subs/${e.target.value}`)
-        if (res.ok) {
-            const data = await res.json()
-            setDepartmentSub(data)
-        }
-
-    }
-
-    const getDepartment = async () => {
-        const res = await fetch(`http://localhost:4000/v1/tickets/departments`)
-        if (res.ok) {
-            const data = await res.json()
-            setDepartments(data)
-        }
-
-    }
-
-    const getUserCourses = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/users/courses", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token} `
-                }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setCoursesUser(data)
-            }
-
-        }
-    }
-
-    useEffect(() => {
-        getDepartment()
-        getSubDepartment()
-        getUserCourses()
-    }, [])
+    const { data: departments = [] } = useDepartments()
+    const { data: departmentSub = [] } = useDepartmentSubs(departmentId)
+    const { data: coursesUser = [] } = useMyCourses()
 
     const addNewTicket = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/tickets", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token} `,
-                    "Content-Type": "application/json"
-
-                },
-                body: JSON.stringify({
-                    departmentID: departmentId,
-                    departmentSubID: departmentSubId,
-                    title: title,
-                    body: body,
-                    priority: priority,
-                    courseId: courseId
-
-                })
+        const res = await attempt(ticketsApi.create({ departmentID: departmentId, departmentSubID: departmentSubId, title, body, priority, courseId }))
+        if (res.ok) {
+            queryClient.invalidateQueries({ queryKey: queryKeys.myTickets })
+            swal({
+                title: "your ticket was sended successfully",
+                icon: "success",
+                buttons: "ok"
+            }).then(result => {
+                if (result) {
+                    navigate("/my-account/tickets/1")
+                }
             })
-            if (res.ok) {
-                swal({
-                    title: "your ticket was sended successfully",
-                    icon: "success",
-                    buttons: "ok"
-                }).then(result => {
-                    if (result) {
-                        navigate("/my-account/tickets/1")
-                    }
-                })
-            }
-
         }
+
+    
     }
 
     return (
@@ -121,7 +65,7 @@ export default function AddNewTicket() {
                     <select className="form-select" id="ticket-department"
                         onChange={(e) => {
                             setDepartmentId(e.target.value)
-                            getSubDepartment(e)
+                            setDepartmentSubId("")
                         }}>
                         <option value="-1">Please Select Department </option>
                         {departments.length ? departments.map((item, index) => (

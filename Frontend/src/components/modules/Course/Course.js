@@ -3,6 +3,7 @@ import "./Course.css"
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { BiSolidCameraOff } from "react-icons/bi";
 import { Link } from 'react-router-dom';
+import { coverUrl } from '../../../config/env'
 
 
 function CourseCover({ cover }) {
@@ -12,7 +13,7 @@ function CourseCover({ cover }) {
     return (
         <div className="course-card__cover">
             {!isShowError ?
-                <img src={`http://localhost:4000/courses/covers/${cover}`} alt="" loading='lazy'
+                <img src={coverUrl(cover)} alt="" loading='lazy'
                     onLoad={() => setIsImageShow(true)}
                     onError={() => setIsShowError(true)} /> :
                 <div className="img-fallback"><BiSolidCameraOff /></div>

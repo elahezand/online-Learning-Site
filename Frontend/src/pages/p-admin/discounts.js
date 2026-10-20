@@ -7,8 +7,9 @@ import Button from '../../components/modules/Form/Button'
 import { requiredValidator, maxValidator, minValidator }
     from '../../validators/rules'
 import { useParams } from 'react-router-dom'
-import getMe from '../../utils/auth'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, discountsApi, queryKeys, useCourses, useDiscounts } from '../../api'
 
 export default function Discounts() {
     const param = useParams()
@@ -16,10 +17,12 @@ export default function Discounts() {
 
     const pageSize = 10
 
-    const [allDiscounts, setAllDiscounts] = useState([])
+    const { data: allDiscounts = [] } = useDiscounts()
+    const queryClient = useQueryClient()
+    const getAllDiscounts = () => queryClient.invalidateQueries({ queryKey: queryKeys.discounts })
     const [currentPage, setCurrentPage] = useState(1)
 
-    const [courses, setCourses] = useState([])
+    const { data: courses = [] } = useCourses()
     const [courseId, setCourseId] = useState("")
 
     const [formState, changeInputHandeler] = useForm({
@@ -39,30 +42,6 @@ export default function Discounts() {
 
     const { code, percent, max } = formState.inputs
 
-    const getAllDiscounts = () => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
-
-        fetch("http://localhost:4000/v1/offs", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${getFromLocalStorage.token}`,
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                setAllDiscounts(data)
-            })
-    }
-
-    useEffect(() => {
-        getAllDiscounts()
-        fetch("http://localhost:4000/v1/courses")
-            .then(res => res.json())
-            .then(data => {
-                setCourses(data)
-            })
-    }, [])
-
     useEffect(() => {
         setCurrentPage(page)
     }, [page, currentPage])
@@ -74,20 +53,13 @@ export default function Discounts() {
     const paginatedData = allDiscounts.slice(firstChild, lastChild)
 
     const removeCode = async (discountId) => {
-        const token = await getMe()
         swal({
             title: "are you sure to remove this discount?",
             icon: "warning",
             buttons: ["No", "yes"]
         }).then(async result => {
             if (result) {
-                const res = await fetch(`http://localhost:4000/v1/offs/${discountId}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-
-                    }
-                })
+                const res = await attempt(discountsApi.remove(discountId))
                 if (res.ok) {
                     swal({
                         title: "the discount was removed successfully",
@@ -104,20 +76,7 @@ export default function Discounts() {
     }
 
     const addNewDiscount = async () => {
-        const token = await getMe()
-        const res = await fetch("http://localhost:4000/v1/offs", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                code: code.value,
-                percent: percent.value,
-                max: max.value,
-                course: courseId
-            })
-        })
+        const res = await attempt(discountsApi.create({ code: code.value, percent: percent.value, max: max.value, course: courseId }))
         if (res.ok) {
             swal({
                 title: "the discount was created successfully",

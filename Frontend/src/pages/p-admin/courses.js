@@ -4,6 +4,8 @@ import AddNewCourse from '../../components/templates/p-admin/AddNewCourse/AddNew
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, coursesApi, queryKeys, useCourses } from '../../api'
 
 export default function CoursesPanel() {
     const param = useParams()
@@ -11,21 +13,13 @@ export default function CoursesPanel() {
 
     const pageSize = 10
 
-    const [allCourses, setAllCourses] = useState([])
+    const { data: allCourses = [] } = useCourses()
+    const queryClient = useQueryClient()
+    const getAllCourses = () => queryClient.invalidateQueries({ queryKey: queryKeys.courses })
     const [currentPage, setCurrentPage] = useState(1)
 
 
-    const getAllCourses = async () => {
-        const res = await fetch("http://localhost:4000/v1/courses")
-        if (res.ok) {
-            const data = await res.json()
-            setAllCourses(data)
-        }
-    }
 
-    useEffect(() => {
-        getAllCourses()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -38,27 +32,21 @@ export default function CoursesPanel() {
     const paginatedData = allCourses.slice(firstChild, lastChild)
 
     const removeCourses = (Id) => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
         swal({
             title: "are you sure to remove this course?",
             icon: "warning",
             buttons: ["No", "yes"]
         }).then(result => {
             if (result) {
-                fetch(`http://localhost:4000/v1/courses/${Id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${getFromLocalStorage.token} `
-                    }
-                }).then(res => res.json())
-                    .then(data => {
-                        swal({
-                            title: "this courses was removed successfuly",
-                            icon: "success",
-                            buttons: "ok"
-                        })
-                        getAllCourses()
+                attempt(coursesApi.remove(Id)).then(res => {
+                    if (!res.ok) return
+                    swal({
+                        title: "this courses was removed successfuly",
+                        icon: "success",
+                        buttons: "ok"
                     })
+                    getAllCourses()
+                })
             }
         })
     }
@@ -70,7 +58,7 @@ export default function CoursesPanel() {
 
     return (
         <>
-            <AddNewCourse getAllCourses={getAllCourses} />
+            <AddNewCourse />
             <DataTable title={"Courses"}>
                 <table className="table table-hover align-middle mb-0">
                     <thead>

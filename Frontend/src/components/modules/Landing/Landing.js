@@ -1,36 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Navbar from '../Navbar/Navbar';
 import { Link } from 'react-router-dom';
 import "./Landing.css"
 import Button from '../Form/Button';
+import { useIndexInfo, useSearch } from '../../../api';
+import useDebouncedValue from '../../../Hooks/useDebouncedValue';
 
 export default function Landing({ url }) {
-    const [searchData, setSearch] = useState([])
     const [value, setValue] = useState("")
-    const [info, setInfo] = useState([])
-
-
-    useEffect(() => {
-        fetch("http://localhost:4000/v1/infos/index")
-            .then(res => res.json())
-            .then(data => {
-                setInfo(data)
-            })
-            .catch(() => setInfo([]))
-    }, [])
-
-    const searchInputHandeler = (e) => {
-        if (e.target.value.trim()) {
-            fetch(`http://localhost:4000/v1/search/${e.target.value}`)
-                .then(res => res.json())
-                .then(data => {
-                    setSearch([...data.allResultArticles, ...data.allResultCourses])
-                })
-                .catch(() => setSearch([]))
-        } else {
-            setSearch([])
-        }
-    }
+    const query = useDebouncedValue(value.trim(), 300)
+    const { data: info = {} } = useIndexInfo()
+    // Results are cached per query; switching keys means a slow, older
+    // response can never overwrite the results for what the user typed last.
+    const { data: searchResult } = useSearch(query)
+    const searchData = value.trim() && query && searchResult
+        ? [...(searchResult.allResultArticles ?? []), ...(searchResult.allResultCourses ?? [])]
+        : []
 
     const stats = [
         { icon: "fa-solid fa-graduation-cap", count: info.usersCount, text: "Users have registered in the ACADEMIA" },
@@ -53,11 +38,8 @@ export default function Landing({ url }) {
                     <div className="input-group input-group-lg landing__search-group">
                         <input type="search" className="form-control" placeholder="Search courses and articles..."
                             aria-label="Search courses and articles"
-                            onChange={(e) => {
-                                setValue(e.target.value)
-                                searchInputHandeler(e)
-                            }} />
-                        <Button className="btn btn-primary px-4" to={`/search/${value}`} ariaLabel="Search">
+                            onChange={(e) => setValue(e.target.value)} />
+                        <Button className="btn btn-primary px-4" to={`/search/${encodeURIComponent(value.trim())}`} ariaLabel="Search">
                             <i className="fas fa-search"></i>
                         </Button>
                     </div>

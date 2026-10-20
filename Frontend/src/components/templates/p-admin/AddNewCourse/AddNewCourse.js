@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { coursesApi, queryKeys, useCategories } from '../../../../api'
 import Input from '../../../modules/Form/Input'
 import Button from '../../../modules/Form/Button'
 import useForm from '../../../../Hooks/useForm'
 import { requiredValidator, minValidator, maxValidator } from '../../../../validators/rules'
 import swal from 'sweetalert'
+import { notifyError } from '../../../../utils/notify'
 
-export default function AddNewCourse({ getAllCourses }) {
+export default function AddNewCourse() {
     const [status, setStatus] = useState("start")
-    const [allCategories, setAllCategories] = useState([])
     const [categoryId, setCtegoryId] = useState("")
     const [cover, setCover] = useState("")
 
@@ -45,43 +47,29 @@ export default function AddNewCourse({ getAllCourses }) {
 
     let { name, description, shortName, price, support } = formState.inputs
 
-    useEffect(() => {
-        fetch("http://localhost:4000/v1/category")
-            .then(res => res.json())
-            .then(data => {
-                setAllCategories(data)
-            })
-    }, [])
+    const { data: allCategories = [] } = useCategories()
+    const queryClient = useQueryClient()
 
-    const formData = new FormData();
-    formData.append("name", name.value)
-    formData.append("price", price.value)
-    formData.append("description", description.value)
-    formData.append("shortName", shortName.value)
-    formData.append("categoryID", categoryId)
-    formData.append("support", support.value)
-    formData.append("status", status)
-    formData.append("cover", cover)
-
+    const createCourse = useMutation({
+        mutationFn: coursesApi.create,
+        onSuccess: () => {
+            swal({ title: "the course was created successfully", icon: "success", buttons: "ok" })
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses })
+        },
+        onError: (err) => notifyError(err, "The course could not be created"),
+    })
 
     const addNewCourse = () => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
-        fetch(`http://localhost:4000/v1/courses`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${getFromLocalStorage.token}`,
-            }, body: formData
-        }).then(res => {
-            if (res.ok) {
-                swal({
-                    title: "the course was created successfully",
-                    icon: "success",
-                    buttons: "ok"
-                })
-                getAllCourses()
-            }
-        })
-
+        const formData = new FormData()
+        formData.append("name", name.value)
+        formData.append("price", price.value)
+        formData.append("description", description.value)
+        formData.append("shortName", shortName.value)
+        formData.append("categoryID", categoryId)
+        formData.append("support", support.value)
+        formData.append("status", status)
+        formData.append("cover", cover)
+        createCourse.mutate(formData)
     }
 
     return (
@@ -203,7 +191,7 @@ export default function AddNewCourse({ getAllCourses }) {
                 </form>
                 <Button
                     className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
-                    disabled={!formState.isFormValid}
+                    disabled={!formState.isFormValid || createCourse.isPending}
                     type="submit"
                     actionForm={(e) => addNewCourse(e)}>
                     <span>Create New Course</span>

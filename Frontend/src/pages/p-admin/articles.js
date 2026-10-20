@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import AddNewArticle from '../../components/templates/p-admin/AddNewArticle/AddNewArticle'
 import Pageination from '../../components/modules/Pageination/Pageination'
-import getMe from '../../utils/auth'
 import { useParams } from 'react-router-dom'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { articlesApi, attempt, queryKeys, useArticles } from '../../api'
 import { Link } from 'react-router-dom'
+import { coverUrl } from '../../config/env'
 
 export default function ArticlesPanel() {
     const param = useParams()
@@ -13,34 +15,12 @@ export default function ArticlesPanel() {
 
     const pageSize = 10
 
-    const [articles, setArticles] = useState([])
+    const { data: articles = [] } = useArticles()
+    const queryClient = useQueryClient()
+    const getAllArticles = () => queryClient.invalidateQueries({ queryKey: queryKeys.articles })
     const [currentPage, setCurrentPage] = useState(1)
 
 
-    const getAllArticles = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/articles", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-
-            if (res.ok) {
-                const data = await res.json()
-                setArticles(data)
-            }
-        }
-    }
-    useEffect(() => {
-        getAllArticles()
-        fetch("http://localhost:4000/v1/courses")
-            .then(res => res.json())
-            .then(data => {
-                setArticles(data)
-            })
-    }, [])
 
     const lastChild = currentPage * pageSize
     const firstChild = lastChild - pageSize
@@ -53,41 +33,33 @@ export default function ArticlesPanel() {
     }, [page, currentPage])
 
     const removeArticle = async (articleID) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "Are you sure to remove this article?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/articles/${articleID}`, {
-                        method: "DELETE",
-                        headers: {
-
-                            "Authorization": `Bearer ${token}`
+        swal({
+            title: "Are you sure to remove this article?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(articlesApi.remove(articleID))
+                if (res.ok) {
+                    swal({
+                        title: "the Article was removed successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllArticles()
                         }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the Article was removed successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllArticles()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     return (
         <>
             <>
-                <AddNewArticle getAllArticles={getAllArticles} />
+                <AddNewArticle />
                 <DataTable title={"Articles"}>
                     <table className="table table-hover align-middle mb-0">
                         <thead>
@@ -109,7 +81,7 @@ export default function ArticlesPanel() {
                                     <td className='number'>{index + 1}</td>
                                     <td>
                                         <img
-                                            src={`http://localhost:4000/courses/covers/${item.cover}`}
+                                            src={coverUrl(item.cover)}
                                             alt="" loading='lazy' />
                                     </td>
                                     <td className='fw-medium text-heading'>

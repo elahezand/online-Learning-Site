@@ -5,40 +5,26 @@ import Spinner from 'react-bootstrap/esm/Spinner'
 import { useParams } from 'react-router-dom'
 import { BiSolidCameraOff } from "react-icons/bi";
 import "../../styles/p-user/courses.css"
-import getMe from '../../utils/auth';
+import { coverUrl } from '../../config/env'
+import { useMyCourses } from '../../api'
+
+// Stable fallback so the filter effect doesn't re-run on every render
+const EMPTY = []
 
 export default function CoursesUser() {
     const param = useParams()
     const { page } = param
     const pageSize = 4
 
-    const [coursesUser, setCoursesUser] = useState([])
+    const { data: coursesUser = EMPTY } = useMyCourses()
     const [currentPage, setCurrentPage] = useState(1)
 
     const [filteredData, setFilteredData] = useState([])
 
     const [status, setStatus] = useState("")
 
-    const getUserCourses = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/users/courses", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token} `
-                }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setCoursesUser(data)
-            }
-        }
-    }
 
 
-    useEffect(() => {
-        getUserCourses()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -157,7 +143,7 @@ function BoughtCourseCover({ cover }) {
     return (
         <div className="bought-course__cover">
             {!isShowError ?
-                <img src={`http://localhost:4000/courses/covers/${cover}`}
+                <img src={coverUrl(cover)}
                     alt="" loading='lazy'
                     onLoad={() => setIsImageShow(true)}
                     onError={() => setIsShowError(true)} /> :

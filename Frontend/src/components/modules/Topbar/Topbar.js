@@ -1,22 +1,17 @@
-import { useContext, useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import "./Topbar.css"
-import authContext from '../../../context/authContext.js';
+import { useAuth } from '../../../context/AuthContext'
 import { Link } from 'react-router-dom';
+import { useTopbarMenu } from '../../../api';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 
 
 export default function Topbar() {
-    const AuthContext = useContext(authContext)
-    const [topbarMenu, setTopbatMenu] = useState([])
-
-    useEffect(() => {
-        fetch(`http://localhost:4000/v1/menus/topbar`)
-            .then(res => res.json())
-            .then(data => {
-                setTopbatMenu(data.sort(() => 0.5 - Math.random()).slice(0, 5))
-            })
-            .catch(() => setTopbatMenu([]))
-    }, [])
+    const AuthContext = useAuth()
+    const { data: menu } = useTopbarMenu()
+    const topbarMenu = useMemo(
+        () => (menu ? [...menu].sort(() => 0.5 - Math.random()).slice(0, 5) : []),
+        [menu])
 
     return (
         <div className='top-bar bg-surface border-bottom'>

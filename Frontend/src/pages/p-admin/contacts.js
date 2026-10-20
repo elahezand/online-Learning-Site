@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import Pageination from '../../components/modules/Pageination/Pageination'
-import getMe from '../../utils/auth'
 import { useParams } from 'react-router-dom'
 import swal from 'sweetalert'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, contactsApi, queryKeys, useContacts } from '../../api'
 
 export default function Contacts() {
 
@@ -13,27 +14,11 @@ export default function Contacts() {
     const pageSize = 10
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [allMessages, setAllMessages] = useState([])
+    const { data: allMessages = [] } = useContacts()
+    const queryClient = useQueryClient()
+    const getAllContact = () => queryClient.invalidateQueries({ queryKey: queryKeys.contacts })
 
-    const getAllContact = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/contact", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setAllMessages(data)
-            }
-        }
-    }
 
-    useEffect(() => {
-        getAllContact()
-    }, [])
     const lastChild = currentPage * pageSize
     const firstChild = lastChild - pageSize
 
@@ -45,40 +30,27 @@ export default function Contacts() {
     }, [page, currentPage])
 
     const answerContact = async (email) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "plaese send your answer",
-                content: "input",
-                buttons: "submit"
-            }).then(async result => {
-                if (result.trim().length) {
-                    const res = await fetch("http://localhost:4000/v1/contact/answer", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            email: email,
-                            answer: result
-                        })
-
+        swal({
+            title: "plaese send your answer",
+            content: "input",
+            buttons: "submit"
+        }).then(async result => {
+            if (result.trim().length) {
+                const res = await attempt(contactsApi.answer(email, result))
+                if (res.ok) {
+                    swal({
+                        title: "your answer was sended successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllContact()
+                        }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "your answer was sended successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllContact()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     const readContact = (body) => {
@@ -89,35 +61,27 @@ export default function Contacts() {
     }
 
     const deleteContact = async (contactID) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "are you sure to remove this contact?",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/contact/${contactID}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-
+        swal({
+            title: "are you sure to remove this contact?",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(contactsApi.remove(contactID))
+                if (res.ok) {
+                    swal({
+                        title: "the contact was removed successfully",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getAllContact()
                         }
                     })
-                    if (res.ok) {
-                        swal({
-                            title: "the contact was removed successfully",
-                            icon: "success",
-                            buttons: "ok"
-                        }).then(result => {
-                            if (result) {
-                                getAllContact()
-                            }
-                        })
-                    }
                 }
-            })
-        }
+            }
+        })
+    
     }
 
     return (

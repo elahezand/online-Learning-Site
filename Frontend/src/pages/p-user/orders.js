@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
-import getMe from '../../utils/auth'
+import { useMyOrders } from '../../api'
 
 export default function Orders() {
   const param = useParams()
@@ -9,28 +9,11 @@ export default function Orders() {
 
   const pageSize = 5
 
-  const [orders, setOrders] = useState([])
+  const { data: allOrders = [] } = useMyOrders()
+  const orders = allOrders.filter(order => order.price > 0)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const getAllOrders = async () => {
-    const token = await getMe()
-    if (token) {
-      const res = await fetch("http://localhost:4000/v1/orders", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token} `
-        }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setOrders(data.filter(order => order.price > 0))
-      }
-    }
-  }
 
-  useEffect(() => {
-    getAllOrders()
-  }, [])
 
   useEffect(() => {
     setCurrentPage(page)

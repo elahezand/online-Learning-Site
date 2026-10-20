@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useContext } from 'react'
-import authContext from '../../context/authContext.js'
+import { useAuth } from '../../context/AuthContext'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth.js'
+import { attempt, usersApi } from '../../api'
 
 export default function UserDetail() {
-  const AuthContext = useContext(authContext)
+  const AuthContext = useAuth()
 
   const [phone, setPhone] = useState("")
   const [name, setName] = useState("")
@@ -14,7 +13,6 @@ export default function UserDetail() {
   const [email, setEmail] = useState("")
 
   useEffect(() => {
-    setPassword(AuthContext.userInfo?.password || "")
     setEmail(AuthContext.userInfo?.email || "")
     setPhone(AuthContext.userInfo?.phone || "")
     setName(AuthContext.userInfo?.name || "")
@@ -23,38 +21,26 @@ export default function UserDetail() {
 
   const EditDetail = async (e) => {
     e.preventDefault()
-    const token = await getMe()
-    if (token) {
-      swal({
-        title: "Are you sure to save Changes?",
-        icon: "warning",
-        buttons: ["No", "yes"]
-      }).then(async result => {
-        if (result) {
-          const res = await fetch("http://localhost:4000/v1/users", {
-            method: "PUT",
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Content-type": "application/json"
-            },
-            body: JSON.stringify({
-              username,
-              name,
-              email,
-              password,
-              phone
-            })
+  swal({
+    title: "Are you sure to save Changes?",
+    icon: "warning",
+    buttons: ["No", "yes"]
+  }).then(async result => {
+    if (result) {
+      // Only send a password when the user typed a new one
+      const res = await attempt(usersApi.updateMe({ username, name, email, phone, ...(password ? { password } : {}) }))
+        if (res.ok) {
+          setPassword("")
+          AuthContext.refreshUser()
+          swal({
+            title: "your Account was updated successfully",
+            icon: "success",
+            buttons: "ok"
           })
-            if (res.ok) {
-              swal({
-                title: "your Account was updated successfully",
-                icon: "success",
-                buttons: "ok"
-              })
-            }          
-        }
-      })
+        }          
     }
+  })
+
   }
 
   return (

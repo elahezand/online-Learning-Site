@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import "./Comments.css"
-import { useContext } from 'react'
-import authContext from '../../../context/authContext.js.js'
+import { useAuth } from '../../../context/AuthContext'
 import { Link } from 'react-router-dom'
 import Pageination from '../../modules/Pageination/Pageination.js'
 import { useParams, useNavigate } from 'react-router-dom'
-import getMe from '../../../utils/auth.js'
+import { commentsApi } from '../../../api'
 import swal from 'sweetalert'
+import { notifyError } from '../../../utils/notify'
 
 
 export default function Comments({ data, courseInfo }) {
-    const AuthContext = useContext(authContext)
+    const AuthContext = useAuth()
     const params = useParams()
     const navigator = useNavigate()
 
@@ -30,39 +30,16 @@ export default function Comments({ data, courseInfo }) {
     const paginatedData = data.slice(firstChild, lastChild)
 
     const sendComment = async (comment, score) => {
-        const token = await getMe()
-        if (token) {
-            fetch(`http://localhost:4000/v1/comments`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    body: comment,
-                    score,
-                    courseShortName: courseInfo.shortName
-                })
-            }).then(res => {
-                if (res.ok) {
-                    swal({
-                        title: "your comment was sent successfully.",
-                        icon: "success",
-                        buttons: "ok"
-                    })
-                }
-            })
-
-        } else {
-            swal({
-                title: "please logIn First!",
-                icon: "warning",
-                buttons: "ok"
-            }).then(result => {
-                if (result) {
-                    navigator("/login")
-                }
-            })
+        if (!AuthContext.isLoggedIn) {
+            const result = await swal({ title: "please logIn First!", icon: "warning", buttons: "ok" })
+            if (result) navigator("/login")
+            return
+        }
+        try {
+            await commentsApi.create({ body: comment, score, courseShortName: courseInfo.shortName })
+            swal({ title: "your comment was sent successfully.", icon: "success", buttons: "ok" })
+        } catch (err) {
+            notifyError(err, "Your comment could not be sent")
         }
     }
 
@@ -128,7 +105,7 @@ export default function Comments({ data, courseInfo }) {
                     currentPage={currentPage} />
                 : null}
 
-            {AuthContext.token ?
+            {AuthContext.isLoggedIn ?
                 <>
                     <div className="mt-4">
                         <h3 className="h6 fw-bold text-primary-strong mb-3"> Rules for Posting Comments </h3>

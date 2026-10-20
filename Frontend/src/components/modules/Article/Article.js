@@ -3,6 +3,7 @@ import "./Article.css"
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { BiSolidCameraOff } from "react-icons/bi";
 import { Link } from 'react-router-dom';
+import { coverUrl } from '../../../config/env'
 
 
 export default function Article(props) {
@@ -13,7 +14,7 @@ export default function Article(props) {
         <article className='card article-card hover-lift h-100'>
             <div className='article-card__cover'>
                 {!isShowError ?
-                    <img src={`http://localhost:4000/courses/covers/${props.cover}`} alt=""
+                    <img src={coverUrl(props.cover)} alt=""
                         onLoad={() => setIsImageShow(true)}
                         onError={() => setIsShowError(true)} loading='lazy' /> :
                     <div className="img-fallback"><BiSolidCameraOff /></div>
