@@ -7,7 +7,8 @@ import Button from '../../components/modules/Form/Button'
 import useForm from '../../Hooks/useForm'
 import { requiredValidator, minValidator, maxValidator } from '../../validators/rules'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, categoriesApi, queryKeys, useCategories } from '../../api'
 
 export default function Categories() {
     const param = useParams()
@@ -15,7 +16,9 @@ export default function Categories() {
 
     const pageSize = 10
 
-    const [categories, setCategories] = useState([])
+    const { data: categories = [] } = useCategories()
+    const queryClient = useQueryClient()
+    const getCategories = () => queryClient.invalidateQueries({ queryKey: queryKeys.categories })
     const [currentPage, setCurrentPage] = useState(1)
 
 
@@ -37,17 +40,7 @@ export default function Categories() {
 
     let { shortName, title } = formState.inputs
 
-    const getCategories = async () => {
-        const res = await fetch("http://localhost:4000/v1/category")
-        if (res.ok) {
-            const data = await res.json()
-            setCategories(data)
-        }
-    }
 
-    useEffect(() => {
-        getCategories()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -60,54 +53,61 @@ export default function Categories() {
     const paginatedData = categories.slice(firstChild, lastChild)
 
     const addNewCategory = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch("http://localhost:4000/v1/category", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
+        const res = await attempt(categoriesApi.create({ name: shortName.value, title: title.value }))
 
-                },
-
-                body: JSON.stringify({
-                    name: shortName.value,
-                    title: title.value
-                })
+        if (res.ok) {
+            swal({
+                title: "this category was added successfuly",
+                icon: "success",
+                buttons: "ok"
+            }).then(result => {
+                if (result) {
+                    getCategories()
+                }
             })
-
-            if (res.ok) {
-                swal({
-                    title: "this category was added successfuly",
-                    icon: "success",
-                    buttons: "ok"
-                }).then(result => {
-                    if (result) {
-                        getCategories()
-                    }
-                })
-            }
         }
+    
     }
 
     const removeCategory = async (Id) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "are you sure to remove this category",
-                icon: "warning",
-                buttons: ["No", "yes"]
-            }).then(async result => {
-                if (result) {
-                    const res = await fetch(`http://localhost:4000/v1/category/${Id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Authorization": `Bearer ${token}`
+        swal({
+            title: "are you sure to remove this category",
+            icon: "warning",
+            buttons: ["No", "yes"]
+        }).then(async result => {
+            if (result) {
+                const res = await attempt(categoriesApi.remove(Id))
+                if (res.ok) {
+                    swal({
+                        title: "this category was removed successfuly",
+                        icon: "success",
+                        buttons: "ok"
+                    }).then(result => {
+                        if (result) {
+                            getCategories()
                         }
                     })
+                }
+            }
+        })
+    
+
+    }
+
+    const editCategory = async (categoryID, shortName) => {
+        swal({
+            title: "plaese send new title",
+            content: "input",
+            buttons: "Create New Title"
+        })
+            .then(async result => {
+                if (result?.trim().length) {
+                    const res = await attempt(categoriesApi.update(categoryID, { title: result, name: shortName }))
                     if (res.ok) {
+                        console.log(res);
+
                         swal({
-                            title: "this category was removed successfuly",
+                            title: "this category was updated successfuly",
                             icon: "success",
                             buttons: "ok"
                         }).then(result => {
@@ -117,57 +117,15 @@ export default function Categories() {
                         })
                     }
                 }
+                else {
+                    swal({
+                        title: "Please inter new Title",
+                        icon: "warning",
+                        buttons: "ok"
+                    })
+                }
             })
-        }
-
-    }
-
-    const editCategory = async (categoryID, shortName) => {
-        const token = await getMe()
-        if (token) {
-            swal({
-                title: "plaese send new title",
-                content: "input",
-                buttons: "Create New Title"
-            })
-                .then(async result => {
-                    if (result?.trim().length) {
-                        const res = await fetch(`http://localhost:4000/v1/category/${categoryID}`, {
-                            method: "PUT",
-                            headers: {
-                                "Authorization": `Bearer ${token}`,
-                                "Content-Type": "application/json"
-
-                            },
-
-                            body: JSON.stringify({
-                                title: result,
-                                name: shortName
-                            })
-                        })
-                        if (res.ok) {
-                            console.log(res);
-
-                            swal({
-                                title: "this category was updated successfuly",
-                                icon: "success",
-                                buttons: "ok"
-                            }).then(result => {
-                                if (result) {
-                                    getCategories()
-                                }
-                            })
-                        }
-                    }
-                    else {
-                        swal({
-                            title: "Please inter new Title",
-                            icon: "warning",
-                            buttons: "ok"
-                        })
-                    }
-                })
-        }
+    
     }
 
 

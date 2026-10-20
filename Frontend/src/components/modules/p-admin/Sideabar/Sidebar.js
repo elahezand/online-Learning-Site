@@ -1,6 +1,5 @@
-import { useContext } from 'react'
 import "./Sidebar.css"
-import authContext from '../../../../context/authContext.js';
+import { useAuth } from '../../../../context/AuthContext'
 import { FaChartLine } from "react-icons/fa";
 import { GiChart } from "react-icons/gi";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -45,7 +44,7 @@ const groups = [
 ]
 
 export default function Sidebar({ show, onHide }) {
-    const AuthoContext = useContext(authContext)
+    const AuthoContext = useAuth()
     const navigate = useNavigate()
     const pathname = useLocation().pathname
 

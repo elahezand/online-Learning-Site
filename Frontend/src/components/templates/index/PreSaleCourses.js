@@ -1,23 +1,9 @@
-import { useState, useEffect } from 'react'
+import { usePresellCourses } from '../../../api'
 import SectionHeader from '../../modules/SectionHeader/SectionHeader'
 import CourseSlider from './CourseSlider';
 
 export default function PreSaleCourses() {
-    const [presellCourses, setPresellCourses] = useState([])
-
-    const getPreSellCourses = async () => {
-        try {
-            const res = await fetch(`http://localhost:4000/v1/courses/presell`)
-            if (res.ok) {
-                const data = await res.json()
-                setPresellCourses(data)
-            }
-        } catch (e) { }
-    }
-
-    useEffect(() => {
-        getPreSellCourses()
-    }, [])
+    const { data: presellCourses = [] } = usePresellCourses()
 
     return (
         <section className='container page-section'>

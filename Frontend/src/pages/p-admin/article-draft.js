@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { articlesApi, attempt, queryKeys, useArticle } from '../../api'
 import Button from "../../components/modules/Form/Button"
 import Editor from "../../components/modules/Form/Editor"
 import swal from 'sweetalert'
 import { useParams } from 'react-router-dom'
-import getMe from '../../utils/auth'
 
-export default function ArticlesPanel() {
+export default function ArticleDraft() {
     const params = useParams()
 
     const [title, setTitle] = useState("")
@@ -16,83 +17,43 @@ export default function ArticlesPanel() {
     const [cover, setCover] = useState("")
 
 
-    const getSingleArticle = useCallback(async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch(`http://localhost:4000/v1/articles/${params.shortName}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+    const { data: article } = useArticle(params.shortName)
+    const queryClient = useQueryClient()
 
-            if (res.ok) {
-                const data = await res.json()
-                setTitle(data.title)
-                setContent(data.body)
-                setCategoryId(data.categoryID._id)
-                setDescription(data.description)
-                setShortName(data.shortName)
-            }
-        }
-    }, [params.shortName])
-
-
+    // Fill the form once the draft has loaded; the fields are editable afterwards
     useEffect(() => {
-        getSingleArticle()
-    }, [getSingleArticle])
+        if (!article) return
+        setTitle(article.title ?? "")
+        setContent(article.body ?? "")
+        setCategoryId(article.categoryID?._id ?? "")
+        setDescription(article.description ?? "")
+        setShortName(article.shortName ?? "")
+    }, [article])
 
-
-    const formdata = new FormData()
-    formdata.append("title", title)
-    formdata.append("shortName", shortName)
-    formdata.append("categoryID", categoryId)
-    formdata.append("body", content)
-    formdata.append("cover", cover)
-    formdata.append("description", description)
+    const buildFormData = () => {
+        const formdata = new FormData()
+        formdata.append("title", title)
+        formdata.append("shortName", shortName)
+        formdata.append("categoryID", categoryId)
+        formdata.append("body", content)
+        formdata.append("cover", cover)
+        formdata.append("description", description)
+        return formdata
+    }
 
     const addNewArticle = async () => {
-        const token = await getMe()
-        const res = await fetch("http://localhost:4000/v1/articles", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`
-
-            },
-            body: formdata
-        })
-
+        const res = await attempt(articlesApi.publish(buildFormData()))
         if (res.ok) {
-            swal({
-                title: "the article was Drafted successfully",
-                icon: "success",
-                buttons: "ok"
-            }).then(result => {
-                if (result) {
-
-                }
-            })
+            queryClient.invalidateQueries({ queryKey: queryKeys.articles })
+            swal({ title: "the article was published successfully", icon: "success", buttons: "ok" })
         }
     }
 
     const addNewDraft = async () => {
-        const token = await getMe()
-        if (token) {
-            fetch("http://localhost:4000/v1/articles/draft", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                body: formdata
-            }).then(res => {
-                if (res.ok) {
-                    swal({
-                        title: "the article was Drafted successfully",
-                        icon: "success",
-                        buttons: "ok"
-                    })
-                }
-            })
+        const res = await attempt(articlesApi.saveDraft(buildFormData()))
+        if (res.ok) {
+            queryClient.invalidateQueries({ queryKey: queryKeys.articles })
+            swal({ title: "the article was Drafted successfully", icon: "success", buttons: "ok" })
         }
     }
 

@@ -3,7 +3,8 @@ import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
 import Pageination from '../../components/modules/Pageination/Pageination'
 import { useParams } from 'react-router-dom'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, queryKeys, ticketsApi, useTickets } from '../../api'
 
 export default function TicketsAdmin() {
     const param = useParams()
@@ -12,28 +13,11 @@ export default function TicketsAdmin() {
     const pageSize = 10
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [allTickets, setAllTickets] = useState([])
+    const { data: allTickets = [] } = useTickets()
+    const queryClient = useQueryClient()
+    const getAllTickets = () => queryClient.invalidateQueries({ queryKey: queryKeys.tickets })
 
-    const getAllTickets = async () => {
-        const token = await getMe()
-        const res = await fetch("http://localhost:4000/v1/tickets", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
 
-        if (res.ok) {
-            const data = await res.json()
-            setAllTickets(data)
-
-        }
-
-    }
-
-    useEffect(() => {
-        getAllTickets()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)
@@ -46,25 +30,13 @@ export default function TicketsAdmin() {
     const paginatedData = allTickets.slice(firstChild, lastChild)
 
     const answerTicket = async (Id) => {
-        const token = await getMe()
         swal({
             title: "Please send your response",
             content: "input",
             buttons: "Send"
         }).then(async result => {
             if (result) {
-                const res = await fetch(`http://localhost:4000/v1/tickets/answer`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-
-                    },
-                    body: JSON.stringify({
-                        body: result,
-                        ticketID: Id
-                    })
-                })
+                const res = await attempt(ticketsApi.answer(Id, result))
                 if (res.ok) {
                     swal({
                         title: "Your respond was sended successfully",

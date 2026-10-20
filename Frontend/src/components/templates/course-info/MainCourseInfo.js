@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import BreadCrumb from '../../modules/BreadCrumb/BreadCrumb';
 import CourseDetailBox from "../../templates/course-info/CourseDetailBox"
 import AccordionItem from "../../templates/course-info/AccordionItem"
 import Comments from "../../templates/course-info/Comments"
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Accordion from 'react-bootstrap/Accordion';
-import getMe from "../../../utils/auth"
+import { useAuth } from "../../../context/AuthContext"
+import { coursesApi, discountsApi, isAbortError } from "../../../api"
 import swal from 'sweetalert'
+import { coverUrl } from '../../../config/env'
+import { notifyError } from '../../../utils/notify'
 
 export default function MainCourseInfo() {
   const params = useParams()
@@ -24,158 +27,79 @@ export default function MainCourseInfo() {
   const [courseTeacher, setCourseTeacher] = useState({})
 
 
-  const getCourseDetail = async () => {
-    const token = await getMe()
-    if (token) {
-      const res = await fetch(`http://localhost:4000/v1/courses/${params.courseName}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      if (res.status === 200) {
-        const data = await res.json()
-        setCourseInfo(data)
-        setCategoryInfo(data.categoryID)
-        setCurseComments(data.comments)
-        setCurseSessions(data.sessions)
-        setUpdatedAt(data.updatedAt.slice(0, 10))
-        setCreatedAt(data.createdAt)
-        setCourseTeacher(data.creator)
-      }
-    }
+  const { isLoggedIn } = useAuth()
+  const { courseName } = params
+
+  const applyCourse = (data) => {
+    setCourseInfo(data)
+    setCategoryInfo(data.categoryID ?? {})
+    setCurseComments(data.comments ?? [])
+    setCurseSessions(data.sessions ?? [])
+    setUpdatedAt(data.updatedAt?.slice(0, 10) ?? "")
+    setCreatedAt(data.createdAt)
+    setCourseTeacher(data.creator ?? {})
   }
 
-  const getRelatedCourse = async () => {
-    const res = await fetch(`http://localhost:4000/v1/courses/related/${params.courseName}`)
-    if (res.status === 200) {
-      const data = await res.json()
-      setRelatedCourses(data)
+  // Guests can view a course too; the token (when present) is attached by
+  // the API client so the server can tell whether the user is registered.
+  const getCourseDetail = useCallback(async (signal) => {
+    try {
+      applyCourse(await coursesApi.getOne(courseName, { signal }))
+    } catch (err) {
+      if (!isAbortError(err)) console.error("Could not load course", err)
     }
-  }
+  }, [courseName])
 
   useEffect(() => {
-    getCourseDetail()
-    getRelatedCourse()
-  }, [params.courseName])
+    const controller = new AbortController()
+    getCourseDetail(controller.signal)
+    coursesApi.getRelated(courseName, { signal: controller.signal })
+      .then(setRelatedCourses)
+      .catch(err => { if (!isAbortError(err)) setRelatedCourses([]) })
+    return () => controller.abort()
+  }, [courseName, getCourseDetail])
 
+  const register = async (price) => {
+    try {
+      await coursesApi.register(courseInfo._id, price)
+      swal({ title: "you are registred successfully", icon: "success", buttons: "ok" })
+      getCourseDetail()
+    } catch (err) {
+      notifyError(err, "something Went Wrong!")
+    }
+  }
 
   const registerToCourse = async () => {
-    const token = await getMe()
-    if (token) {
-      if (courseInfo.price === 0) {
-        const res = await fetch(`http://localhost:4000/v1/courses/${courseInfo._id}/register`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ price: courseInfo.price })
-
-        })
-        if (res.status === 200) {
-          swal({
-            title: "you are registred successfully",
-            icon: "success",
-            buttons: "ok"
-          })
-          getCourseDetail()
-        }
-        else {
-          swal({
-            title: "someThing Went Wrong !",
-            icon: "warning",
-            buttons: "Try again"
-          })
-        }
-      }
-      else {
-        swal({
-          title: "Please send Discount Code :)",
-          content: "input",
-          buttons: ["Without Discount Code", "Submit"]
-        })
-          .then(async result => {
-            if (result === null) {
-              const res = await fetch(`http://localhost:4000/v1/courses/${courseInfo._id}/register`, {
-                method: "POST",
-                headers: {
-                  "Authorization": `Bearer ${token}`,
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ price: courseInfo.price })
-              })
-              if (res.status === 201) {
-                swal({
-                  title: "you are registred successfully",
-                  icon: "success",
-                  buttons: "ok"
-                })
-                getCourseDetail()
-              }
-              else {
-                swal({
-                  title: "something Went Wrong!",
-                  icon: "warning",
-                  buttons: "Try again"
-                })
-              }
-            }
-            else {
-              const res = await fetch(`http://localhost:4000/v1/offs/${result}`, {
-                method: "POST",
-                headers: {
-                  "Authorization": `Bearer ${token}`,
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify(
-                  { course: courseInfo._id }
-                )
-              })
-
-              const data = await res.json()
-              if (res.ok) {
-                const priceData = (courseInfo.price) - ((courseInfo.price * data.percent) / 100)
-
-                const res = await fetch(`http://localhost:4000/v1/courses/${courseInfo._id}/register`, {
-                  method: "POST",
-                  headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({ price: priceData })
-                })
-                if (res.status === 201) {
-                  swal({
-                    title: "you are registred successfully",
-                    icon: "success",
-                    buttons: "ok"
-                  })
-                  getCourseDetail()
-                }
-              }
-              else {
-                swal({
-                  title: "This code is not valid !!",
-                  icon: "warning",
-                  buttons: "ok"
-                })
-              }
-            }
-          })
-      }
+    if (!isLoggedIn) {
+      const result = await swal({ title: "plaese loginIn First", icon: "info", buttons: "ok" })
+      if (result) navigator("/login", { state: { from: { pathname: `/course-info/${courseName}/1` } } })
+      return
     }
-    else {
-      swal({
-        title: "plaese loginIn First",
-        icon: "success",
-        buttons: "ok"
-      }).then(result => {
-        if (result) {
-          navigator("/login")
-        }
-      })
+
+    if (courseInfo.price === 0) {
+      register(0)
+      return
     }
+
+    const code = await swal({
+      title: "Please send Discount Code :)",
+      content: "input",
+      buttons: ["Without Discount Code", "Submit"]
+    })
+
+    if (code === null) {
+      register(courseInfo.price)
+      return
+    }
+
+    let discount
+    try {
+      discount = await discountsApi.apply(code, courseInfo._id)
+    } catch {
+      swal({ title: "This code is not valid !!", icon: "warning", buttons: "ok" })
+      return
+    }
+    register(courseInfo.price - (courseInfo.price * discount.percent) / 100)
   }
 
 
@@ -191,7 +115,7 @@ export default function MainCourseInfo() {
       <section className="row g-4 align-items-center mb-4" id="main-course">
         <div className="col-12 col-lg-6">
           <video src='#'
-            poster={`http://localhost:4000/courses/covers/${courseInfo.cover}`}
+            poster={coverUrl(courseInfo.cover)}
             className="course-hero__video"></video>
         </div>
 
@@ -289,7 +213,7 @@ export default function MainCourseInfo() {
                       to={`/course-info/${course.shortName}/1`}
                       className="related-course">
                       <img
-                        src={`http://localhost:4000/courses/covers/${course.cover}`}
+                        src={coverUrl(course.cover)}
                         alt=""
                         className="related-course__img" />
                       <span className="related-course__name">
@@ -350,7 +274,7 @@ export default function MainCourseInfo() {
                 Lorem ipsum dolor sit amet consectetur adipisicing.
               </h2>
               <img
-                src={`http://localhost:4000/courses/covers/${courseInfo.cover}`}
+                src={coverUrl(courseInfo.cover)}
                 alt=""
                 className="img-fluid rounded-3 my-3" />
               <p className="text-body-secondary">

@@ -3,7 +3,11 @@ import Course from "../../modules/Course/Course"
 import { useParams } from 'react-router-dom';
 import Pageination from '../../modules/Pageination/Pageination';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useCategoryCourses } from '../../../api';
 
+
+// Stable fallback so the sorting effect below doesn't re-run on every render
+const EMPTY = []
 
 export default function CategoryMain() {
     const params = useParams();
@@ -11,7 +15,7 @@ export default function CategoryMain() {
 
     const pageSize = 3
 
-    const [courses, setCourses] = useState([])
+    const { data: courses = EMPTY } = useCategoryCourses(categoryName)
     const [currentPage, setCurrentPage] = useState("")
 
     const [orderedCourses, setOrderedCourses] = useState([])
@@ -21,26 +25,11 @@ export default function CategoryMain() {
     const [changeStatus, setChangeStatuse] = useState("Default sorting")
     const [direction, setDirection] = useState("row")
 
-    const getCourseCategory = async () => {
-        const res = await fetch(`http://localhost:4000/v1/courses/category/${categoryName}`, {
-            method: "GET",
-        })
-
-        if (res.status === 200) {
-            const data = await res.json()
-            setCourses(data)
-        }
-    }
-
 
     const searchCourses = (e) => {
         let filteredcourses = courses.filter(course => course.name.toLowerCase().includes(e.target.value))
         setOrderedCourses(filteredcourses)
     }
-
-    useEffect(() => {
-        getCourseCategory()
-    }, [])
 
     useEffect(() => {
         setCurrentPage(page)

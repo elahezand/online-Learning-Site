@@ -1,32 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useAdminDashboard } from '../../api'
 import Chart from '../../components/templates/p-admin/Chart/Chart'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable'
-import getMe from '../../utils/auth'
 
 
 export default function PanelAdminIndex() {
-    const [lastUsers, setLastUsers] = useState([])
-    const [infos, setInfoes] = useState([])
+    const { data } = useAdminDashboard()
+    const lastUsers = data?.lastUsers ?? []
+    const infos = data?.infos ?? []
 
-    const getLastUsers = async () => {
-        const token = await getMe()
-        const res = await fetch("http://localhost:4000/v1/infos/p-admin", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        if (res.ok) {
-            const data = await res.json()
-            setLastUsers(data.lastUsers);
-            setInfoes(data.infos)
-        }
 
-    }
-
-    useEffect(() => {
-        getLastUsers()
-    }, [])
 
 
     return (

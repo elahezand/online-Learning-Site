@@ -1,52 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import "./ArticleInfoMain.css"
 import { useParams, useNavigate } from 'react-router-dom'
 import ArticleInfoSidebar from '../article-info/ArticleInfoSidebar'
 import DOMPpurify from "dompurify"
 import { Link } from 'react-router-dom'
-import getMe from '../../../utils/auth'
+import { useArticle } from '../../../api'
+import { useAuth } from '../../../context/AuthContext'
+import { coverUrl } from '../../../config/env'
 
 export default function ArticleInfoMain() {
 
     const param = useParams()
     const navigate = useNavigate()
 
-    const [articleData, setArticleData] = useState([])
-    const [articleCreator, setArticleCreator] = useState([])
-    const [categoryId, setCategoryId] = useState([])
-    const [createdAt, setCreatedAt] = useState("")
-    const [articleCover, setArticleCover] = useState("")
+    const { data: articleData = {} } = useArticle(param.articleName)
+    const articleCreator = articleData.creator ?? {}
+    const categoryId = articleData.categoryID ?? {}
+    const createdAt = articleData.createdAt ?? ""
+    const articleCover = articleData.cover
 
-    const getMainArticle = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch(`http://localhost:4000/v1/articles/${param.articleName}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-
-            if (res.status === 200) {
-                const data = await res.json()
-                setArticleData(data)
-                setArticleCreator(data.creator)
-                setCategoryId(data.categoryID)
-                setCreatedAt(data.createdAt)
-                setArticleCover(data.cover)
-            }
-        }
-        else {
-            navigate("/login")
-        }
-    }
-
-
+    // The article endpoint requires a logged-in user
+    const { status } = useAuth()
     useEffect(() => {
-        getMainArticle()
-    }, [])
-
-
+        if (status === "guest") navigate("/login", { state: { from: { pathname: `/article-info/${param.articleName}` } } })
+    }, [status, navigate, param.articleName])
 
     return (
         <div className='container mt-4'>
@@ -75,7 +52,7 @@ export default function ArticleInfoMain() {
                                 Views : 1.4k
                             </span>
                         </div>
-                        <img src={`http://localhost:4000/courses/covers/${articleCover}`}
+                        <img src={coverUrl(articleCover)}
                             alt="Article Cover" className="article-detail__banner"></img>
 
                         <div className="d-flex align-items-center gap-3 my-3">

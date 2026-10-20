@@ -1,24 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useCourses } from '../../../api'
 import Course from '../../modules/Course/Course'
 import SectionHeader from '../../modules/SectionHeader/SectionHeader'
 import useFramer from '../../../Hooks/useFramer'
 
 export default function LateatCourses() {
     const [isShowView, ref] = useFramer()
-    const [allCourseData, SetAllCourseData] = useState([])
-
-    const getLatestCourse = async () => {
-        try {
-            const res = await fetch(`http://localhost:4000/v1/courses`)
-            if (res.status === 200) {
-                const data = await res.json()
-                SetAllCourseData(data.slice(0, 8))
-            }
-        } catch (e) { }
-    }
-    useEffect(() => {
-        getLatestCourse()
-    }, [])
+    const { data: courses = [] } = useCourses()
+    const allCourseData = courses.slice(0, 8)
 
     return (
         <section className='container page-section'>

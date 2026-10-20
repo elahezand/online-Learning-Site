@@ -3,7 +3,7 @@ import Pageination from '../../components/modules/Pageination/Pageination'
 import { Link } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import swal from 'sweetalert'
-import getMe from '../../utils/auth'
+import { useMyTickets } from '../../api'
 
 
 
@@ -13,28 +13,10 @@ export default function Tickets() {
 
   const pageSize = 10
 
-  const [tickets, setTickets] = useState([])
+  const { data: tickets = [] } = useMyTickets()
   const [currentPage, setCurrentPage] = useState(1)
 
-  const getTickets = async () => {
-    const token = await getMe()
-    if (token) {
-      const res = await fetch("http://localhost:4000/v1/tickets/user", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token} `
-        }
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setTickets(data)
-      }
-    }
-  }
 
-  useEffect(() => {
-    getTickets()
-  }, [])
 
   useEffect(() => {
     setCurrentPage(page)

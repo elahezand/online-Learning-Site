@@ -1,22 +1,13 @@
-import { useEffect, useState } from 'react'
 import "./Navbar.css"
 import { Link } from 'react-router-dom'
 import BsNavbar from 'react-bootstrap/Navbar'
 import Container from 'react-bootstrap/Container'
 import Offcanvas from 'react-bootstrap/Offcanvas'
+import { useMainMenu } from '../../../api'
 
 
 export default function Navbar({ email, phone }) {
-  const [navbarData, setNavbarData] = useState([])
-
-  useEffect(() => {
-    fetch(`http://localhost:4000/v1/menus`)
-      .then(res => res.json())
-      .then(data => {
-        setNavbarData(data)
-      })
-      .catch(() => setNavbarData([]))
-  }, [])
+  const { data: navbarData = [] } = useMainMenu()
 
   return (
     <BsNavbar expand="lg" className='main-header' collapseOnSelect>

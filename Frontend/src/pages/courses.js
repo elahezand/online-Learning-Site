@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { useParams } from 'react-router-dom'
+import { useCourses } from '../api'
 import Topbar from '../components/modules/Topbar/Topbar'
 import CoursesMain from "../components/templates/courses/CoursesMain"
 import Pageination from '../components/modules/Pageination/Pageination'
@@ -13,17 +14,12 @@ export default function Courses() {
     const { page } = param
 
     const pageSize = 3
-    const [courses, setCourses] = useState([])
+    const { data: courses = [] } = useCourses()
     const [currentPage, setCurrentPage] = useState("")
 
     useEffect(() => {
         setCurrentPage(page)
-        fetch(`http://localhost:4000/v1/courses`)
-            .then(res => res.json())
-            .then(data => {
-                setCourses(data)
-            })
-    }, [currentPage, page])
+    }, [page])
 
 
     const lastChild = currentPage * pageSize

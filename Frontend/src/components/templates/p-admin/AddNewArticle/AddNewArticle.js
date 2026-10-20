@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { articlesApi, queryKeys, useCategories } from '../../../../api'
 import useForm from '../../../../Hooks/useForm'
 import Input from '../../../modules/Form/Input'
 import Button from '../../../modules/Form/Button'
 import { requiredValidator, minValidator, maxValidator } from '../../../../validators/rules'
 import swal from 'sweetalert'
 import Editor from '../../../modules/Form/Editor'
+import { notifyError } from '../../../../utils/notify'
 
 
 
-export default function AddNewArticle({ getAllArticles }) {
-    const [categories, setCategories] = useState([])
+export default function AddNewArticle() {
     const [categoryId, setCategoryId] = useState("")
     const [cover, setCover] = useState("")
     const [content, setContent] = useState("")
@@ -42,70 +44,35 @@ export default function AddNewArticle({ getAllArticles }) {
     let { title, description, shortName } = formState.inputs
 
 
-    useEffect(() => {
-        fetch("http://localhost:4000/v1/category")
-            .then(res => res.json())
-            .then(data => {
-                setCategories(data)
+    const { data: categories = [] } = useCategories()
+    const queryClient = useQueryClient()
+
+    const buildFormData = () => {
+        const formdata = new FormData()
+        formdata.append("title", title.value)
+        formdata.append("shortName", shortName.value)
+        formdata.append("categoryID", categoryId)
+        formdata.append("body", content)
+        formdata.append("cover", cover)
+        formdata.append("description", description.value)
+        return formdata
+    }
+
+    const saveArticle = useMutation({
+        mutationFn: ({ draft }) => (draft ? articlesApi.saveDraft : articlesApi.publish)(buildFormData()),
+        onSuccess: (_, { draft }) => {
+            swal({
+                title: draft ? "the article was Drafted successfully" : "the article was created successfully",
+                icon: "success",
+                buttons: "ok"
             })
-    }, [])
+            queryClient.invalidateQueries({ queryKey: queryKeys.articles })
+        },
+        onError: (err) => notifyError(err, "The article could not be saved"),
+    })
 
-    const formdata = new FormData()
-    formdata.append("title", title.value)
-    formdata.append("shortName", shortName.value)
-    formdata.append("categoryID", categoryId)
-    formdata.append("body", content)
-    formdata.append("cover", cover)
-    formdata.append("description", description.value)
-
-
-    const addNewArticle = () => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
-
-        fetch("http://localhost:4000/v1/articles", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${getFromLocalStorage.token}`
-            },
-            body: formdata
-        }).then(res => {
-            if (res.ok) {
-                swal({
-                    title: "the article was created successfully",
-                    icon: "success",
-                    buttons: "ok"
-                }).then(result => {
-
-                })
-                getAllArticles()
-            }
-        })
-
-    }
-
-    const addNewDraft = () => {
-        const getFromLocalStorage = JSON.parse(localStorage.getItem("userData"))
-
-        fetch("http://localhost:4000/v1/articles/draft", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${getFromLocalStorage.token}`
-            },
-            body: formdata
-        }).then(res => {
-            if (res.ok) {
-                swal({
-                    title: "the article was Drafted successfully",
-                    icon: "success",
-                    buttons: "ok"
-                }).then(result => {
-
-                })
-                getAllArticles()
-            }
-        })
-
-    }
+    const addNewArticle = () => saveArticle.mutate({ draft: false })
+    const addNewDraft = () => saveArticle.mutate({ draft: true })
 
     return (
         <>
@@ -182,7 +149,7 @@ export default function AddNewArticle({ getAllArticles }) {
                 <div className='d-flex flex-wrap gap-2'>
                     <Button
                         className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
-                        disabled={!formState.isFormValid}
+                        disabled={!formState.isFormValid || saveArticle.isPending}
                         type="submit"
                         actionForm={(e) => addNewArticle(e)}>
                         <span>Create New Article</span>
@@ -190,7 +157,7 @@ export default function AddNewArticle({ getAllArticles }) {
                     </Button>
                     <Button
                         className={`btn ${formState.isFormValid ? "btn-primary" : "btn-secondary"} d-inline-flex align-items-center gap-2`}
-                        disabled={!formState.isFormValid}
+                        disabled={!formState.isFormValid || saveArticle.isPending}
                         type="submit"
                         actionForm={(e) => addNewDraft(e)}>
                         <span>Create New Draft</span>

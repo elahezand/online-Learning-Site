@@ -1,34 +1,14 @@
-import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import "../../styles/p-user/ticket.css"
+import { useTicketAnswer } from '../../api'
 import { Link } from 'react-router-dom'
-import getMe from '../../utils/auth'
 
 
 export default function Ticket() {
     const params = useParams()
-    const [answerTicket, setAnswerTicket] = useState({})
+    const { data: answerTicket = {} } = useTicketAnswer(params.id)
     
-    const getTicketAnswer = async () => {
-        const token = await getMe()
-        if (token) {
-            const res = await fetch(`http://localhost:4000/v1/tickets/answer/${params.id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
 
-            if (res.ok) {
-                const data = await res.json()
-                setAnswerTicket(data)
-            }
-        }
-    }
-
-    useEffect(() => {
-        getTicketAnswer()
-    }, [])
 
     return (
         <div className="ticket">

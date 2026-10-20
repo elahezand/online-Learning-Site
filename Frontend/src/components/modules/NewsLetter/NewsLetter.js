@@ -3,6 +3,8 @@ import "./NewsLetter.css"
 import regex from '../../../validators/regex';
 import Button from "../../modules/Form/Button"
 import swal from 'sweetalert';
+import { newsletterApi } from '../../../api';
+import { notifyError } from '../../../utils/notify'
 
 
 const inputreducer = (state, action) => {
@@ -37,21 +39,15 @@ export default function NewsLetter() {
 
     const sendRequest = async (e) => {
         e.preventDefault()
-        const res = await fetch(`http://localhost:4000/v1/newsletters`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(
-                { email: emailUser.value }
-            )
-        })
-        if (res.ok) {
+        try {
+            await newsletterApi.subscribe(emailUser.value)
             swal({
                 title: "You have subscribed to the newsletter :)",
                 icon: "success",
                 buttons: "ok"
             })
+        } catch (err) {
+            notifyError(err, "Subscription failed, please try again")
         }
     }
 

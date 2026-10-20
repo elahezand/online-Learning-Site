@@ -1,5 +1,6 @@
-import { useState, useEffect, useContext } from 'react'
-import authContext from '../../context/authContext.js.js'
+import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { attempt, queryKeys, useUsers, usersApi } from '../../api'
 import DataTable from '../../components/modules/p-admin/DataTable/DataTable.js'
 import Pageination from '../../components/modules/Pageination/Pageination.js'
 import AddNewUser from '../../components/templates/p-admin/AddNewUser/AddNewUser.js'
@@ -8,31 +9,15 @@ import swal from 'sweetalert'
 
 
 export default function Users() {
-    const AuthoContext = useContext(authContext)
     const param = useParams()
     const { page } = param
 
     const pageSize = 10
 
     const [currentPage, setCurrentPage] = useState(1)
-    const [allUsers, setAllUsers] = useState([])
-
-    const getAllUsers = async () => {
-        const res = await fetch("http://localhost:4000/v1/users", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${AuthoContext.token}`
-            }
-        })
-        if (res.status === 200) {
-            const data = await res.json()
-            setAllUsers(data)
-        }
-    }
-
-    useEffect(() => {
-        getAllUsers()
-    }, [])
+    const { data: allUsers = [] } = useUsers()
+    const queryClient = useQueryClient()
+    const getAllUsers = () => queryClient.invalidateQueries({ queryKey: queryKeys.users })
 
     useEffect(() => {
         setCurrentPage(page)
@@ -52,12 +37,7 @@ export default function Users() {
             buttons: ["No", "Yes"]
         }).then(async result => {
             if (result) {
-                const res = await fetch(`http://localhost:4000/v1/users/${id}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${AuthoContext.token}`
-                    }
-                })
+                const res = await attempt(usersApi.remove(id))
                 if (res.ok) {
                     swal({
                         title: "the user was removed successfully!",
@@ -80,12 +60,7 @@ export default function Users() {
             buttons: ["No", "Yes"]
         }).then(async result => {
             if (result) {
-                const res = await fetch(`http://localhost:4000/v1/users/ban/${id}`, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `Bearer ${AuthoContext.token}`
-                    },
-                })
+                const res = await attempt(usersApi.ban(id))
                 if (res.ok) {
                     swal({
                         title: "the user was banned successfully!",
@@ -108,17 +83,7 @@ export default function Users() {
             content: "input"
         }).then(async result => {
             if (result) {
-                const res = await fetch(`http://localhost:4000/v1/users/role`, {
-                    method: "PUT",
-                    headers: {
-                        "Authorization": `Bearer ${AuthoContext.token}`,
-                        "Content-type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        id: Id,
-                        role: result.toUpperCase()
-                    })
-                })
+                const res = await attempt(usersApi.changeRole(Id, result.toUpperCase()))
                 if (res.ok) {
                     swal({
                         title: "The role was changged successfully!",
@@ -135,7 +100,7 @@ export default function Users() {
 
     return (
         <>
-            <AddNewUser getAllUsers={getAllUsers} />
+            <AddNewUser />
             <DataTable title="Users">
                 <table className="table table-hover align-middle mb-0">
                     <thead>
