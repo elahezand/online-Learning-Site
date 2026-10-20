@@ -11,7 +11,9 @@ const testPhonenumber = (value) => {
 }
 
 
-export default {
+const regex = {
     testEmail,
     testPhonenumber
 }
+
+export default regex
