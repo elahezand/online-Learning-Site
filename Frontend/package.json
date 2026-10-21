@@ -7,6 +7,7 @@
     "@ckeditor/ckeditor5-react": "^9.5.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "~5.2.2",
     "@mui/material": "^7.0.2",
     "@mui/x-data-grid": "^8.0.0",
     "@tanstack/react-query": "^5.104.5",
@@ -14,6 +15,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.20.0",
     "bootstrap": "^5.3.3",
     "ckeditor5": "^45.0.0",
     "ckeditor5-premium-features": "^45.0.0",
@@ -23,13 +25,15 @@
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
     "react-google-recaptcha": "^3.1.0",
+    "react-hook-form": "^7.90.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
     "recharts": "^2.15.3",
-    "sweetalert": "^2.1.2",
+    "sonner": "^2.0.8",
     "swiper": "^11.2.6",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zod": "^4.6.7"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -59,7 +63,12 @@
     "moduleNameMapper": {
       "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
       "^react-router$": "<rootDir>/node_modules/react-router/dist/development/index.js",
-      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
+      "^axios$": "axios/dist/node/axios.cjs"
     }
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^2.1.0",
+    "sass": "^1.77.8"
   }
 }

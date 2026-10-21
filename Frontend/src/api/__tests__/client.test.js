@@ -1,81 +1,89 @@
-import api, { ApiError, errorMessage, onUnauthorized } from "../client"
-import tokenStorage from "../tokenStorage"
+import MockAdapter from "axios-mock-adapter"
+import { toast } from "sonner"
+import { api } from "../client"
 
-const jsonResponse = (status, body) => ({
-    ok: status >= 200 && status < 300,
-    status,
-    headers: { get: () => "application/json; charset=utf-8" },
-    text: () => Promise.resolve(body === undefined ? "" : JSON.stringify(body)),
-})
+jest.mock("sonner", () => ({ toast: { error: jest.fn() } }))
+
+let mock
 
 beforeEach(() => {
-    global.fetch = jest.fn()
+    mock = new MockAdapter(api)
     localStorage.clear()
+    toast.error.mockClear()
 })
 
-test("prefixes the base URL and returns parsed JSON", async () => {
-    fetch.mockResolvedValue(jsonResponse(200, [{ id: 1 }]))
-    await expect(api.get("/courses")).resolves.toEqual([{ id: 1 }])
-    expect(fetch.mock.calls[0][0]).toBe("http://localhost:4000/v1/courses")
+afterEach(() => mock.restore())
+
+const setTokens = (access, refresh) => {
+    localStorage.setItem("accessToken", access)
+    if (refresh) localStorage.setItem("refreshToken", refresh)
+}
+
+test("sends the token from localStorage", async () => {
+    setTokens("abc")
+    mock.onGet("/courses").reply(200, [{ id: 1 }])
+
+    const res = await api.get("/courses")
+    expect(res.data).toEqual([{ id: 1 }])
+    expect(mock.history.get[0].headers.Authorization).toBe("Bearer abc")
 })
 
-test("attaches the stored token, and omits it when auth is false", async () => {
-    tokenStorage.set("abc")
-    fetch.mockResolvedValue(jsonResponse(200, {}))
+test("no token → no Authorization header", async () => {
+    mock.onGet("/courses").reply(200, [])
 
-    await api.get("/users")
-    expect(fetch.mock.calls[0][1].headers.Authorization).toBe("Bearer abc")
-
-    await api.post("/auth/login", { identifier: "a" }, { auth: false })
-    expect(fetch.mock.calls[1][1].headers.Authorization).toBeUndefined()
+    await api.get("/courses")
+    expect(mock.history.get[0].headers.Authorization).toBeUndefined()
 })
 
-test("sends objects as JSON and FormData untouched", async () => {
-    fetch.mockResolvedValue(jsonResponse(201, {}))
+test("401 → refresh → saves new tokens → retries with the new token", async () => {
+    setTokens("old", "r1")
+    mock.onGet("/users").replyOnce(401).onGet("/users").replyOnce(200, ["ok"])
+    mock.onPost("/auth/refresh").reply(200, { accessToken: "new", refreshToken: "r2" })
 
-    await api.post("/category", { name: "js" })
-    const [, jsonInit] = fetch.mock.calls[0]
-    expect(jsonInit.headers["Content-Type"]).toBe("application/json")
-    expect(jsonInit.body).toBe('{"name":"js"}')
-
-    const form = new FormData()
-    await api.post("/courses", form)
-    const [, formInit] = fetch.mock.calls[1]
-    expect(formInit.headers["Content-Type"]).toBeUndefined() // browser sets the boundary
-    expect(formInit.body).toBe(form)
+    const res = await api.get("/users")
+    expect(res.data).toEqual(["ok"])
+    expect(JSON.parse(mock.history.post[0].data)).toEqual({ refreshToken: "r1" })
+    expect(mock.history.get[1].headers.Authorization).toBe("Bearer new")
+    expect(localStorage.getItem("accessToken")).toBe("new")
+    expect(localStorage.getItem("refreshToken")).toBe("r2")
 })
 
-test("throws ApiError with the server message on non-2xx", async () => {
-    fetch.mockResolvedValue(jsonResponse(409, { message: "Username is taken" }))
-    const error = await api.post("/auth/register", {}).catch(e => e)
-    expect(error).toBeInstanceOf(ApiError)
-    expect(error.status).toBe(409)
-    expect(errorMessage(error, "fallback")).toBe("Username is taken")
+test("several 401s at once share a single refresh", async () => {
+    setTokens("old", "r1")
+    mock.onGet("/a").replyOnce(401).onGet("/a").reply(200, "a")
+    mock.onGet("/b").replyOnce(401).onGet("/b").reply(200, "b")
+    mock.onPost("/auth/refresh").reply(200, { accessToken: "new" })
+
+    const [a, b] = await Promise.all([api.get("/a"), api.get("/b")])
+    expect([a.data, b.data]).toEqual(["a", "b"])
+    expect(mock.history.post).toHaveLength(1)
 })
 
-test("uses the fallback message when the server sent none", async () => {
-    fetch.mockResolvedValue(jsonResponse(500))
+test("refresh fails → tokens cleared, one toast", async () => {
+    setTokens("old", "r1")
+    mock.onGet("/x").reply(401)
+    mock.onPost("/auth/refresh").reply(401)
+
     const error = await api.get("/x").catch(e => e)
-    expect(errorMessage(error, "fallback")).toBe("fallback")
+
+    expect(error._authToastShown).toBe(true)
+    expect(localStorage.getItem("accessToken")).toBeNull()
+    expect(localStorage.getItem("refreshToken")).toBeNull()
+    expect(toast.error).toHaveBeenCalledWith("Please LogIn", { id: "auth" })
 })
 
-test("reports a network failure as status 0", async () => {
-    fetch.mockRejectedValue(new TypeError("Failed to fetch"))
-    const error = await api.get("/x").catch(e => e)
-    expect(error.status).toBe(0)
-    expect(errorMessage(error)).toMatch(/could not reach the server/)
+test("silentAuth: no toast when the session is over", async () => {
+    setTokens("old", "r1")
+    mock.onGet("/auth/me").reply(401)
+    mock.onPost("/auth/refresh").reply(401)
+
+    await expect(api.get("/auth/me", { silentAuth: true })).rejects.toBeTruthy()
+    expect(toast.error).not.toHaveBeenCalled()
 })
 
-test("401 with a token notifies listeners; 401 without one does not", async () => {
-    const listener = jest.fn()
-    const unsubscribe = onUnauthorized(listener)
-    fetch.mockResolvedValue(jsonResponse(401, { message: "expired" }))
+test("skipRefresh: a wrong password does not trigger a refresh", async () => {
+    mock.onPost("/auth/login").reply(401, { message: "wrong password" })
 
-    await api.get("/auth/me").catch(() => { })
-    expect(listener).not.toHaveBeenCalled()
-
-    tokenStorage.set("old")
-    await api.get("/auth/me").catch(() => { })
-    expect(listener).toHaveBeenCalledTimes(1)
-    unsubscribe()
+    await expect(api.post("/auth/login", {}, { skipRefresh: true })).rejects.toBeTruthy()
+    expect(mock.history.post.filter(r => r.url === "/auth/refresh")).toHaveLength(0)
 })

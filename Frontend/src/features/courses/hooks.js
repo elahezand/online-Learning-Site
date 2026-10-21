@@ -1,0 +1,135 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
+
+const ENDPOINT = "/courses";
+const KEY = ["courses"];
+const SESSIONS_KEY = ["sessions"];
+const enc = encodeURIComponent;
+
+/* ---------- GET: courses ---------- */
+
+export const useCourses = () =>
+  useGet(ENDPOINT, undefined, {
+    queryKey: KEY,
+    errorFallback: "Failed to load courses",
+  });
+
+export const usePopularCourses = () =>
+  useGet(`${ENDPOINT}/popular`, undefined, {
+    queryKey: [...KEY, "popular"],
+    silentError: true,
+  });
+
+export const usePresellCourses = () =>
+  useGet(`${ENDPOINT}/presell`, undefined, {
+    queryKey: [...KEY, "presell"],
+    silentError: true,
+  });
+
+export const useCategoryCourses = (categoryName) =>
+  useGet(`${ENDPOINT}/category/${enc(categoryName)}`, undefined, {
+    queryKey: [...KEY, "category", categoryName],
+    enabled: Boolean(categoryName),
+    errorFallback: "Failed to load courses",
+  });
+
+export const useCourse = (shortName) =>
+  useGet(`${ENDPOINT}/${enc(shortName)}`, undefined, {
+    queryKey: [...KEY, "detail", shortName],
+    enabled: Boolean(shortName),
+    errorFallback: "Failed to load course",
+  });
+
+export const useRelatedCourses = (shortName) =>
+  useGet(`${ENDPOINT}/related/${enc(shortName)}`, undefined, {
+    queryKey: [...KEY, "related", shortName],
+    enabled: Boolean(shortName),
+    silentError: true,
+  });
+
+/* ---------- GET: sessions ---------- */
+
+export const useSessions = () =>
+  useGet(`${ENDPOINT}/sessions`, undefined, {
+    queryKey: SESSIONS_KEY,
+    errorFallback: "Failed to load sessions",
+  });
+
+export const useSession = (shortName, sessionId) =>
+  useGet(`${ENDPOINT}/${enc(shortName)}/${enc(sessionId)}`, undefined, {
+    queryKey: [...SESSIONS_KEY, shortName, sessionId],
+    enabled: Boolean(shortName && sessionId),
+    errorFallback: "Failed to load session",
+  });
+
+/* ---------- POST ---------- */
+
+export const useCreateCourse = (onSuccessCallback) => {
+  const queryClient = useQueryClient();
+
+  return usePost(ENDPOINT, {
+    onSuccess: () => {
+      toast.success("Course created");
+      queryClient.invalidateQueries({ queryKey: KEY });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to create course",
+  });
+};
+
+export const useRegisterCourse = (onSuccessCallback) => {
+  const queryClient = useQueryClient();
+
+  return usePost(({ courseId }) => `${ENDPOINT}/${courseId}/register`, {
+    onSuccess: () => {
+      toast.success("You are registered successfully");
+      queryClient.invalidateQueries({ queryKey: KEY });
+      queryClient.invalidateQueries({ queryKey: ["me", "courses"] });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Registration failed",
+  });
+};
+
+/* courseId is a hook argument because the body here is FormData (the video) */
+export const useCreateSession = (courseId, onSuccessCallback) => {
+  const queryClient = useQueryClient();
+
+  return usePost(`${ENDPOINT}/${courseId}/sessions`, {
+    onSuccess: () => {
+      toast.success("Session created");
+      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: KEY });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to create session",
+  });
+};
+
+/* ---------- DELETE ---------- */
+
+export const useDeleteCourse = () => {
+  const queryClient = useQueryClient();
+
+  return useDelete((id) => `${ENDPOINT}/${id}`, {
+    onSuccess: () => {
+      toast.success("Course removed");
+      queryClient.invalidateQueries({ queryKey: KEY });
+    },
+    errorFallback: "Failed to remove course",
+  });
+};
+
+export const useDeleteSession = () => {
+  const queryClient = useQueryClient();
+
+  return useDelete((id) => `${ENDPOINT}/sessions/${id}`, {
+    onSuccess: () => {
+      toast.success("Session removed");
+      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: KEY });
+    },
+    errorFallback: "Failed to remove session",
+  });
+};

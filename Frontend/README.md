@@ -9,19 +9,47 @@ npm start
 npm test
 ```
 
-## How data flows
+## Folder structure
 
-- **`src/api/client.js`** is the only place that calls `fetch`. It adds the base URL from `.env`
-  and the Bearer token, sends JSON or `FormData`, and throws `ApiError` for non-2xx responses.
-  A 401 logs the user out everywhere.
-- **`src/api/<domain>.js`** (`coursesApi`, `usersApi`, …) holds one function per endpoint. Pages never write URLs.
-- **`src/api/queries.js`** has the TanStack Query hooks (`useCourses()`, `useUsers()`, …) and the `queryKeys`.
-  Reads are cached and deduplicated, and they are cancelled when a component unmounts.
-  After a change, call `queryClient.invalidateQueries({ queryKey: queryKeys.users })`.
-- **`attempt(promise)`** runs an action without throwing, returns `{ ok, data, error }` and shows the error to the user.
-- **`src/context/AuthContext.js`** has `useAuth()` → `{ user, status, isLoggedIn, isAdmin, login, logout, refreshUser }`.
-- **`src/components/routing/RouteGuards.js`** has `RequireAuth`, `RequireRole role="ADMIN"` and `GuestOnly`.
-  They wait while the session is loading, then redirect, and send the user back to where they were after login.
+```
+src/
+├── app/            App, routes, AppProviders (React Query + Router + Auth + Toaster)
+├── api/            client.js (axios + token refresh), tokenStorage.js, queryClient.js
+├── features/       one folder per domain: its data hooks + its components
+│   ├── auth/       hooks.js, AuthContext, RouteGuards, LoginForm, RegisterForm
+│   ├── courses/    hooks.js, CourseCard, CourseDetail, CoursesList, AddCourseForm, ...
+│   ├── articles/   hooks.js, ArticleCard, ArticleDetail, AddArticleForm, ...
+│   └── ...         categories, comments, contacts, discounts, info, menus,
+│                   newsletter, notifications, orders, search, tickets, users
+├── components/
+│   ├── ui/         shared building blocks: Button, Input, Pagination, DataTable, ...
+│   └── layout/     Navbar, Topbar, Footer, Landing, admin/, account/
+├── pages/          route screens only: public/, admin/ (/p-admin), account/ (/my-account)
+├── hooks/          useTheme, useForm, useDebouncedValue, useInView, useReactQueryHooks
+├── styles/         main.scss — Bootstrap variables only (colors, fonts, radius, dark mode)
+├── config/         env.js
+└── utils/          validators
+```
+
+### Rules
+- A **page** composes features and layout; it holds no fetching logic of its own.
+- A **feature** owns its data: `features/<name>/hooks.js` (`useCourses`, `useCreateCourse`, ...),
+  built on `useGet` / `usePost` / `usePut` / `useDelete` from `hooks/useReactQueryHooks.js`.
+  Mutations show their own toast and refresh the lists they change.
+- **components/ui** knows nothing about the API; anything used by two or more features lives here.
+- Imports are relative and without the `.js` extension; file name = component name.
+
+## Styling
+- **Bootstrap only.** There are no component CSS files. `src/styles/main.scss` sets Bootstrap's own
+  Sass variables (brand colors, neutrals, radius, shadows, dark-mode values) and compiles Bootstrap.
+  Components use Bootstrap classes and utilities.
+- **Light / dark** use Bootstrap 5.3 color modes (`<html data-bs-theme>`), switched by `useTheme`.
+  Use `bg-body` for cards/panels, `bg-body-tertiary` for the page, `text-body-emphasis` for headings,
+  `text-primary-emphasis` for orange text (readable in both themes).
+- **Text on photos** (hero, page headers): wrap the section in `data-bs-theme="dark"` so its contents
+  use light-on-dark colors.
+- **Icons**: `react-icons/fa6` (bundled, no CDN).
+- **Dialogs**: `useDialog()` from `components/ui/DialogProvider` (Bootstrap Modal). **Toasts**: `sonner`.
 
 ---
 
