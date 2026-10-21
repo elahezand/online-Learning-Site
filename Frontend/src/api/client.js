@@ -1,90 +1,81 @@
-import env from "../config/env"
-import tokenStorage from "./tokenStorage"
+import axios from "axios";
+import { toast } from "sonner";
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export class ApiError extends Error {
-    constructor(status, data, message) {
-        super(message || `Request failed with status ${status}`)
-        this.name = "ApiError"
-        this.status = status
-        this.data = data
-    }
-}
+let refreshPromise = null;
 
-const unauthorizedListeners = new Set()
-
-/* Subscribe to "the server rejected our token". Returns an unsubscribe fn. */
-export const onUnauthorized = (listener) => {
-    unauthorizedListeners.add(listener)
-    return () => unauthorizedListeners.delete(listener)
-}
-
-const parseBody = async (res) => {
-    if (res.status === 204) return null
-    const text = await res.text()
-    if (!text) return null
-    const type = res.headers.get("content-type") || ""
-    if (type.includes("application/json")) {
-        try { return JSON.parse(text) } catch { return text }
-    }
-    return text
-}
-
-const messageFrom = (data) =>
-    (data && typeof data === "object" && (data.message || data.error)) ||
-    (typeof data === "string" && data) ||
-    undefined
-
-export async function request(path, { method = "GET", body, headers, signal, auth = true } = {}) {
-    const token = auth ? tokenStorage.get() : null
-    const isFormData = typeof FormData !== "undefined" && body instanceof FormData
-
-    const finalHeaders = {
-        Accept: "application/json",
-        ...(body !== undefined && !isFormData ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...headers,
-    }
-
-    let res
-    try {
-        res = await fetch(`${env.apiUrl}${path}`, {
-            method,
-            headers: finalHeaders,
-            signal,
-            body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
-        })
-    } catch (err) {
-        if (err.name === "AbortError") throw err
-        throw new ApiError(0, null, "Network error: could not reach the server")
-    }
-
-    const data = await parseBody(res)
-
-    if (!res.ok) {
-        if (res.status === 401 && token) {
-            unauthorizedListeners.forEach(listener => listener())
+const refreshAccessToken = () => {
+  if (!refreshPromise) {
+    refreshPromise = api
+      .post(
+        "/auth/refresh",
+        { refreshToken: localStorage.getItem("refreshToken") },
+        { skipRefresh: true }
+      )
+      .then((res) => {
+        localStorage.setItem("accessToken", res.data.accessToken);
+        if (res.data.refreshToken) {
+          localStorage.setItem("refreshToken", res.data.refreshToken);
         }
-        throw new ApiError(res.status, data, messageFrom(data))
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
     }
 
-    return data
-}
+    if (originalRequest.skipRefresh) {
+      return Promise.reject(error);
+    }
 
-const api = {
-    get: (path, options) => request(path, { ...options, method: "GET" }),
-    post: (path, body, options) => request(path, { ...options, method: "POST", body }),
-    put: (path, body, options) => request(path, { ...options, method: "PUT", body }),
-    delete: (path, options) => request(path, { ...options, method: "DELETE" }),
-}
+    const status = error.response?.status;
 
-/* Text to show the user for a failed request: the server's own message
-   when it sent one, otherwise the fallback. */
-export const errorMessage = (error, fallback = "Something went wrong, please try again") =>
-    (error?.status === 0 && error.message) || messageFrom(error?.data) || fallback
+    if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-/* True for errors we should ignore (component unmounted / request replaced) */
-export const isAbortError = (err) => err?.name === "AbortError"
+      try {
+        await refreshAccessToken();
 
-export default api
+        return api.request(originalRequest);
+      } catch (refreshError) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
+        if (!originalRequest.silentAuth) {
+          toast.error("Please LogIn", { id: "auth" });
+        }
+
+        if (refreshError instanceof Error) {
+          refreshError._authToastShown = true;
+        }
+
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export { api };

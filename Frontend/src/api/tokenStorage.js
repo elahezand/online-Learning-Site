@@ -1,27 +1,31 @@
-/*
- * The only place that knows where the access token is stored.
- * Kept under the same "userData" key the app used before, so people
- * who are already logged in stay logged in after this change.
- */
-const STORAGE_KEY = "userData"
+const ACCESS_KEY = "accessToken"
+const REFRESH_KEY = "refreshToken"
 
 const tokenStorage = {
     get() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY)
-            return raw ? JSON.parse(raw)?.token ?? null : null
+            return localStorage.getItem(ACCESS_KEY)
         } catch {
             return null
         }
     },
-    set(token) {
+    getRefresh() {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ token }))
-        } catch { /* storage unavailable: session-only login */ }
+            return localStorage.getItem(REFRESH_KEY)
+        } catch {
+            return null
+        }
+    },
+    set(token, refreshToken) {
+        try {
+            localStorage.setItem(ACCESS_KEY, token)
+            if (refreshToken) localStorage.setItem(REFRESH_KEY, refreshToken)
+        } catch { }
     },
     clear() {
         try {
-            localStorage.removeItem(STORAGE_KEY)
+            localStorage.removeItem(ACCESS_KEY)
+            localStorage.removeItem(REFRESH_KEY)
         } catch { }
     },
 }
