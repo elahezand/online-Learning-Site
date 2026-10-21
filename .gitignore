@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+bower_components/
+
+# builds
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# secrets
+.env
+.env.local
+.env.*.local
+
+# logs and backups
+*.log
+logs
+**/*.backup.*
+**/*.back.*
+
+# editor / OS
+.DS_*
+*.sublime*
+
+# design files
+psd
+thumb
+sketch

@@ -1,0 +1,156 @@
+
+// ---------- Brand -----------------------------------------------------
+// #c2410c keeps white text readable on buttons (contrast 5.2:1, WCAG AA).
+$primary:   #c2410c;
+$secondary: #57534e;
+$success:   #15803d;
+$info:      #0369a1;
+$warning:   #f59e0b;
+$danger:    #be123c;
+$light:     #f5f5f4;
+$dark:      #1c1917;
+
+$min-contrast-ratio: 4.5;
+
+// ---------- Neutrals (warm) — light mode ------------------------------
+$white:    #ffffff;
+$gray-100: #faf9f7;
+$gray-200: #f2efeb;
+$gray-300: #e7e3de;
+$gray-400: #d4cec7;
+$gray-500: #a19a93;
+$gray-600: #6b6560;
+$gray-700: #44403c;
+$gray-800: #292524;
+$gray-900: #1c1b1a;
+$black:    #000000;
+
+$body-bg:              $white;      // cards, panels, navbar
+$body-tertiary-bg:     $gray-100;   // page background
+$body-secondary-bg:    $gray-200;
+$body-color:           $gray-700;
+$body-emphasis-color:  $gray-900;
+$headings-color:       $gray-900;
+$border-color:         $gray-300;
+
+// ---------- Dark mode ------------------------------------------------
+$body-bg-dark:              #1c1a18;
+$body-tertiary-bg-dark:     #121110;
+$body-secondary-bg-dark:    #262321;
+$body-color-dark:           #d9d5d0;
+$body-emphasis-color-dark:  #f6f4f1;
+$headings-color-dark:       #f6f4f1;
+$border-color-dark:         #322e2b;
+
+// .text-primary-emphasis = readable orange text in both themes
+$primary-text-emphasis: $primary;
+
+// Orange text/links on dark backgrounds must be lighter (8:1 contrast)
+$link-color-dark:                  #fb923c;
+$link-hover-color-dark:            #fdba74;
+$primary-text-emphasis-dark:       #fdba74;
+$primary-bg-subtle-dark:           #3a2214;
+$primary-border-subtle-dark:       #6b3615;
+
+// ---------- Type ------------------------------------------------------
+$font-family-sans-serif: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+$headings-font-weight: 700;
+$lead-font-weight: 400;
+$enable-rfs: true;                 // fluid headings on small screens
+
+// ---------- Shape & depth --------------------------------------------
+$border-radius:     .625rem;
+$border-radius-sm:  .375rem;
+$border-radius-lg:  1rem;
+$border-radius-xl:  1.25rem;
+$box-shadow-sm: 0 1px 2px rgba(28, 25, 23, .06), 0 1px 3px rgba(28, 25, 23, .08);
+$box-shadow:    0 8px 24px -6px rgba(28, 25, 23, .12);
+$box-shadow-lg: 0 18px 40px -12px rgba(28, 25, 23, .22);
+
+// ---------- Components -----------------------------------------------
+$link-decoration: none;
+$link-hover-decoration: none;
+$btn-font-weight: 500;
+$btn-padding-x: 1rem;
+$input-btn-focus-width: .2rem;
+$card-border-color: var(--bs-border-color);
+$card-cap-bg: transparent;
+$navbar-padding-y: .75rem;
+$navbar-nav-link-padding-x: .75rem;
+$breadcrumb-margin-bottom: 0;
+$breadcrumb-divider-color: var(--bs-secondary-color);
+$breadcrumb-active-color: var(--bs-emphasis-color);
+$pagination-border-radius: $border-radius-sm;
+$accordion-button-active-bg: var(--bs-primary-bg-subtle);
+$accordion-button-active-color: var(--bs-primary-text-emphasis);
+$offcanvas-horizontal-width: 300px;
+$table-cell-padding-y: .75rem;
+$table-cell-padding-x: .75rem;
+$progress-bar-bg: $primary;
+
+@import "bootstrap/scss/bootstrap";
+
+@include color-mode(dark) {
+  .text-primary { color: $primary-text-emphasis-dark !important; }
+  .btn-outline-primary { @include button-outline-variant($link-color-dark); }
+}
+
+// ---------- Card hover animation --------------------------------------
+.card-hover {
+  transition: transform .25s ease, box-shadow .25s ease;
+
+  .ratio img { transition: transform .4s ease; }
+  .badge-tilt { transform: rotate(12deg); transition: transform .25s ease; }
+  .card-footer { transition: background-color .25s ease, color .25s ease; }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $box-shadow !important;
+
+    .ratio img { transform: scale(1.06); }
+    .badge-tilt { transform: rotate(-8deg); }
+    .card-footer { background-color: $primary !important; color: $white !important; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hover, .card-hover * { transition: none !important; }
+}
+// ---------- Banner overlay ---------------------------------------------
+// Lighter in light mode so the photo shows, darker in dark mode so the
+// banner does not glare next to the dark page.
+.banner-overlay { opacity: .25; }
+html[data-bs-theme="dark"] .banner-overlay { opacity: .6; }
+
+// ---------- CKEditor follows the site theme ----------------------------
+// html[data-bs-theme] outranks the :root rules in ckeditor5.css, which loads later.
+html[data-bs-theme] {
+  --ck-border-radius: #{$border-radius-sm};
+  --ck-color-base-background: var(--bs-body-bg);
+  --ck-color-base-foreground: var(--bs-tertiary-bg);
+  --ck-color-base-border: var(--bs-border-color);
+  --ck-color-text: var(--bs-body-color);
+  --ck-color-toolbar-background: var(--bs-tertiary-bg);
+  --ck-color-toolbar-border: var(--bs-border-color);
+  --ck-color-panel-background: var(--bs-body-bg);
+  --ck-color-panel-border: var(--bs-border-color);
+  --ck-color-dropdown-panel-background: var(--bs-body-bg);
+  --ck-color-dropdown-panel-border: var(--bs-border-color);
+  --ck-color-input-background: var(--bs-body-bg);
+  --ck-color-input-text: var(--bs-body-color);
+  --ck-color-input-border: var(--bs-border-color);
+  --ck-color-list-background: var(--bs-body-bg);
+  --ck-color-list-button-hover-background: var(--bs-secondary-bg);
+  --ck-color-list-button-on-background: var(--bs-primary-bg-subtle);
+  --ck-color-list-button-on-text: var(--bs-primary-text-emphasis);
+  --ck-color-button-default-hover-background: var(--bs-secondary-bg);
+  --ck-color-button-default-active-background: var(--bs-secondary-bg);
+  --ck-color-button-on-background: var(--bs-primary-bg-subtle);
+  --ck-color-button-on-hover-background: var(--bs-primary-bg-subtle);
+  --ck-color-button-on-color: var(--bs-primary-text-emphasis);
+  --ck-color-focus-border: var(--bs-primary);
+  --ck-color-shadow-drop: rgba(0, 0, 0, .15);
+  --ck-color-shadow-inner: transparent;
+}
+
+.ck-editor__editable_inline { min-height: 200px; }
