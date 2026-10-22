@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { file, image, message, numberField, select, slug, text } from "./fields"
+import { file, image, message, numberField, optionalImage, select, slug, text } from "./fields"
 
 export const courseSchema = z.object({
     name: text("Name", { min: 3, max: 80 }),
@@ -10,6 +10,12 @@ export const courseSchema = z.object({
     status: z.enum(["presell", "start"], { error: "Please select a status" }),
     description: message("Description", { min: 10, max: 1000 }),
     cover: image("Cover"),
+    isComplete: z.enum(["0", "1"], { error: "Please select a state" }).default("0"),
+})
+
+/* Editing: the cover is optional — leave it empty to keep the current one */
+export const courseEditSchema = courseSchema.extend({
+    cover: optionalImage("Cover"),
 })
 
 export const sessionSchema = z.object({
@@ -25,4 +31,5 @@ export const discountCodeSchema = text("Discount code", { min: 3, max: 20 })
 export type CourseFormValues = z.input<typeof courseSchema>
 export type SessionFormValues = z.input<typeof sessionSchema>
 export type CourseData = z.output<typeof courseSchema>
+export type CourseEditData = z.output<typeof courseEditSchema>
 export type SessionData = z.output<typeof sessionSchema>

@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
+import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 import type { Course, CourseDetail, Session, SessionDetail } from "../../types/models";
 
 const ENDPOINT = "/courses";
@@ -76,6 +76,22 @@ export const useCreateCourse = (onSuccessCallback?: () => void) => {
       onSuccessCallback?.();
     },
     errorFallback: "Failed to create course",
+  });
+};
+
+/* ---------- PUT ---------- */
+
+/* FormData so a new cover can be sent; without a cover the current one stays */
+export const useUpdateCourse = (courseId: string, onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+
+  return usePut<unknown, FormData>(`${ENDPOINT}/${courseId}`, {
+    onSuccess: () => {
+      toast.success("Course updated");
+      queryClient.invalidateQueries({ queryKey: KEY });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to update course",
   });
 };
 
