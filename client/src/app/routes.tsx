@@ -17,24 +17,26 @@ const Login = lazy(() => import("../pages/public/Login"))
 const Register = lazy(() => import("../pages/public/Register"))
 
 // Admin panel (/p-admin)
-const AdminLayout = lazy(() => import("../pages/admin/AdminLayout"))
+const AdminLayout = lazy(() => import("../components/layout/admin/AdminLayout"))
 const AdminDashboard = lazy(() => import("../pages/admin/Dashboard"))
 const AdminUsers = lazy(() => import("../pages/admin/Users"))
 const AdminCourses = lazy(() => import("../pages/admin/Courses"))
+const AdminEditCourse = lazy(() => import("../pages/admin/EditCourse"))
 const AdminSessions = lazy(() => import("../pages/admin/Sessions"))
 const AdminCategories = lazy(() => import("../pages/admin/Categories"))
 const AdminArticles = lazy(() => import("../pages/admin/Articles"))
-const AdminArticleDraft = lazy(() => import("../pages/admin/ArticleDraft"))
+const AdminEditArticle = lazy(() => import("../pages/admin/EditArticle"))
 const AdminComments = lazy(() => import("../pages/admin/Comments"))
 const AdminContacts = lazy(() => import("../pages/admin/Contacts"))
 const AdminMenus = lazy(() => import("../pages/admin/Menus"))
 const AdminDiscounts = lazy(() => import("../pages/admin/Discounts"))
 const AdminSiteWideDiscount = lazy(() => import("../pages/admin/SiteWideDiscount"))
 const AdminTickets = lazy(() => import("../pages/admin/Tickets"))
+const AdminTicket = lazy(() => import("../pages/admin/Ticket"))
 const AddUserForm = lazy(() => import("../features/users/AddUserForm"))
 
 // User account (/my-account)
-const AccountLayout = lazy(() => import("../pages/account/AccountLayout"))
+const AccountLayout = lazy(() => import("../components/layout/account/AccountLayout"))
 const AccountDashboard = lazy(() => import("../pages/account/Dashboard"))
 const AccountCourses = lazy(() => import("../pages/account/Courses"))
 const AccountOrders = lazy(() => import("../pages/account/Orders"))
@@ -71,6 +73,7 @@ const routes: RouteObject[] = [
                     { path: "wallet", element: <AccountWallet /> },
                     { path: "detail", element: <AccountProfile /> },
                     { path: "tickets/:page?", element: <AccountTickets /> },
+                    { path: "ticket/:id", element: <AccountTicket /> },
                     { path: "ticket/answer/:id", element: <AccountTicket /> },
                     { path: "add-newTicket", element: <AccountNewTicket /> },
                 ],
@@ -87,16 +90,18 @@ const routes: RouteObject[] = [
             { path: "users/:page?", element: <AdminUsers /> },
             { path: "new-user", element: <AddUserForm /> },
             { path: "courses/:page?", element: <AdminCourses /> },
+            { path: "course/:id/edit", element: <AdminEditCourse /> },
             { path: "sessions/:page?", element: <AdminSessions /> },
             { path: "categories/:page?", element: <AdminCategories /> },
             { path: "articles/:page?", element: <AdminArticles /> },
-            { path: "article-draft/:shortName", element: <AdminArticleDraft /> },
+            { path: "article/:shortName/edit", element: <AdminEditArticle /> },
             { path: "comments/:page?", element: <AdminComments /> },
             { path: "contacts/:page?", element: <AdminContacts /> },
             { path: "menu/:page?", element: <AdminMenus /> },
             { path: "discounts/:page?", element: <AdminDiscounts /> },
             { path: "siteWide-discounts", element: <AdminSiteWideDiscount /> },
             { path: "tickets/:page?", element: <AdminTickets /> },
+            { path: "ticket/:id", element: <AdminTicket /> },
         ],
     },
 

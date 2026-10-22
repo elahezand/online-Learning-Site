@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import PageHeader from '../../components/layout/PageHeader'
+import PageHeader from '../../components/ui/PageHeader'
 import Pagination from "../../components/ui/Pagination"
 import usePagination from '../../hooks/usePagination'
 import { useArticles } from '../../features/articles/hooks'

@@ -30,9 +30,7 @@ export function RequireRole({ role, children }: { role: Role; children: ReactNod
     return children
 }
 
-/* Pages such as /login and /register: once logged in, send the user back
-   to the page that sent them here (or home). While the session is still
-   resolving we keep showing the form, so logging in doesn't flash a loader. */
+
 export function GuestOnly({ children }: { children: ReactNode }) {
     const { status } = useAuth()
     const location = useLocation()

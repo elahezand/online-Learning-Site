@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import PageHeader from '../../components/layout/PageHeader'
+import PageHeader from '../../components/ui/PageHeader'
 import NewsLetter from '../../features/newsletter/NewsLetter'
 import ContactForm from "../../features/contacts/ContactForm"
 import { useSendContact } from '../../features/contacts/hooks'

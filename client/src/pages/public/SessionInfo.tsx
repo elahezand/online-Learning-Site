@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom"
 import { FaCirclePlay, FaClock } from "react-icons/fa6"
-import PageHeader from "../../components/layout/PageHeader"
+import PageHeader from "../../components/ui/PageHeader"
 import { useSession } from "../../features/courses/hooks"
 import type { Session } from "../../types/models"
 

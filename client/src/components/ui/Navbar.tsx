@@ -6,10 +6,8 @@ import Offcanvas from "react-bootstrap/Offcanvas"
 import { FaRightToBracket, FaUser } from "react-icons/fa6"
 import { useMainMenu } from "../../features/menus/hooks"
 import { useAuth } from "../../features/auth/useAuth"
-import ThemeToggle from "../ui/ThemeToggle"
+import ThemeToggle from "./ThemeToggle"
 
-/* Main site navbar: sticky, collapses into an off-canvas menu below lg.
-   The account button and theme toggle stay visible on every screen size. */
 export default function Navbar() {
     const { data: menu = [] } = useMainMenu()
     const { isLoggedIn, userInfo } = useAuth()

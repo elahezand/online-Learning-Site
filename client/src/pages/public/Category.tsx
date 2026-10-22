@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import PageHeader from "../../components/layout/PageHeader"
+import PageHeader from "../../components/ui/PageHeader"
 import CategoryCourses from "../../features/courses/CategoryCourses"
 import NewsLetter from "../../features/newsletter/NewsLetter"
 

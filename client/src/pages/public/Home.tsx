@@ -1,4 +1,4 @@
-import Hero from '../../components/layout/Hero'
+import Hero from '../../components/ui/Hero'
 import LatestCourses from "../../features/courses/LatestCourses"
 import CategoryGrid from "../../features/categories/CategoryGrid"
 import AboutUs from '../../features/info/AboutUs'

@@ -36,19 +36,19 @@ export default function PromptForm({ title, description, placeholder, confirmLab
     }
 
     return (
-        <ToastCard title={title} description={description} onClose={() => finish(null)}>
-            <form className="mt-3" onSubmit={submit} noValidate>
+        <ToastCard title={title} description={description} icon="edit" onClose={() => finish(null)}>
+            <form className="mt-4" onSubmit={submit} noValidate>
                 {multiline ?
-                    <textarea className={`form-control form-control-sm ${error ? "is-invalid" : ""}`} rows={3} autoFocus
+                    <textarea className={`form-control ${error ? "is-invalid" : ""}`} rows={4} autoFocus
                         placeholder={placeholder} aria-label={title}
                         value={value} onChange={(e) => { setValue(e.target.value); setError("") }} /> :
-                    <input className={`form-control form-control-sm ${error ? "is-invalid" : ""}`} autoFocus
+                    <input className={`form-control ${error ? "is-invalid" : ""}`} autoFocus
                         placeholder={placeholder} aria-label={title}
                         value={value} onChange={(e) => { setValue(e.target.value); setError("") }} />}
                 {error && <div className="invalid-feedback">{error}</div>}
-                <div className="d-flex justify-content-end gap-2 mt-2">
-                    <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => finish(cancelValue)}>{cancelLabel}</button>
-                    <button type="submit" className="btn btn-sm btn-primary">{confirmLabel}</button>
+                <div className="d-flex flex-column-reverse flex-sm-row justify-content-sm-end gap-2 mt-4">
+                    <button type="button" className="btn btn-outline-secondary px-4" onClick={() => finish(cancelValue)}>{cancelLabel}</button>
+                    <button type="submit" className="btn btn-primary px-4">{confirmLabel}</button>
                 </div>
             </form>
         </ToastCard>

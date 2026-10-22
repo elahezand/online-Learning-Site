@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import PageHeader from '../../components/layout/PageHeader'
 import { useRegister } from '../../features/auth/hooks'
 import RegisterForm from '../../features/auth/RegisterForm'
 import { registerSchema } from '../../validators'
@@ -16,10 +15,7 @@ export default function Register() {
         registerMutation.mutate({ ...data, phone: phonenumber, confirmPassword: data.password })
 
     return (
-        <>
-            <PageHeader title="Create your account" image="/images/blog/hero_1.jpg.webp"
-                breadcrumb={[{ title: "Home", to: "/" }, { title: "Register" }]} />
+       
             <RegisterForm form={form} onSubmit={registerNewUser} isSubmitting={registerMutation.isPending} />
-        </>
     )
 }

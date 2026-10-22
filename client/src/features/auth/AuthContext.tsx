@@ -6,18 +6,6 @@ import { api } from "../../api/client"
 import tokenStorage from "../../api/tokenStorage"
 import type { User } from "../../types/models"
 
-/*
- * Auth state for the whole app.
- *
- * status:
- *   "loading"        – we have a token and are asking the server who we are
- *   "authenticated"  – user is known
- *   "guest"          – no token, or the token was rejected
- *
- * Guards must wait while status is "loading", otherwise a logged-in
- * admin who refreshes /p-admin would be bounced to /login.
- */
-
 export type AuthStatus = "loading" | "authenticated" | "guest"
 
 export interface AuthContextValue {
@@ -30,7 +18,6 @@ export interface AuthContextValue {
     login: (token: string, refreshToken?: string) => void
     logout: () => void
     refreshUser: (signal?: AbortSignal) => Promise<User | null>
-    /** Always an object, so components can read fields without null checks */
     userInfo: Partial<User>
 }
 
@@ -42,8 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<AuthStatus>(() => (tokenStorage.get() ? "loading" : "guest"))
     const queryClient = useQueryClient()
 
-    // Cached server data can be user-specific ("my courses", "is registered"),
-    // so it is dropped whenever the session changes.
+
     const clearSession = useCallback(() => {
         queryClient.clear()
         tokenStorage.clear()
@@ -58,14 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return null
         }
         try {
-            // silentAuth: an expired session at startup is not an error to show
             const { data: me } = await api.get<User>("/auth/me", { signal, silentAuth: true })
             setUser(me)
             setStatus("authenticated")
             return me
         } catch (err) {
             if (axios.isCancel(err)) return null
-            // The client already tried a refresh. If it failed, the tokens are gone.
             if (!tokenStorage.get()) clearSession()
             else setStatus(prev => (prev === "loading" ? "guest" : prev))
             return null
@@ -110,7 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         logout: clearSession,
         refreshUser,
-        // Backwards-compatible alias used by existing components
         userInfo: user ?? {},
     }), [token, user, status, login, clearSession, refreshUser])
 

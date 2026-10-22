@@ -3,14 +3,13 @@ import type { ChangeEvent } from 'react'
 import { Link } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import { FaBars, FaBell, FaEarthAmericas, FaUser } from 'react-icons/fa6';
-import ThemeToggle from '../../ui/ThemeToggle';
+import ThemeToggle from '../ThemeToggle';
 import { useAuth } from '../../../features/auth/useAuth';
 import { useMarkNotificationSeen } from '../../../features/notifications/hooks'
 
 
 export default function AdminTopbar({ onMenuClick }: { onMenuClick: () => void }) {
-    // The admin's profile (and notifications) already live in the auth
-    // context, so there is no second /auth/me request here.
+
     const { userInfo: adminInfo } = useAuth()
     const notifications = adminInfo.notifications ?? []
     const [show, setShow] = useState(false);

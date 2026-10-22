@@ -5,7 +5,6 @@ import ReCAPTCHA from "react-google-recaptcha"
 import { FaShieldHalved } from "react-icons/fa6"
 import useTheme from "../../hooks/useTheme"
 
-/* Card shell shared by the login and register forms */
 interface AuthCardProps {
     title: string
     subtitle: string

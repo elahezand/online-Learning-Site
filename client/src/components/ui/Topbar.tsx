@@ -4,7 +4,6 @@ import { FaEnvelope, FaPhone } from "react-icons/fa6"
 import { useTopbarMenu } from "../../features/menus/hooks"
 import { useIndexInfo } from "../../features/info/hooks"
 
-/* Thin utility bar above the navbar (desktop only): contact info + quick links */
 export default function Topbar() {
     const { data: info = {} } = useIndexInfo()
     const { data: menu } = useTopbarMenu()

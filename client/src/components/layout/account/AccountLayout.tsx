@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import { Outlet } from "react-router-dom"
-import PageLoader from "../../components/ui/PageLoader"
-import PageHeader from "../../components/layout/PageHeader"
-import AccountSidebar from "../../components/layout/account/AccountSidebar"
-import { useAuth } from "../../features/auth/useAuth"
+import PageLoader from "../../ui/PageLoader"
+import PageHeader from "../../ui/PageHeader"
+import AccountSidebar from "../../ui/account/AccountSidebar"
+import { useAuth } from "../../../features/auth/useAuth"
 
 export default function AccountLayout() {
     const { userInfo } = useAuth()

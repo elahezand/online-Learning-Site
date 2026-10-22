@@ -1,4 +1,4 @@
-import PageHeader from '../../components/layout/PageHeader'
+import PageHeader from '../../components/ui/PageHeader'
 import { useParams } from 'react-router-dom'
 import { useSearch } from '../../features/search/hooks'
 import SearchResults from '../../features/search/SearchResults'

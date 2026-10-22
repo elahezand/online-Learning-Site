@@ -2,7 +2,9 @@ import type { ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { FaBagShopping, FaGauge, FaGraduationCap, FaRightFromBracket, FaTicket, FaUserGear, FaWallet } from "react-icons/fa6"
 import { useAuth } from "../../../features/auth/useAuth"
-import { confirmToast } from "../../ui/toastActions"
+import { useMyTickets } from "../../../features/tickets/hooks"
+import { hasNewReply, isTopLevel } from "../../../features/tickets/ticketView"
+import { confirmToast } from "../toastActions"
 
 interface NavItem {
     to: string
@@ -21,10 +23,13 @@ const links: NavItem[] = [
     { to: "detail", label: "Account details", icon: <FaUserGear /> },
 ]
 
-/* Vertical pills on desktop; a horizontally scrollable pill bar on phones */
 export default function AccountSidebar() {
     const { logout } = useAuth()
     const navigate = useNavigate()
+    const { data: tickets = [] } = useMyTickets()
+    const badges: Record<string, number> = {
+        tickets: tickets.filter(ticket => isTopLevel(ticket) && hasNewReply(ticket)).length,
+    }
 
     const exitPanel = async () => {
         const ok = await confirmToast({ title: "Log out of your account?", confirmLabel: "Log out" })
@@ -47,6 +52,7 @@ export default function AccountSidebar() {
                             <li className="nav-item" key={link.to}>
                                 <NavLink to={link.to} end={link.end} className={linkClass(link)}>
                                     {link.icon}{link.label}
+                                    {badges[link.to] ? <span className="badge rounded-pill text-bg-danger ms-auto" aria-label={`${badges[link.to]} new`}>{badges[link.to]}</span> : null}
                                 </NavLink>
                             </li>
                         ))}
