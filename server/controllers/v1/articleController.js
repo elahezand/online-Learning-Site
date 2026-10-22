@@ -45,7 +45,7 @@ exports.saveDraft = async (req, res, next) => {
     if (duplicatedShortname) {
       return res.status(401).json({ message: "duplicated short name" });
     }
-    
+
     const cover = req.file;
     await articleModel.validation({ ...req.body, cover }).catch((err) => {
       err.statusCode = 400;
@@ -131,6 +131,49 @@ exports.remove = async (req, res, next) => {
     });
 
     return res.json(deletedArticle);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const article = await articleModel.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ message: "Article Not Found!" });
+    }
+
+    const { title, description, body, shortName, categoryID, publish } = req.body;
+
+    if (shortName && shortName !== article.shortName) {
+      const duplicatedShortname = await articleModel.findOne({ shortName });
+      if (duplicatedShortname) {
+        return res.status(401).json({ message: "duplicated short name" });
+      }
+    }
+
+    const oldCover = article.cover;
+
+    if (title !== undefined) article.title = title;
+    if (description !== undefined) article.description = description;
+    if (body !== undefined) article.body = body;
+    if (shortName !== undefined) article.shortName = shortName;
+    if (categoryID !== undefined) article.categoryID = categoryID;
+    if (publish !== undefined) article.publish = Number(publish);
+    if (req.file) article.cover = req.file.filename;
+
+    await article.save();
+
+    if (req.file && oldCover) {
+      const imgPath = path.join(__dirname, "..", "..", "public", "courses", "covers", oldCover);
+      fs.unlink(imgPath, (err) => {
+        if (err) console.log(err);
+      });
+    }
+
+    const updatedArticle = await article.populate("creator", "-password");
+
+    return res.json(updatedArticle);
   } catch (error) {
     next(error);
   }

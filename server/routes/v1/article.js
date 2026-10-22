@@ -34,9 +34,15 @@ router
     isAdminMiddleware,
     articleController.saveDraft
   );
-
 router
   .route("/:id")
+  .put(
+    authenticatedMiddleware,
+    isAdminMiddleware,
+    multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single(
+      "cover"
+    ),
+    articleController.update
+  )
   .delete(authenticatedMiddleware, isAdminMiddleware, articleController.remove);
-
 module.exports = router;
