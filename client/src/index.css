@@ -1,4 +1,0 @@
-/* Order matters: tokens first, then global base. Bootstrap itself is
-   imported before this file in index.js. */
-@import "./styles/theme.css";
-@import "./styles/base.css";
