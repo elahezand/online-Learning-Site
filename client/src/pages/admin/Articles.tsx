@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { FaPen, FaTrash } from "react-icons/fa6"
+import { Link, useNavigate } from "react-router-dom"
+import { FaPenToSquare, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
 import usePagination from "../../hooks/usePagination"
@@ -12,6 +12,7 @@ import type { Article } from "../../types/models"
 
 export default function Articles() {
         const { data: articles = [] } = useArticles()
+    const navigate = useNavigate()
     const deleteArticle = useDeleteArticle()
 
 
@@ -43,20 +44,20 @@ export default function Articles() {
                             <tr key={article._id}>
                                 <td className="text-body-secondary">{start + index + 1}</td>
                                 <td>
-                                    <img src={coverUrl(article.cover)} alt="" loading="lazy" width="64" height="36"
-                                        className="rounded object-fit-cover bg-body-secondary" />
+                                    <img src={coverUrl(article.cover)} alt="" loading="lazy" width="96" height="54"
+                                        className="rounded-2 object-fit-cover bg-body-secondary" />
                                 </td>
-                                <td className="fw-medium text-body-emphasis">{article.title}</td>
+                                <td>
+                                    <Link to={`/p-admin/article/${article.shortName}/edit`} className="fw-medium link-body-emphasis text-decoration-none">{article.title}</Link>
+                                </td>
                                 <td>{article.creator?.username ?? article.creator?.name}</td>
                                 <td><StatusBadge ok={article.publish === 1} okLabel="Published" pendingLabel="Draft" /></td>
                                 <td>{article.shortName}</td>
                                 <td>
                                     <RowActions>
-                                        {article.publish !== 1 &&
-                                            <Link to={`/p-admin/article-draft/${article.shortName}`}
-                                                className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
-                                                <FaPen /> Continue
-                                            </Link>}
+                                        <ActionButton icon={<FaPenToSquare />} onClick={() => navigate(`/p-admin/article/${article.shortName}/edit`)}>
+                                            {Number(article.publish) === 1 ? "Edit" : "Continue"}
+                                        </ActionButton>
                                         <ActionButton variant="danger" icon={<FaTrash />} onClick={() => remove(article)}>Remove</ActionButton>
                                     </RowActions>
                                 </td>

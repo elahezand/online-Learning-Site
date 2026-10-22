@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Article } from "../../types/models";
-import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
+import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/articles";
 const KEY = ["articles"];
@@ -46,6 +46,22 @@ export const useSaveDraft = (onSuccessCallback?: () => void) => {
       onSuccessCallback?.();
     },
     errorFallback: "Failed to save draft",
+  });
+};
+
+/* ---------- PUT ---------- */
+
+/* Edit a published article. Without a new cover the current one stays. */
+export const useUpdateArticle = (articleId: string, onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+
+  return usePut<unknown, FormData>(`${ENDPOINT}/${articleId}`, {
+    onSuccess: () => {
+      toast.success("The article was updated");
+      queryClient.invalidateQueries({ queryKey: KEY });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to update article",
   });
 };
 
