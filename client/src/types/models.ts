@@ -116,22 +116,44 @@ export interface Contact {
 
 export type Priority = 1 | 2 | 3
 
+/** The backend sends either an id or a populated document, depending on the endpoint */
+export type Ref<T> = Id | T
+
 export interface Ticket {
     _id: Id
     title: string
     body: string
-    user?: string
-    course?: string | null
-    departmentID?: string
-    departmentSubID?: string
+    user?: Ref<Pick<User, "_id" | "name">> | null
+    course?: Ref<Pick<Course, "_id" | "name">> | null
+    departmentID?: Ref<Department> | null
+    departmentSubID?: Ref<Department> | null
     priority?: Priority
+    /** 1 once the support team has replied */
     answer: Flag
+    /** 1 for a reply, 0 for the ticket a user opened */
+    isAnswer?: Flag
+    parent?: Ref<{ _id: Id }> | null
     createdAt?: string
+    updatedAt?: string
 }
 
 export interface TicketAnswer {
     ticket?: string
     answer?: string | null
+}
+
+export interface TicketMessage {
+    _id: Id
+    body: string
+    /** 1 when the message comes from the support team */
+    isAnswer: Flag
+    user?: Ref<Pick<User, "_id" | "name" | "role">> | null
+    createdAt?: string
+}
+
+export interface TicketThread {
+    ticket?: Partial<Ticket>
+    messages: TicketMessage[]
 }
 
 export interface Department {

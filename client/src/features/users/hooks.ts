@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AuthTokens, MyCourse, Role, User } from "../../types/models";
+import type { AuthTokens, Course, MyCourse, Role, User } from "../../types/models";
 import type { RegisterPayload } from "../auth/types";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 import { useAuth } from "../auth/useAuth";
@@ -99,3 +99,8 @@ export const useCreateUser = (onSuccessCallback?: () => void) => {
     errorFallback: "Username or email already exists",
   });
 };
+
+/* /users/courses returns enrollments ({ course, price }); older backends return
+   the courses themselves. Either way, give back the course. */
+export const enrolledCourse = (item: MyCourse | Course): Pick<Course, "_id" | "name"> | undefined =>
+  "course" in item && item.course ? item.course : "name" in item ? item : undefined;

@@ -3,12 +3,11 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FaPaperPlane } from "react-icons/fa6"
 import Input from "../../components/ui/Input"
-import { ticketSchema } from "../../validators"
+import { COURSE_SUB_DEPARTMENT, ticketSchema } from "../../validators"
 import type { TicketFormValues } from "../../validators"
 import { useCreateTicket, useDepartmentSubs, useDepartments } from "../../features/tickets/hooks"
-import { useMyCourses } from "../../features/users/hooks"
+import { enrolledCourse, useMyCourses } from "../../features/users/hooks"
 
-const COURSE_SUB_DEPARTMENT = "63b688c5516a30a651e98156"
 
 const defaultValues: TicketFormValues = { title: "", departmentID: "", departmentSubID: "", priority: "", courseId: "", body: "" }
 
@@ -25,7 +24,8 @@ export default function NewTicket() {
     const departmentSubID = watch("departmentSubID")
     const { data: departments = [] } = useDepartments()
     const { data: subDepartments = [] } = useDepartmentSubs(departmentID)
-    const { data: myCourses = [] } = useMyCourses()
+    const { data: myCourses = [], isLoading: coursesLoading } = useMyCourses()
+    const enrolled = myCourses.map(enrolledCourse).filter(course => course !== undefined)
 
     return (
         <>
@@ -33,7 +33,7 @@ export default function NewTicket() {
                 <h2 className="h4 fw-bold mb-0">New Ticket</h2>
                 <Link className="btn btn-outline-primary" to="/my-account/tickets">All tickets</Link>
             </div>
-            <form className="row g-3" onSubmit={handleSubmit(data => createTicket.mutate(data))} noValidate>
+            <form className="row g-3" onSubmit={handleSubmit(data => createTicket.mutate({ ...data, course: data.courseId || undefined }))} noValidate>
                 <div className="col-12 col-md-6">
                     <label className="form-label" htmlFor="ticket-title">Title</label>
                     <Input id="ticket-title" placeholder="Title" {...register("title")} error={errors.title?.message} />
@@ -67,7 +67,11 @@ export default function NewTicket() {
                         <label className="form-label" htmlFor="ticket-course">Course</label>
                         <Input as="select" id="ticket-course" {...register("courseId")} error={errors.courseId?.message}>
                             <option value="">Select a course</option>
-                            {myCourses.map(item => <option key={item._id} value={item._id}>{item.course?.name}</option>)}
+                            {coursesLoading ?
+                                <option disabled>Loading your courses…</option> :
+                                enrolled.length ?
+                                    enrolled.map(course => <option key={course._id} value={course._id}>{course.name}</option>) :
+                                    <option disabled>You haven't enrolled in any course yet</option>}
                         </Input>
                     </div>}
                 <div className="col-12">
