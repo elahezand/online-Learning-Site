@@ -29,8 +29,7 @@ export const useCreateDiscount = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* Checks a code for a course and returns it (with `percent`). No success toast:
-   the register flow continues with the discounted price. */
+
 export const useApplyDiscount = () =>
   usePost<Pick<Discount, "percent">, { code: string; course: string }>(({ code }) => `${ENDPOINT}/${encodeURIComponent(code)}`, {
     errorFallback: "This code is not valid",

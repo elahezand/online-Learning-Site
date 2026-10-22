@@ -9,7 +9,6 @@ const TEN_MINUTES = 10 * 60 * 1000;
 
 /* ---------- GET ---------- */
 
-/* Site navbar: rarely changes, and a failed menu shouldn't show an error */
 export const useMainMenu = () =>
   useGet<Menu[]>(ENDPOINT, undefined, {
     queryKey: [...KEY, "main"],
