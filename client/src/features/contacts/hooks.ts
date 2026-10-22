@@ -6,15 +6,11 @@ import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
 const ENDPOINT = "/contact";
 const KEY = ["contacts"];
 
-/* ---------- GET ---------- */
-
 export const useContacts = () =>
   useGet<Contact[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load messages",
   });
-
-/* ---------- POST ---------- */
 
 export const useSendContact = (onSuccessCallback?: () => void) =>
   usePost<unknown, { name: string; email: string; phone: string; body: string }>(ENDPOINT, {
@@ -37,8 +33,6 @@ export const useAnswerContact = (onSuccessCallback?: () => void) => {
     errorFallback: "Failed to send answer",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteContact = () => {
   const queryClient = useQueryClient();

@@ -8,23 +8,17 @@ import { useAuth } from "../auth/useAuth";
 const ENDPOINT = "/users";
 const KEY = ["users"];
 
-/* ---------- GET ---------- */
-
-/* Admin: all users */
 export const useUsers = () =>
   useGet<User[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load users",
   });
 
-/* User panel: courses I bought */
 export const useMyCourses = () =>
   useGet<MyCourse[]>(`${ENDPOINT}/courses`, undefined, {
     queryKey: ["me", "courses"],
     errorFallback: "Failed to load your courses",
   });
-
-/* ---------- PUT ---------- */
 
 export const useBanUser = () => {
   const queryClient = useQueryClient();
@@ -50,7 +44,6 @@ export const useChangeRole = () => {
   });
 };
 
-/* Account details: after saving, reload the logged-in user */
 export const useUpdateMe = (onSuccessCallback?: () => void) => {
   const { refreshUser } = useAuth();
 
@@ -64,8 +57,6 @@ export const useUpdateMe = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* ---------- DELETE ---------- */
-
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
@@ -78,10 +69,6 @@ export const useDeleteUser = () => {
   });
 };
 
-/* ---------- POST ---------- */
-
-/* Admin adds a user. Uses /auth/register, but unlike useRegister it does NOT
-   store the new user's tokens — the admin stays logged in as themselves. */
 export const useCreateUser = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
@@ -100,7 +87,5 @@ export const useCreateUser = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* /users/courses returns enrollments ({ course, price }); older backends return
-   the courses themselves. Either way, give back the course. */
 export const enrolledCourse = (item: MyCourse | Course): Pick<Course, "_id" | "name"> | undefined =>
   "course" in item && item.course ? item.course : "name" in item ? item : undefined;

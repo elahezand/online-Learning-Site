@@ -106,9 +106,7 @@ export default function TicketChat({ ticketId, viewer, meta, backTo }: TicketCha
             <form className="card-footer bg-body p-2 p-sm-3" onSubmit={submit}>
                 {send.isError &&
                     <div className="small text-danger mb-2">
-                        {send.error.response?.status === 404 ?
-                            "Replying to a ticket isn't available yet." :
-                            send.error.response?.data?.message ?? "Your message wasn't sent. Please try again."}
+                        {send.error.response?.data?.message ?? "Your message wasn't sent. Please try again."}
                     </div>}
                 <div className="d-flex align-items-end gap-2">
                     <textarea

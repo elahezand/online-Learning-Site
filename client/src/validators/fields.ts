@@ -25,7 +25,6 @@ export const slug = (label = "Link") =>
     text(label, { min: 2, max: 60 })
         .regex(/^[a-z0-9-]+$/, `${label} can only contain lowercase letters, numbers and -`)
 
-/* A <select> or radio group whose empty first option means "not chosen yet" */
 export const choice = <const T extends readonly [string, ...string[]]>(values: T, error: string) =>
     z.string().refine((value): value is T[number] => values.includes(value), error)
 

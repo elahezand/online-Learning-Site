@@ -6,8 +6,6 @@ interface DataTableProps {
     children: ReactNode
 }
 
-/* Card wrapper for admin tables. Children should be a
-   <table className="table table-hover align-middle mb-0">. */
 export default function DataTable({ title, actions, children }: DataTableProps) {
     return (
         <section className="card shadow-sm mt-4 overflow-hidden">

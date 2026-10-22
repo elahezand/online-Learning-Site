@@ -10,7 +10,7 @@ import { courseEditSchema, courseSchema } from "../../validators"
 import type { CourseEditData, CourseFormValues } from "../../validators"
 import CoverPreview from "../../components/ui/CoverPreview"
 import { useCategories } from "../categories/hooks"
-import { categoryIdOf } from "./CourseView"
+import { categoryIdOf } from "./courseView"
 import { useCreateCourse, useUpdateCourse } from "./hooks"
 import type { Course } from "../../types/models"
 
@@ -34,15 +34,12 @@ const valuesOf = (course: Course): CourseFormValues => ({
 })
 
 interface CourseFormProps {
-    /** Pass a course to edit it; leave empty to create a new one */
     course?: Course
-    /** Called after a successful save */
     onSaved?: () => void
 }
 
 export default function CourseForm({ course, onSaved }: CourseFormProps) {
     const isEdit = Boolean(course)
-    // Both schemas take the same fields; only the cover is optional when editing
     const resolver = zodResolver(isEdit ? courseEditSchema : courseSchema) as Resolver<CourseFormValues, unknown, CourseEditData>
 
     const { register, handleSubmit, reset, control, formState: { errors, isDirty } } = useForm<CourseFormValues, unknown, CourseEditData>({
@@ -57,7 +54,6 @@ export default function CourseForm({ course, onSaved }: CourseFormProps) {
     const updateCourse = useUpdateCourse(course?._id ?? "", onSaved)
     const saving = createCourse.isPending || updateCourse.isPending
 
-    // Load the course again if it changes (e.g. after it was fetched)
     useEffect(() => { if (course) reset(valuesOf(course)) }, [course, reset])
 
     const onSubmit = (data: CourseEditData) => {

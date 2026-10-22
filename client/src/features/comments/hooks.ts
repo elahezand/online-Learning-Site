@@ -6,15 +6,11 @@ import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHoo
 const ENDPOINT = "/comments";
 const KEY = ["comments"];
 
-/* ---------- GET ---------- */
-
 export const useComments = () =>
   useGet<Comment[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load comments",
   });
-
-/* ---------- POST ---------- */
 
 export const useCreateComment = (onSuccessCallback?: () => void) =>
   usePost<unknown, { body: string; score: string; courseShortName: string }>(ENDPOINT, {
@@ -37,8 +33,6 @@ export const useAnswerComment = (onSuccessCallback?: () => void) => {
     errorFallback: "Failed to send answer",
   });
 };
-
-/* ---------- PUT ---------- */
 
 export const useAcceptComment = () => {
   const queryClient = useQueryClient();
@@ -63,8 +57,6 @@ export const useRejectComment = () => {
     errorFallback: "Failed to reject comment",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();

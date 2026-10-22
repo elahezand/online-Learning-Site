@@ -9,7 +9,7 @@ import SectionHeader from "../../components/ui/SectionHeader"
 import { useCourses } from "../courses/hooks"
 import { useCategories } from "./hooks"
 import type { Category } from "../../types/models"
-import { categoryIdOf } from "../courses/CourseView"
+import { categoryIdOf } from "../courses/courseView"
 
 interface RankedCategory extends Category {
     Icon: IconType

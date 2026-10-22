@@ -483,3 +483,10 @@ body:has(.dialog-toaster [data-sonner-toast]:not([data-removed="true"]))::before
     margin-inline: auto;
   }
 }
+/* ---------- Checkout ---------- */
+.checkout-method {
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease;
+
+  &:hover { border-color: var(--bs-primary-border-subtle); }
+}

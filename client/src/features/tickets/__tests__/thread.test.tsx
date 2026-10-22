@@ -29,28 +29,26 @@ test("reads the full conversation when the backend supports it", async () => {
     expect(result.current.data?.ticket?.title).toBe("Help")
 })
 
-test("falls back to the question and answer endpoint", async () => {
-    mock.onGet("/tickets/t1/messages").reply(404)
-    mock.onGet("/tickets/answer/t1").reply(200, { ticket: "My question", answer: "Our answer" })
-    const { result } = renderHook(() => useTicketThread("t1"), { wrapper: wrapper() })
-    await waitFor(() => expect(result.current.data?.messages.map(m => [m.body, m.isAnswer])).toEqual([["My question", 0], ["Our answer", 1]]))
+test("admin and student both reply through the messages endpoint", async () => {
+    mock.onPost("/tickets/t1/messages").reply(201, {})
+    const admin = renderHook(() => useSendTicketMessage("t1", true), { wrapper: wrapper() })
+    await act(() => admin.result.current.mutateAsync("Here is the fix"))
+    const student = renderHook(() => useSendTicketMessage("t1", false), { wrapper: wrapper() })
+    await act(() => student.result.current.mutateAsync("Thanks, it works"))
+    expect(mock.history.post.map(r => [r.url, JSON.parse(r.data).body])).toEqual([
+        ["/tickets/t1/messages", "Here is the fix"],
+        ["/tickets/t1/messages", "Thanks, it works"],
+    ])
 })
 
-test("an admin reply falls back to POST /tickets/answer", async () => {
-    mock.onGet("/tickets/t1/messages").reply(404)
-    mock.onGet("/tickets/answer/t1").reply(200, { ticket: "Q", answer: null })
-    mock.onPost("/tickets/t1/messages").reply(404)
-    mock.onPost("/tickets/answer").reply(201, {})
-    const { result } = renderHook(() => useSendTicketMessage("t1", true), { wrapper: wrapper() })
-    await act(() => result.current.mutateAsync("Here is the fix"))
-    expect(JSON.parse(mock.history.post.at(-1)!.data)).toEqual({ ticketID: "t1", body: "Here is the fix" })
-})
-
-test("a user reply needs the messages endpoint", async () => {
-    mock.onPost("/tickets/t1/messages").reply(404)
-    const { result } = renderHook(() => useSendTicketMessage("t1", false), { wrapper: wrapper() })
-    await act(() => result.current.mutateAsync("Still broken").catch(() => { }))
-    expect(mock.history.post.map(r => r.url)).toEqual(["/tickets/t1/messages"])
+test("a failed message is removed from the chat", async () => {
+    const thread = { messages: [{ _id: "m1", body: "Hi", isAnswer: 0 }] }
+    mock.onGet("/tickets/t1/messages").reply(200, thread)
+    mock.onPost("/tickets/t1/messages").reply(500)
+    const { result } = renderHook(() => ({ thread: useTicketThread("t1"), send: useSendTicketMessage("t1", false) }), { wrapper: wrapper() })
+    await waitFor(() => expect(result.current.thread.data?.messages).toHaveLength(1))
+    await act(() => result.current.send.mutateAsync("Lost").catch(() => { }))
+    await waitFor(() => expect(result.current.thread.data?.messages).toHaveLength(1))
 })
 
 test("a reply stays new until the ticket is opened", () => {

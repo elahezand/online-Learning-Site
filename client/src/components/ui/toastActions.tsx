@@ -6,7 +6,6 @@ import ToastCard from "./ToastCard"
 import type { ToastTone } from "./ToastCard"
 import { DIALOG_TOASTER } from "./toastConfig"
 
-/* Shows a card in the dialog toaster and resolves with the user's answer */
 const ask = <T,>(render: (finish: (value: T | undefined) => void) => ReactElement) => new Promise<T | undefined>(resolve => {
     let settled = false
     const finish = (value: T | undefined) => {
@@ -49,7 +48,6 @@ export const promptToast = ({ title, description, placeholder, confirmLabel = "S
             confirmLabel={confirmLabel} cancelLabel={cancelLabel} cancelValue={cancelValue} multiline={multiline} finish={finish} />
     )).then(value => (value === undefined ? null : value))
 
-/* Read-only view of a long text (a comment, a contact message …) */
 export const messageToast = (title: string, body?: string) =>
     void ask<void>(finish => (
         <ToastCard title={title} tone="info" onClose={() => finish(undefined)}>

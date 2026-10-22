@@ -11,7 +11,8 @@ import { confirmToast, promptToast } from '../../components/ui/toastActions'
 import { discountCodeSchema } from '../../validators'
 import { coverUrl } from '../../config/env'
 import { CoursePrice } from './CourseCard'
-import { FaCalendarDays, FaChalkboardUser, FaCircleCheck, FaCircleInfo, FaClock, FaGraduationCap, FaLink, FaPlay, FaRegComments, FaUser, FaUserGraduate, FaUserLarge } from 'react-icons/fa6'
+import useCart from '../cart/useCart'
+import { FaCalendarDays, FaCartPlus, FaCartShopping, FaChalkboardUser, FaCircleCheck, FaCircleInfo, FaClock, FaGraduationCap, FaLink, FaPlay, FaRegComments, FaUser, FaUserGraduate, FaUserLarge } from 'react-icons/fa6'
 
 export default function CourseDetail() {
   const params = useParams()
@@ -30,8 +31,9 @@ export default function CourseDetail() {
   const createdAt = courseInfo.createdAt ?? ""
   const courseTeacher: Partial<NonNullable<CourseDetailData["creator"]>> = courseInfo.creator ?? {}
 
-  // Registering invalidates the course, so it reloads with the new status
   const registerCourse = useRegisterCourse()
+  const cart = useCart()
+  const inCart = cart.has(courseInfo._id)
   const applyDiscount = useApplyDiscount()
 
   const register = (price: number) => {
@@ -78,12 +80,9 @@ export default function CourseDetail() {
     }
   }
 
-
-
   return (
     <div className="container py-4 py-lg-5">
       <div className="row g-4 g-xl-5">
-        {/* ---------- main column ---------- */}
         <div className="col-12 col-lg-8 order-2 order-lg-1">
           <div className="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm bg-body-secondary mb-4">
             <img src={coverUrl(courseInfo.cover)} alt="" className="object-fit-cover" />
@@ -145,7 +144,6 @@ export default function CourseDetail() {
           <CourseComments courseInfo={{ shortName: courseInfo.shortName ?? "" }} data={courseComments} />
         </div>
 
-        {/* ---------- sidebar: purchase card + related ---------- */}
         <aside className="col-12 col-lg-4 order-1 order-lg-2">
           <div className="sticky-lg-top d-grid gap-4" style={{ top: "6rem" }}>
             <div className="card shadow">
@@ -155,15 +153,29 @@ export default function CourseDetail() {
                   <div className="alert alert-success d-flex align-items-center gap-2 mb-0">
                     <FaCircleCheck /> You are a student of this course
                   </div> :
-                  <button type="button" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2"
-                    onClick={registerToCourse} disabled={registerCourse.isPending}>
-                    <FaGraduationCap /> Enroll in this course
-                  </button>}
+                  <div className="d-grid gap-2">
+                    <button type="button" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                      onClick={registerToCourse} disabled={registerCourse.isPending}>
+                      <FaGraduationCap /> Enroll in this course
+                    </button>
+                    {courseInfo.price ?
+                      (inCart ?
+                        <Link to="/cart" className="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-2">
+                          <FaCartShopping /> In your cart — view cart
+                        </Link> :
+                        <button type="button" className="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                          onClick={() => courseInfo._id && cart.add({
+                            _id: courseInfo._id, name: courseInfo.name ?? "", shortName: courseInfo.shortName ?? "",
+                            cover: courseInfo.cover, price: courseInfo.price ?? 0, discount: courseInfo.discount,
+                          })}>
+                          <FaCartPlus /> Add to cart
+                        </button>) : null}
+                  </div>}
 
                 <ul className="list-unstyled d-grid gap-2 small text-body-secondary mt-4 mb-0">
                   <li className="d-flex justify-content-between"><span className="d-inline-flex align-items-center gap-2"><FaUserGraduate /> Students</span><span className="fw-medium text-body-emphasis">{courseInfo.courseStudentsCount ?? 0}</span></li>
                   <li className="d-flex justify-content-between"><span className="d-inline-flex align-items-center gap-2"><FaRegComments /> Comments</span><span className="fw-medium text-body-emphasis">{courseComments.length}</span></li>
-                  <li className="d-flex justify-content-between"><span className="d-inline-flex align-items-center gap-2"><FaLink /> Short link</span><span className="fw-medium text-body-emphasis text-truncate ms-3">academia.com/?p=117472</span></li>
+                  <li className="d-flex justify-content-between"><span className="d-inline-flex align-items-center gap-2"><FaLink /> Short link</span><span className="fw-medium text-body-emphasis text-truncate ms-3">{window.location.host}/course-info/{courseInfo.shortName}</span></li>
                 </ul>
               </div>
             </div>

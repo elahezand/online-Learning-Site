@@ -6,15 +6,11 @@ import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHoo
 const ENDPOINT = "/category";
 const KEY = ["categories"];
 
-/* ---------- GET ---------- */
-
 export const useCategories = () =>
   useGet<Category[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load categories",
   });
-
-/* ---------- POST ---------- */
 
 export const useCreateCategory = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -29,8 +25,6 @@ export const useCreateCategory = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* ---------- PUT ---------- */
-
 export const useUpdateCategory = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
@@ -43,8 +37,6 @@ export const useUpdateCategory = (onSuccessCallback?: () => void) => {
     errorFallback: "Failed to update category",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient();

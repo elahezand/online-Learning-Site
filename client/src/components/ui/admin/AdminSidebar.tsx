@@ -80,7 +80,6 @@ export default function AdminSidebar({ show, onHide, collapsed, onToggle }: Admi
         navigate("/login")
     }
 
-    // Paginated pages (users/1, users/2 …) keep their menu item active
     const linkClass = (item: NavItem) => ({ isActive }: { isActive: boolean }) => {
         const active = isActive || (item.match && window.location.pathname.startsWith(item.match))
         return `nav-link d-flex align-items-center gap-3 position-relative ${collapsed ? "justify-content-lg-center" : ""} ${active ? "active" : "link-body-emphasis"}`

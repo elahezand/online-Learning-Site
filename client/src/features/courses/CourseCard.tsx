@@ -6,12 +6,10 @@ import { FaArrowRight, FaChalkboardUser, FaStar, FaUsers } from "react-icons/fa6
 import { coverUrl } from "../../config/env"
 import type { Course } from "../../types/models"
 
-/* 16:9 cover with a spinner while loading and an icon if the image fails */
 export function CourseCover({ cover, className = "" }: { cover?: string; className?: string }) {
     const [loaded, setLoaded] = useState(false)
     const [failedSrc, setFailedSrc] = useState<string | null>(null)
     const src = coverUrl(cover)
-    // No cover at all, or this cover failed to load → show the placeholder
     const failed = !src || failedSrc === src
 
     return (

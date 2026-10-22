@@ -12,10 +12,6 @@ interface ButtonProps {
     children: ReactNode
 }
 
-/*
- * Shared button. Renders a router <Link> (to), an <a> (href) or a <button>.
- * Pass Bootstrap classes through className, e.g. "btn btn-primary".
- */
 export default function Button({ to, className = "", href, disabled, actionForm, type = "button", ariaLabel, children }: ButtonProps) {
     if (to) {
         return <Link to={to} className={className} aria-label={ariaLabel}>{children}</Link>

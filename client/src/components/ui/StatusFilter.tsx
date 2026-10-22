@@ -6,7 +6,6 @@ interface StatusFilterProps {
     label?: string
 }
 
-/* Pill tabs with a count, used above admin and account lists */
 export default function StatusFilter({ options, value, onChange, counts, label = "Filter by status" }: StatusFilterProps) {
     return (
         <ul className="nav nav-pills flex-nowrap overflow-auto gap-1" aria-label={label}>

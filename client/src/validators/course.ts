@@ -13,7 +13,6 @@ export const courseSchema = z.object({
     isComplete: z.enum(["0", "1"], { error: "Please select a state" }).default("0"),
 })
 
-/* Editing: the cover is optional — leave it empty to keep the current one */
 export const courseEditSchema = courseSchema.extend({
     cover: optionalImage("Cover"),
 })

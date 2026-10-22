@@ -5,7 +5,6 @@ export interface Crumb {
     to?: string
 }
 
-/* The last link is the current page */
 export default function BreadCrumb({ links }: { links: Crumb[] }) {
     return (
         <nav aria-label="breadcrumb">

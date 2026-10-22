@@ -24,7 +24,6 @@ export default function AboutUs() {
         <section className="about bg-body-tertiary py-5 my-5">
             <div ref={ref} className={`container py-lg-4 fade ${isVisible ? "show" : ""}`}>
                 <div className="row align-items-center gy-5 gx-lg-5">
-                    {/* ---------- Photo ---------- */}
                     <div className="col-lg-5">
                         <figure className="photo-frame bg-primary-subtle border border-primary-subtle rounded-5 p-3 mb-0 mx-auto">
                             <img src="/images/blog/about.jpg.webp" alt="A student learning on her laptop"
@@ -40,7 +39,6 @@ export default function AboutUs() {
                         </figure>
                     </div>
 
-                    {/* ---------- Reasons ---------- */}
                     <div className="col-lg-7">
                         <div className="text-center text-lg-start mb-4">
                             <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis border border-primary-subtle px-3 py-2 mb-3">Why ACADEMIA</span>

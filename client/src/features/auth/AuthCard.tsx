@@ -43,7 +43,6 @@ export default function AuthCard({ title, subtitle, switchText, switchLabel, swi
     )
 }
 
-/* reCAPTCHA in the site theme; the compact widget fits narrow phones */
 export function Captcha({ onChange }: { onChange: (token: string | null) => void }) {
     const [theme] = useTheme()
     const [compact, setCompact] = useState(() => window.matchMedia("(max-width: 399.98px)").matches)

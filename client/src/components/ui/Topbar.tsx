@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { FaEnvelope, FaPhone } from "react-icons/fa6"
 import { useTopbarMenu } from "../../features/menus/hooks"
@@ -7,9 +6,7 @@ import { useIndexInfo } from "../../features/info/hooks"
 export default function Topbar() {
     const { data: info = {} } = useIndexInfo()
     const { data: menu } = useTopbarMenu()
-    const quickLinks = useMemo(
-        () => (menu ? [...menu].sort(() => 0.5 - Math.random()).slice(0, 5) : []),
-        [menu])
+    const quickLinks = (menu ?? []).slice(0, 5)
 
     return (
         <div className="bg-body border-bottom small d-none d-lg-block">
@@ -27,7 +24,7 @@ export default function Topbar() {
 
                 <nav className="d-flex align-items-center gap-3" aria-label="Quick links">
                     {quickLinks.map(item => (
-                        <Link key={item._id} to={`/course-info/${item.href}`} className="link-secondary text-nowrap">
+                        <Link key={item._id} to={`/category-info/${item.href}`} className="link-secondary text-nowrap">
                             {item.title}
                         </Link>
                     ))}

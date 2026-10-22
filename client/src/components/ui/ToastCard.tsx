@@ -18,14 +18,11 @@ interface ToastCardProps {
     title: string
     description?: ReactNode
     tone?: ToastTone
-    /** "edit" shows a pen instead of the tone's icon (used by prompts) */
     icon?: "edit"
-    /** Called by the close button and the Escape key */
     onClose?: () => void
     children?: ReactNode
 }
 
-/* The dialog-style card shown in the middle of the page by confirmToast, promptToast and messageToast */
 export default function ToastCard({ title, description, tone = "primary", icon, onClose, children }: ToastCardProps) {
     const titleId = useId()
 

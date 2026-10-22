@@ -12,7 +12,7 @@ import CourseForm from "../../features/courses/CourseForm"
 import { CourseCover } from "../../features/courses/CourseCard"
 import { useCourses, useDeleteCourse } from "../../features/courses/hooks"
 import { useCategories } from "../../features/categories/hooks"
-import { categoryIdOf } from "../../features/courses/CourseView"
+import { categoryIdOf } from "../../features/courses/courseView"
 import type { Category, Course } from "../../types/models"
 
 const NO_COURSES: Course[] = []

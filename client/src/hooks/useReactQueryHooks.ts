@@ -53,7 +53,6 @@ export const useGet = <TData = unknown>(url: string, params?: Record<string, unk
 
         return data;
       } catch (error) {
-        // A cancelled request (component unmounted, StrictMode in dev) is not an error
         if (!silentError && !axios.isCancel(error)) {
           showErrorToast(error as ApiError, errorFallback || "Failed to load data");
         }

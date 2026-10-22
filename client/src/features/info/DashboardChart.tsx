@@ -15,13 +15,13 @@ interface DashboardChartProps {
 
 export default function DashboardChart({ title, data, valueLabel }: DashboardChartProps) {
     const [theme] = useTheme()
-
     const colors = useMemo(() => ({
         primary: getToken("--bs-link-color"),
         grid: getToken("--bs-border-color"),
         axis: getToken("--bs-secondary-color"),
         surface: getToken("--bs-body-bg"),
         text: getToken("--bs-emphasis-color"),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- theme is the trigger, not an input
     }), [theme])
 
     return (

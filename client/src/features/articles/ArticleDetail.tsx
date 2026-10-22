@@ -74,7 +74,6 @@ export default function ArticleDetail() {
                         {isLoading ?
                             <div className="card-body p-5 text-center"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading…</span></div></div> :
                             <div className="card-body p-3 p-sm-4 p-lg-5">
-                                {/* ---------- Header ---------- */}
                                 <header className="mb-4">
                                     {category?.title &&
                                         <Link to={`/category-info/${category.name}`} className="article-kicker d-inline-flex align-items-center gap-2 small fw-bold text-uppercase text-primary text-decoration-none mb-3">
@@ -102,10 +101,8 @@ export default function ArticleDetail() {
                                         <img src={coverUrl(article.cover)} alt="" className="object-fit-cover" />
                                     </div>}
 
-                                {/* ---------- Body ---------- */}
                                 <div className="article-body" dangerouslySetInnerHTML={{ __html: sanitize(article?.body) }} />
 
-                                {/* ---------- Footer ---------- */}
                                 <footer className="d-flex flex-wrap align-items-center justify-content-between gap-3 border-top pt-4 mt-5">
                                     <Link to="/articles" className="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
                                         <FaArrowLeft /> All articles

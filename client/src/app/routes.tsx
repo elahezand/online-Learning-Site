@@ -3,7 +3,6 @@ import type { RouteObject } from "react-router-dom"
 import { GuestOnly, RequireAuth, RequireRole } from "../features/auth/RouteGuards"
 import PublicLayout from "../components/layout/PublicLayout"
 
-// Public pages
 import Home from "../pages/public/Home"
 const Courses = lazy(() => import("../pages/public/Courses"))
 const CourseInfo = lazy(() => import("../pages/public/CourseInfo"))
@@ -15,8 +14,9 @@ const Search = lazy(() => import("../pages/public/Search"))
 const Contact = lazy(() => import("../pages/public/Contact"))
 const Login = lazy(() => import("../pages/public/Login"))
 const Register = lazy(() => import("../pages/public/Register"))
+const Cart = lazy(() => import("../pages/public/Cart"))
+const Checkout = lazy(() => import("../pages/public/Checkout"))
 
-// Admin panel (/p-admin)
 const AdminLayout = lazy(() => import("../components/layout/admin/AdminLayout"))
 const AdminDashboard = lazy(() => import("../pages/admin/Dashboard"))
 const AdminUsers = lazy(() => import("../pages/admin/Users"))
@@ -35,7 +35,6 @@ const AdminTickets = lazy(() => import("../pages/admin/Tickets"))
 const AdminTicket = lazy(() => import("../pages/admin/Ticket"))
 const AddUserForm = lazy(() => import("../features/users/AddUserForm"))
 
-// User account (/my-account)
 const AccountLayout = lazy(() => import("../components/layout/account/AccountLayout"))
 const AccountDashboard = lazy(() => import("../pages/account/Dashboard"))
 const AccountCourses = lazy(() => import("../pages/account/Courses"))
@@ -47,7 +46,6 @@ const AccountTicket = lazy(() => import("../pages/account/Ticket"))
 const AccountNewTicket = lazy(() => import("../pages/account/NewTicket"))
 
 const routes: RouteObject[] = [
-    // ---------- public (shared header + footer)
     {
         element: <PublicLayout />,
         children: [
@@ -59,10 +57,11 @@ const routes: RouteObject[] = [
             { path: "/article-info/:articleName", element: <ArticleInfo /> },
             { path: "/search/:value", element: <Search /> },
             { path: "/contact-Us", element: <Contact /> },
+            { path: "/cart", element: <Cart /> },
+            { path: "/checkout", element: <RequireAuth><Checkout /></RequireAuth> },
             { path: "/login", element: <GuestOnly><Login /></GuestOnly> },
             { path: "/register", element: <GuestOnly><Register /></GuestOnly> },
             { path: "/:courseName/:sessionId", element: <SessionInfo /> },
-            // /my-account lives inside the public layout (same header + footer)
             {
                 path: "/my-account",
                 element: <RequireAuth><AccountLayout /></RequireAuth>,
@@ -81,7 +80,6 @@ const routes: RouteObject[] = [
         ],
     },
 
-    // ---------- admin
     {
         path: "/p-admin",
         element: <RequireRole role="ADMIN"><AdminLayout /></RequireRole>,
@@ -104,7 +102,6 @@ const routes: RouteObject[] = [
             { path: "ticket/:id", element: <AdminTicket /> },
         ],
     },
-
 ]
 
 export default routes

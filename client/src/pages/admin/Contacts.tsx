@@ -3,8 +3,7 @@ import { FaEye, FaReply, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
 import usePagination from "../../hooks/usePagination"
-import useStatusFilter, { ALL } from "../../hooks/useStatusFilter"
-import type { StatusOption } from "../../hooks/useStatusFilter"
+import useStatusFilter, { ALL, type StatusOption } from "../../hooks/useStatusFilter"
 import StatusFilter from "../../components/ui/StatusFilter"
 import { formatDate } from "../../features/tickets/ticketView"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
@@ -32,7 +31,6 @@ export default function Contacts() {
     const { status, setStatus, counts, filtered } = useStatusFilter(messages, FILTERS)
     const answerContact = useAnswerContact()
     const deleteContact = useDeleteContact()
-
 
     const { page, pageCount, start, pageItems: paginatedData } = usePagination(filtered)
 

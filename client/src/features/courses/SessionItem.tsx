@@ -2,7 +2,6 @@ import { Link, useParams } from "react-router-dom"
 import { FaCirclePlay, FaLock } from "react-icons/fa6"
 import type { Session } from "../../types/models"
 
-/* One row of the course content list. Free sessions link to the player. */
 interface SessionItemProps extends Pick<Session, "_id" | "title" | "time" | "free"> {
     number: number
 }

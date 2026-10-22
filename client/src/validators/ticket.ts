@@ -1,7 +1,6 @@
 import { z } from "zod"
 import { choice, message, select, text } from "./fields"
 
-/** The "Course Support" sub-department: tickets there must name a course */
 export const COURSE_SUB_DEPARTMENT = "63b688c5516a30a651e98156"
 
 export const ticketSchema = z.object({

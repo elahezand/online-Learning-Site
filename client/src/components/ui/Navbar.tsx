@@ -3,14 +3,16 @@ import BsNavbar from "react-bootstrap/Navbar"
 import Nav from "react-bootstrap/Nav"
 import NavDropdown from "react-bootstrap/NavDropdown"
 import Offcanvas from "react-bootstrap/Offcanvas"
-import { FaRightToBracket, FaUser } from "react-icons/fa6"
+import { FaCartShopping, FaRightToBracket, FaUser } from "react-icons/fa6"
 import { useMainMenu } from "../../features/menus/hooks"
 import { useAuth } from "../../features/auth/useAuth"
 import ThemeToggle from "./ThemeToggle"
+import useCart from "../../features/cart/useCart"
 
 export default function Navbar() {
     const { data: menu = [] } = useMainMenu()
     const { isLoggedIn, userInfo } = useAuth()
+    const { count } = useCart()
 
     return (
         <BsNavbar expand="lg" sticky="top" className="bg-body border-bottom shadow-sm" collapseOnSelect>
@@ -21,6 +23,11 @@ export default function Navbar() {
 
                 <div className="d-flex align-items-center gap-2 order-lg-last ms-auto ms-lg-3">
                     <ThemeToggle />
+                    <Link to="/cart" className="btn btn-outline-secondary position-relative p-2 lh-1" aria-label={`Cart, ${count} ${count === 1 ? "course" : "courses"}`} title="Cart">
+                        <FaCartShopping />
+                        {count > 0 &&
+                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-primary">{count}</span>}
+                    </Link>
                     {isLoggedIn ?
                         <Link to="/my-account" className="btn btn-outline-primary d-inline-flex align-items-center gap-2">
                             <FaUser />

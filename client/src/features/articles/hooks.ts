@@ -6,8 +6,6 @@ import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHoo
 const ENDPOINT = "/articles";
 const KEY = ["articles"];
 
-/* ---------- GET ---------- */
-
 export const useArticles = () =>
   useGet<Article[]>(ENDPOINT, undefined, {
     queryKey: KEY,
@@ -20,8 +18,6 @@ export const useArticle = (shortName?: string) =>
     enabled: Boolean(shortName),
     errorFallback: "Failed to load article",
   });
-
-/* ---------- POST ---------- */
 
 export const usePublishArticle = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -49,23 +45,19 @@ export const useSaveDraft = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* ---------- PUT ---------- */
-
-/* Edit a published article. Without a new cover the current one stays. */
 export const useUpdateArticle = (articleId: string, onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
   return usePut<unknown, FormData>(`${ENDPOINT}/${articleId}`, {
-    onSuccess: () => {
-      toast.success("The article was updated");
+    onSuccess: (_data, formData) => {
+      const publish = formData.get("publish");
+      toast.success(publish === "0" ? "The draft was saved" : publish === "1" ? "The article was published" : "The article was updated");
       queryClient.invalidateQueries({ queryKey: KEY });
       onSuccessCallback?.();
     },
     errorFallback: "Failed to update article",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteArticle = () => {
   const queryClient = useQueryClient();

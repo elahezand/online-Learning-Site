@@ -10,7 +10,7 @@ import { confirmToast } from "../../components/ui/toastActions"
 import AddSessionForm from "../../features/courses/AddSessionForm"
 import { useCourses, useDeleteSession, useSessions } from "../../features/courses/hooks"
 import { useCategories } from "../../features/categories/hooks"
-import { categoryIdOf } from "../../features/courses/CourseView"
+import { categoryIdOf } from "../../features/courses/courseView"
 import type { Category, Course, Session } from "../../types/models"
 
 const NO_SESSIONS: Session[] = []
@@ -36,7 +36,6 @@ export default function Sessions() {
         count: sessions.filter(session => categoryOfCourse.get(session.course?._id ?? "") === item._id).length,
     })), [categories, sessions, categoryOfCourse])
 
-    // Only the courses of the chosen category
     const courseOptions = useMemo(() => courses
         .filter(item => !category || categoryIdOf(item) === category)
         .map(item => ({ value: item._id, label: item.name, count: sessions.filter(session => session.course?._id === item._id).length })),

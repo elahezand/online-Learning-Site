@@ -18,7 +18,6 @@ interface FilterSelectProps {
 
 const withCount = (label: string, count?: number) => count === undefined ? label : `${label} (${count})`
 
-/* Compact dropdown filter for the top of a table */
 export default function FilterSelect({ label, value, onChange, options, allLabel, allCount, disabled }: FilterSelectProps) {
     const id = useId()
     return (

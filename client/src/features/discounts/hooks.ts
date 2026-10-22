@@ -6,15 +6,11 @@ import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
 const ENDPOINT = "/offs";
 const KEY = ["discounts"];
 
-/* ---------- GET ---------- */
-
 export const useDiscounts = () =>
   useGet<Discount[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load discounts",
   });
-
-/* ---------- POST ---------- */
 
 export const useCreateDiscount = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -29,7 +25,6 @@ export const useCreateDiscount = (onSuccessCallback?: () => void) => {
   });
 };
 
-
 export const useApplyDiscount = () =>
   usePost<Pick<Discount, "percent">, { code: string; course: string }>(({ code }) => `${ENDPOINT}/${encodeURIComponent(code)}`, {
     errorFallback: "This code is not valid",
@@ -43,8 +38,6 @@ export const useSiteWideDiscount = (onSuccessCallback?: () => void) =>
     },
     errorFallback: "Failed to create site-wide discount",
   });
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteDiscount = () => {
   const queryClient = useQueryClient();

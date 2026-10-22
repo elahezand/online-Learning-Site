@@ -7,7 +7,6 @@ type InputProps =
 
 type Props = InputProps & { error?: string }
 
-/* Bootstrap form control with an error message under it */
 export default function Input({ error, className = "", ...rest }: Props) {
     const state = error ? "is-invalid" : ""
     const feedback = error && <div className="invalid-feedback">{error}</div>

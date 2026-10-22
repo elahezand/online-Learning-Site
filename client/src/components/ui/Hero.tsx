@@ -40,7 +40,6 @@ export default function Hero({ image }: { image: string }) {
         <section className="hero position-relative overflow-hidden">
             <div className="m-5 position-relative">
                 <div className="hero__inner row align-items-center gy-5 gx-lg-5 py-5">
-                    {/* ---------- Text, search and stats ---------- */}
                     <div className="col-lg-6 text-center text-lg-start">
                         <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis border border-primary-subtle px-3 py-2 mb-4 d-inline-flex align-items-center gap-2">
                             <FaGraduationCap /> Online Education &amp; Learning
@@ -104,7 +103,6 @@ export default function Hero({ image }: { image: string }) {
                         </div>
                     </div>
 
-                    {/* ---------- Photo ---------- */}
                     <div className="col-lg-6">
                         <div className="hero__photo-wrap">
                             <img src={image} alt="A student learning on her laptop"

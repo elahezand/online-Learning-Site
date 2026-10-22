@@ -9,7 +9,6 @@ export interface PromptOptions {
     placeholder?: string
     confirmLabel?: string
     cancelLabel?: string
-    /** What the Cancel button returns. Closing the toast always returns null. */
     cancelValue?: string | null
     schema?: ZodType<string, string>
     multiline?: boolean

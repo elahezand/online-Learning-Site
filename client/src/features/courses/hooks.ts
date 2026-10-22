@@ -8,8 +8,6 @@ const KEY = ["courses"];
 const SESSIONS_KEY = ["sessions"];
 const enc = encodeURIComponent;
 
-/* ---------- GET: courses ---------- */
-
 export const useCourses = () =>
   useGet<Course[]>(ENDPOINT, undefined, {
     queryKey: KEY,
@@ -49,8 +47,6 @@ export const useRelatedCourses = (shortName?: string) =>
     silentError: true,
   });
 
-/* ---------- GET: sessions ---------- */
-
 export const useSessions = () =>
   useGet<Session[]>(`${ENDPOINT}/sessions`, undefined, {
     queryKey: SESSIONS_KEY,
@@ -63,8 +59,6 @@ export const useSession = (shortName?: string, sessionId?: string) =>
     enabled: Boolean(shortName && sessionId),
     errorFallback: "Failed to load session",
   });
-
-/* ---------- POST ---------- */
 
 export const useCreateCourse = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -79,9 +73,6 @@ export const useCreateCourse = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* ---------- PUT ---------- */
-
-/* FormData so a new cover can be sent; without a cover the current one stays */
 export const useUpdateCourse = (courseId: string, onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
@@ -109,7 +100,6 @@ export const useRegisterCourse = (onSuccessCallback?: () => void) => {
   });
 };
 
-/* courseId is a hook argument because the body here is FormData (the video) */
 export const useCreateSession = (courseId: string, onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
@@ -123,8 +113,6 @@ export const useCreateSession = (courseId: string, onSuccessCallback?: () => voi
     errorFallback: "Failed to create session",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient();

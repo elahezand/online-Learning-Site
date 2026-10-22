@@ -22,7 +22,6 @@ export const PRIORITY_CLASSES: Record<Priority, string> = {
     1: "bg-secondary-subtle text-secondary-emphasis",
 }
 
-/* Only the tickets users opened — replies are stored as tickets too */
 export const isTopLevel = (ticket: Pick<Ticket, "isAnswer" | "parent">) => !ticket.isAnswer && !ticket.parent
 
 export const isAnswered = (ticket: Pick<Ticket, "answer">) => Number(ticket.answer) === 1
@@ -32,7 +31,6 @@ export const formatDate = (iso?: string) =>
 
 export const formatTime = (iso?: string) =>
     iso ? new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : ""
-
 
 const SEEN_KEY = "seenTicketReplies"
 

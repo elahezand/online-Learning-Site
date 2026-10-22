@@ -29,7 +29,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<AuthStatus>(() => (tokenStorage.get() ? "loading" : "guest"))
     const queryClient = useQueryClient()
 
-
     const clearSession = useCallback(() => {
         queryClient.clear()
         tokenStorage.clear()
@@ -56,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, [clearSession])
 
-    // Resolve the session whenever the token changes
     useEffect(() => {
         if (!token) return
         const controller = new AbortController()
@@ -65,7 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return () => controller.abort()
     }, [token, refreshUser])
 
-    // Logging in/out in another tab updates this tab too
     useEffect(() => {
         const onStorage = (e: StorageEvent) => {
             if (e.key === null || e.key === "accessToken") {

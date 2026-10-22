@@ -3,8 +3,7 @@ import { FaBan, FaCheck, FaEye, FaReply, FaStar, FaTrash, FaXmark } from "react-
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
 import usePagination from "../../hooks/usePagination"
-import useStatusFilter, { ALL } from "../../hooks/useStatusFilter"
-import type { StatusOption } from "../../hooks/useStatusFilter"
+import useStatusFilter, { ALL, type StatusOption } from "../../hooks/useStatusFilter"
 import StatusFilter from "../../components/ui/StatusFilter"
 import FilterSelect from "../../components/ui/FilterSelect"
 import useQueryParam from "../../hooks/useQueryParam"
@@ -67,7 +66,6 @@ export default function Comments() {
     const rejectComment = useRejectComment()
     const answerComment = useAnswerComment()
     const banUser = useBanUser()
-
 
     const { page, pageCount, start, pageItems: paginatedData } = usePagination(filtered)
 

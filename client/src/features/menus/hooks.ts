@@ -7,8 +7,6 @@ const ENDPOINT = "/menus";
 const KEY = ["menus"];
 const TEN_MINUTES = 10 * 60 * 1000;
 
-/* ---------- GET ---------- */
-
 export const useMainMenu = () =>
   useGet<Menu[]>(ENDPOINT, undefined, {
     queryKey: [...KEY, "main"],
@@ -23,14 +21,11 @@ export const useTopbarMenu = () =>
     silentError: true,
   });
 
-/* Admin panel list */
 export const useMenus = () =>
   useGet<Menu[]>(`${ENDPOINT}/all`, undefined, {
     queryKey: [...KEY, "all"],
     errorFallback: "Failed to load menus",
   });
-
-/* ---------- POST ---------- */
 
 export const useCreateMenu = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -44,8 +39,6 @@ export const useCreateMenu = (onSuccessCallback?: () => void) => {
     errorFallback: "Failed to create menu",
   });
 };
-
-/* ---------- DELETE ---------- */
 
 export const useDeleteMenu = () => {
   const queryClient = useQueryClient();

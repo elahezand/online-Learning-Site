@@ -17,7 +17,7 @@ import { PRIORITY_CLASSES, PRIORITY_LABELS, formatDate, isAnswered, isTopLevel, 
 import { useUsers } from "../../features/users/hooks"
 import { useAuth } from "../../features/auth/useAuth"
 import type { Category, Comment, Contact, Course, Ticket, User } from "../../types/models"
-import { categoryIdOf } from "../../features/courses/CourseView"
+import { categoryIdOf } from "../../features/courses/courseView"
 
 const EMPTY: never[] = []
 

@@ -9,8 +9,6 @@ const swiperColors = {
     "--swiper-pagination-bullet-inactive-color": "var(--bs-secondary-color)",
 } as CSSProperties
 
-/* Responsive course carousel shared by "popular" and "pre-sale" sections.
-   Swiper reads its accent color from --swiper-theme-color. */
 export default function CourseSlider({ courses }: { courses: Course[] }) {
     return (
         <Swiper

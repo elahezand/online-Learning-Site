@@ -5,7 +5,6 @@ import type { Role } from "../../types/models"
 import { useAuth } from "./useAuth"
 import PageLoader from "../../components/ui/PageLoader"
 
-/* Logged-in users only. Guests go to /login and come back afterwards. */
 export function RequireAuth({ children }: { children: ReactNode }) {
     const { status } = useAuth()
     const location = useLocation()
@@ -17,7 +16,6 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     return children
 }
 
-/* Logged-in users with a specific role (e.g. "ADMIN"). */
 export function RequireRole({ role, children }: { role: Role; children: ReactNode }) {
     const { status, user } = useAuth()
     const location = useLocation()
@@ -29,7 +27,6 @@ export function RequireRole({ role, children }: { role: Role; children: ReactNod
     if (user?.role !== role) return <Navigate to="/" replace />
     return children
 }
-
 
 export function GuestOnly({ children }: { children: ReactNode }) {
     const { status } = useAuth()

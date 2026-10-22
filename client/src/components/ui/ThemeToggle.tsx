@@ -1,8 +1,6 @@
 import { BsMoonStarsFill, BsSunFill } from "react-icons/bs"
 import useTheme from "../../hooks/useTheme"
 
-/* Square icon button that switches light / dark. Pass Bootstrap button
-   classes through `className` (default: outline on the page background). */
 export default function ThemeToggle({ className = "btn-outline-secondary" }: { className?: string }) {
     const [theme, toggleTheme] = useTheme()
     const isDark = theme === "dark"
