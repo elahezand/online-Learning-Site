@@ -1,56 +1,50 @@
-import { useMemo } from 'react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import useTheme, { getToken } from '../../hooks/useTheme';
+import { useMemo } from "react"
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import useTheme, { getToken } from "../../hooks/useTheme"
 
-const data = [
-    { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
-    { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
-    { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
-    { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
-    { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
-    { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
-    { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
-];
+export interface ChartPoint {
+    name: string
+    value: number
+}
 
-export default function DashboardChart() {
+interface DashboardChartProps {
+    title: string
+    data: ChartPoint[]
+    valueLabel: string
+}
+
+export default function DashboardChart({ title, data, valueLabel }: DashboardChartProps) {
     const [theme] = useTheme()
 
-    // SVG attributes can't read CSS variables, so resolve Bootstrap's per theme.
-    // --bs-link-color is the theme-aware accent (lighter orange in dark mode).
     const colors = useMemo(() => ({
         primary: getToken("--bs-link-color"),
         grid: getToken("--bs-border-color"),
         axis: getToken("--bs-secondary-color"),
         surface: getToken("--bs-body-bg"),
-        border: getToken("--bs-border-color"),
         text: getToken("--bs-emphasis-color"),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }), [theme])
 
     return (
-        <section className='card shadow-sm mt-4'>
-            <div className="card-header py-3"><h2 className="h6 fw-bold mb-0">Overview</h2></div>
+        <section className="card shadow-sm h-100">
+            <div className="card-header py-3"><h2 className="h6 fw-bold mb-0">{title}</h2></div>
             <div className="card-body">
-            <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
-                    <AreaChart data={data} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
-                        <defs>
-                            <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor={colors.primary} stopOpacity={0.45} />
-                                <stop offset="100%" stopColor={colors.primary} stopOpacity={0.05} />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-                        <XAxis dataKey="name" stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} />
-                        <YAxis stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} />
-                        <Tooltip
-                            contentStyle={{ backgroundColor: colors.surface, borderColor: colors.border, borderRadius: 8, color: colors.text }}
-                            labelStyle={{ color: colors.text }}
-                            itemStyle={{ color: colors.primary }} />
-                        <Area type="monotone" dataKey="uv" stroke={colors.primary} strokeWidth={2} fill="url(#chartFill)" />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
+                {data.length ?
+                    <div style={{ width: "100%", height: 300 }}>
+                        <ResponsiveContainer>
+                            <BarChart data={data} margin={{ top: 10, right: 8, left: -16, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                                <XAxis dataKey="name" stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} interval={0} angle={-25} textAnchor="end" height={60} />
+                                <YAxis allowDecimals={false} stroke={colors.axis} tick={{ fill: colors.axis, fontSize: 12 }} />
+                                <Tooltip
+                                    cursor={{ fill: colors.grid, opacity: 0.4 }}
+                                    contentStyle={{ backgroundColor: colors.surface, borderColor: colors.grid, borderRadius: 8, color: colors.text }}
+                                    labelStyle={{ color: colors.text }}
+                                    formatter={(value) => [value, valueLabel]} />
+                                <Bar dataKey="value" fill={colors.primary} radius={[6, 6, 0, 0]} maxBarSize={48} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div> :
+                    <p className="text-body-secondary mb-0">No data yet.</p>}
             </div>
         </section>
     )

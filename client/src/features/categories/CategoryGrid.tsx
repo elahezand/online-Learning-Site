@@ -8,7 +8,8 @@ import {
 import SectionHeader from "../../components/ui/SectionHeader"
 import { useCourses } from "../courses/hooks"
 import { useCategories } from "./hooks"
-import type { Category, Course } from "../../types/models"
+import type { Category } from "../../types/models"
+import { categoryIdOf } from "../courses/CourseView"
 
 interface RankedCategory extends Category {
     Icon: IconType
@@ -34,9 +35,6 @@ const iconFor = (category: Category) => {
     const text = `${category.name} ${category.title}`.toLowerCase()
     return ICONS.find(([pattern]) => pattern.test(text))?.[1] ?? FaLayerGroup
 }
-
-const categoryId = (course: Course) =>
-    typeof course.categoryID === "object" ? course.categoryID._id : course.categoryID
 
 const countLabel = (count: number) => (count ? `${count} ${count === 1 ? "course" : "courses"}` : "Coming soon")
 
@@ -90,7 +88,7 @@ export default function CategoryGrid() {
         .map(category => ({
             ...category,
             Icon: iconFor(category),
-            count: courses.filter(course => categoryId(course) === category._id).length,
+            count: courses.filter(course => categoryIdOf(course) === category._id).length,
         }))
         .sort((a, b) => b.count - a.count), [categories, courses])
 

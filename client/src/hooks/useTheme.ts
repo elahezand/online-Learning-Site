@@ -1,14 +1,5 @@
 import { useCallback, useSyncExternalStore } from "react"
 
-/*
- * Light / dark theme, shared by every component.
- *
- * The theme lives on <html data-bs-theme="..."> (Bootstrap 5.3 color modes)
- * and the user's choice is remembered in localStorage. index.html
- * applies it before the first paint, so there is no flash.
- *
- * Until the user picks a theme, the site follows the OS setting.
- */
 
 export type Theme = "light" | "dark"
 
@@ -28,7 +19,6 @@ const readSaved = () => {
     }
 }
 
-/* Keep the browser UI (mobile address bar) in the same color as the page */
 const syncThemeColor = (theme: Theme) => {
     const color = getComputedStyle(root).getPropertyValue("--bs-body-bg").trim()
     if (!color) return
@@ -45,24 +35,17 @@ const applyTheme = (theme: Theme) => {
     listeners.forEach((listener) => listener())
 }
 
-// index.html sets the theme before React loads; match the browser UI to it
 syncThemeColor(readTheme())
 
-/* OS theme changed: follow it only if the user never picked one */
 const onSystemChange = (e: MediaQueryListEvent) => {
     if (!readSaved()) applyTheme(e.matches ? "dark" : "light")
 }
 
-/* Theme changed in another tab */
 const onStorage = (e: StorageEvent) => {
     if (e.key === STORAGE_KEY) applyTheme(e.newValue === "dark" || e.newValue === "light" ? e.newValue : systemDark?.matches ? "dark" : "light")
 }
 
-/*
- * The window listeners are added once, when the first component subscribes,
- * and removed when the last one unsubscribes, no matter how many components
- * use the hook.
- */
+
 const subscribe = (listener: () => void) => {
     if (listeners.size === 0) {
         systemDark?.addEventListener?.("change", onSystemChange)
@@ -94,5 +77,4 @@ export default function useTheme(): [Theme, () => void] {
     return [theme, toggleTheme]
 }
 
-/* Read a CSS variable from the page, e.g. getToken("--bs-body-bg") */
 export const getToken = (name: string) => getComputedStyle(root).getPropertyValue(name).trim()
