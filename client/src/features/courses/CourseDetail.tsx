@@ -5,10 +5,8 @@ import CourseComments from "../comments/CourseComments"
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Accordion from 'react-bootstrap/Accordion';
 import { useAuth } from "../auth/useAuth"
-import { useApplyDiscount } from "../discounts/hooks"
 import { useCourse, useRegisterCourse, useRelatedCourses } from "./hooks"
-import { confirmToast, promptToast } from '../../components/ui/toastActions'
-import { discountCodeSchema } from '../../validators'
+import { confirmToast } from '../../components/ui/toastActions'
 import { coverUrl } from '../../config/env'
 import { CoursePrice } from './CourseCard'
 import useCart from '../cart/useCart'
@@ -34,11 +32,7 @@ export default function CourseDetail() {
   const registerCourse = useRegisterCourse()
   const cart = useCart()
   const inCart = cart.has(courseInfo._id)
-  const applyDiscount = useApplyDiscount()
-
-  const register = (price: number) => {
-    if (courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id, price })
-  }
+  const isFree = courseInfo.price === 0
 
   const registerToCourse = async () => {
     if (!isLoggedIn) {
@@ -47,37 +41,7 @@ export default function CourseDetail() {
       return
     }
 
-    if (courseInfo.price === 0) {
-      register(0)
-      return
-    }
-
-    const code = await promptToast({
-      title: "Have a discount code?",
-      description: "Enter it below, or continue without one.",
-      placeholder: "Discount code",
-      confirmLabel: "Apply",
-      cancelLabel: "Continue without code",
-      cancelValue: "",
-      schema: discountCodeSchema,
-      multiline: false,
-    })
-
-    if (code === null) return
-
-    const price = courseInfo.price ?? 0
-
-    if (code === "") {
-      register(price)
-      return
-    }
-
-    try {
-      const discount = await applyDiscount.mutateAsync({ code, course: courseInfo._id ?? "" })
-      register(price - (price * discount.percent) / 100)
-    } catch {
-      // "This code is not valid" is shown by the hook
-    }
+    if (courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id, price: 0 })
   }
 
   return (
@@ -153,24 +117,22 @@ export default function CourseDetail() {
                   <div className="alert alert-success d-flex align-items-center gap-2 mb-0">
                     <FaCircleCheck /> You are a student of this course
                   </div> :
-                  <div className="d-grid gap-2">
+                  isFree ?
                     <button type="button" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2"
                       onClick={registerToCourse} disabled={registerCourse.isPending}>
                       <FaGraduationCap /> Enroll in this course
-                    </button>
-                    {courseInfo.price ?
-                      (inCart ?
-                        <Link to="/cart" className="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-2">
-                          <FaCartShopping /> In your cart — view cart
-                        </Link> :
-                        <button type="button" className="btn btn-outline-primary w-100 d-inline-flex align-items-center justify-content-center gap-2"
-                          onClick={() => courseInfo._id && cart.add({
-                            _id: courseInfo._id, name: courseInfo.name ?? "", shortName: courseInfo.shortName ?? "",
-                            cover: courseInfo.cover, price: courseInfo.price ?? 0, discount: courseInfo.discount,
-                          })}>
-                          <FaCartPlus /> Add to cart
-                        </button>) : null}
-                  </div>}
+                    </button> :
+                    inCart ?
+                      <Link to="/cart" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2">
+                        <FaCartShopping /> In your cart — view cart
+                      </Link> :
+                      <button type="button" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2"
+                        onClick={() => courseInfo._id && cart.add({
+                          _id: courseInfo._id, name: courseInfo.name ?? "", shortName: courseInfo.shortName ?? "",
+                          cover: courseInfo.cover, price: courseInfo.price ?? 0, discount: courseInfo.discount,
+                        })}>
+                        <FaCartPlus /> Add to cart
+                      </button>}
 
                 <ul className="list-unstyled d-grid gap-2 small text-body-secondary mt-4 mb-0">
                   <li className="d-flex justify-content-between"><span className="d-inline-flex align-items-center gap-2"><FaUserGraduate /> Students</span><span className="fw-medium text-body-emphasis">{courseInfo.courseStudentsCount ?? 0}</span></li>
