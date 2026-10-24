@@ -1,0 +1,29 @@
+const path = require("path");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+
+const required = (name) => {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing environment variable: ${name}`);
+  return value;
+};
+
+const env = {
+  nodeEnv: process.env.NODE_ENV || "development",
+  port: Number(process.env.PORT) || 4000,
+  mongoUri: required("MONGO_URI"),
+  jwtSecret: required("JWT_SECRET"),
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || "30d",
+  corsOrigin: process.env.CORS_ORIGIN || "*",
+  mail: {
+    service: process.env.MAIL_SERVICE || "gmail",
+    user: process.env.MAIL_USER || "",
+    pass: process.env.MAIL_PASS || "",
+    fromName: process.env.MAIL_FROM_NAME || "ACADEMIA",
+  },
+};
+
+env.isProduction = env.nodeEnv === "production";
+
+module.exports = env;
