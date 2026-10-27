@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { choice, file, flag, number, objectId, optional, slug, text } from "./common";
+import { choice, file, flag, number, objectId, optional, paginationQuery, slug, sortChoice, text } from "./common";
 
 const STATUSES = ["start", "presell"] as const;
 
@@ -47,15 +47,28 @@ export const registerSchema = z.object({
   price: number("Price", { min: 0 }),
 });
 
-export const shortNameParams = z.object({ shortName: text("Course link", { max: 80 }) });
+export const COURSE_SORTS = ["newest", "oldest", "price-asc", "price-desc", "name"] as const;
 
-export const categoryParams = z.object({ categoryName: text("Category", { max: 80 }) });
+export const courseListQuery = paginationQuery.extend({
+  search: optional(text("Search", { max: 80 })),
+  category: optional(text("Category", { max: 80 })),
+  status: optional(fields.status),
+  free: optional(flag("Free")),
+  sort: sortChoice(COURSE_SORTS),
+});
+
+export const popularQuery = z.object({
+  limit: optional(number("Limit", { min: 1, max: 20 })).default(8),
+});
+
+export const shortNameParams = z.object({ shortName: text("Course link", { max: 80 }) });
 
 export const sessionParams = z.object({
   shortName: text("Course link", { max: 80 }),
   sessionID: objectId("Session id"),
 });
 
+export type CourseListQuery = z.infer<typeof courseListQuery>;
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
 export type CreateSessionInput = z.infer<typeof createSessionSchema>;

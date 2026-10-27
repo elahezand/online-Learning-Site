@@ -1,27 +1,23 @@
 const asyncHandler = require("../../utils/asyncHandler");
 const commentService = require("../../services/admin/comment.service");
-const { idParams } = require("../../validators/common");
-const { answerCommentSchema } = require("../../validators/comment");
-
-const commentId = (req) => idParams("Comment id").parse(req.params).id;
 
 exports.getAll = asyncHandler(async (req, res) => {
-  res.json(await commentService.list());
+  res.json(await commentService.list(req.parsed.data));
 });
 
 exports.accept = asyncHandler(async (req, res) => {
-  res.json(await commentService.accept(commentId(req)));
+  res.json(await commentService.accept(req.parsed.data.id));
 });
 
 exports.reject = asyncHandler(async (req, res) => {
-  res.json(await commentService.reject(commentId(req)));
+  res.json(await commentService.reject(req.parsed.data.id));
 });
 
 exports.answer = asyncHandler(async (req, res) => {
-  const id = commentId(req);
-  res.json(await commentService.answer(req.user, id, answerCommentSchema.parse(req.body)));
+  const { id, ...input } = req.parsed.data;
+  res.json(await commentService.answer(req.user, id, input));
 });
 
 exports.remove = asyncHandler(async (req, res) => {
-  res.json(await commentService.remove(commentId(req)));
+  res.json(await commentService.remove(req.parsed.data.id));
 });

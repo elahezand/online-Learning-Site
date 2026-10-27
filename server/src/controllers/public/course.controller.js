@@ -1,22 +1,13 @@
 const asyncHandler = require("../../utils/asyncHandler");
 const courseService = require("../../services/public/course.service");
-const { shortNameParams, categoryParams } = require("../../validators/course");
+const { shortNameParams } = require("../../validators/course");
 
 exports.getAll = asyncHandler(async (req, res) => {
-  res.json(await courseService.list());
-});
-
-exports.getPresell = asyncHandler(async (req, res) => {
-  res.json(await courseService.listPresell());
+  res.json(await courseService.list(req.parsed.data));
 });
 
 exports.getPopular = asyncHandler(async (req, res) => {
-  res.json(await courseService.listPopular());
-});
-
-exports.getByCategory = asyncHandler(async (req, res) => {
-  const { categoryName } = categoryParams.parse(req.params);
-  res.json(await courseService.listByCategory(categoryName));
+  res.json(await courseService.listPopular(req.parsed.data));
 });
 
 exports.getOne = asyncHandler(async (req, res) => {

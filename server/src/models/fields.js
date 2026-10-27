@@ -19,6 +19,7 @@ const hideInternals = {
   versionKey: false,
   transform: (doc, ret) => {
     delete ret.password;
+    delete ret.refreshTokenHash;
     return ret;
   },
 };

@@ -1,16 +1,16 @@
 const { Router } = require("express");
 const { user, admin, optionalUser } = require("../guards");
+const validate = require("../../middlewares/validate");
 const { uploadCover, uploadVideo } = require("../../middlewares/upload");
+const { courseListQuery, popularQuery } = require("../../validators/course");
 const publicCourses = require("../../controllers/public/course.controller");
 const userCourses = require("../../controllers/user/course.controller");
 const adminCourses = require("../../controllers/admin/course.controller");
 
 const router = Router();
 
-router.route("/").get(publicCourses.getAll).post(admin, uploadCover, adminCourses.create);
-router.get("/presell", publicCourses.getPresell);
-router.get("/popular", publicCourses.getPopular);
-router.get("/category/:categoryName", publicCourses.getByCategory);
+router.route("/").get(validate({ query: courseListQuery }), publicCourses.getAll).post(admin, uploadCover, adminCourses.create);
+router.get("/popular", validate({ query: popularQuery }), publicCourses.getPopular);
 router.get("/related/:shortName", publicCourses.getRelated);
 
 router.get("/sessions", admin, adminCourses.getSessions);

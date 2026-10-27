@@ -10,7 +10,6 @@ const userSchema = new Schema(
     password: { type: String, required: [true, "Password is required"], select: false },
     name: requiredString("Name", { minlength: 3, maxlength: 60 }),
     phone: { type: String, trim: true },
-    profile: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
   },
   { timestamps: true, toJSON: hideInternals, toObject: hideInternals }

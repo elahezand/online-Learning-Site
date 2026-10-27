@@ -13,8 +13,8 @@ const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT) || 4000,
   mongoUri: required("MONGO_URI"),
-  jwtSecret: required("JWT_SECRET"),
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || "30d",
+  accessTokenSecret: required("ACCESS_TOKEN_SECRET"),
+  refreshTokenSecret: required("REFRESH_TOKEN_SECRET"),
   corsOrigin: process.env.CORS_ORIGIN || "*",
   mail: {
     service: process.env.MAIL_SERVICE || "gmail",

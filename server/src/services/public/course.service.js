@@ -1,5 +1,4 @@
 const Course = require("../../models/course");
-const Category = require("../../models/category");
 const Session = require("../../models/session");
 const Comment = require("../../models/comment");
 const CourseUser = require("../../models/course-user");
@@ -7,25 +6,48 @@ const AppError = require("../../utils/AppError");
 const { withStats } = require("../shared/course-summary");
 const { nestAnswers } = require("../shared/comment-tree");
 const { PUBLIC_USER } = require("../shared/selects");
+const { searchFilter, categoryFilter } = require("../shared/filter");
+const paginate = require("../../utils/paginate");
 
 const RELATED_LIMIT = 4;
 
-const findCourses = (filter = {}) =>
-  Course.find(filter).populate("creator", "name").populate("categoryID").sort({ _id: -1 }).lean();
-
-const list = async () => withStats(await findCourses());
-
-const listPresell = async () => withStats(await findCourses({ status: "presell" }));
-
-const listPopular = async () => {
-  const courses = await withStats(await findCourses());
-  return courses.sort((a, b) => b.registers - a.registers || b.courseAverageScore - a.courseAverageScore);
+const SORTS = {
+  newest: { _id: -1 },
+  oldest: { _id: 1 },
+  "price-asc": { price: 1, _id: -1 },
+  "price-desc": { price: -1, _id: -1 },
+  name: { name: 1 },
 };
 
-const listByCategory = async (categoryName) => {
-  const category = await Category.findOne({ name: categoryName }).lean();
-  if (!category) return [];
-  return withStats(await findCourses({ categoryID: category._id }));
+const buildFilter = async ({ search, category, status, free }) => ({
+  ...searchFilter("name", search),
+  ...(await categoryFilter(category)),
+  ...(status && { status }),
+  ...(free === 1 && { price: 0 }),
+  ...(free === 0 && { price: { $gt: 0 } }),
+});
+
+const list = async ({ page, limit, sort, ...query }) => {
+  const result = await paginate(Course, {
+    filter: await buildFilter(query),
+    sort: SORTS[sort],
+    page,
+    limit,
+    populate: [{ path: "creator", select: "name" }, { path: "categoryID" }],
+  });
+  return { ...result, items: await withStats(result.items) };
+};
+
+const listPopular = async ({ limit }) => {
+  const top = await Course.aggregate([
+    { $lookup: { from: "courseusers", localField: "_id", foreignField: "course", as: "enrollments" } },
+    { $addFields: { enrollmentCount: { $size: "$enrollments" } } },
+    { $sort: { enrollmentCount: -1, _id: -1 } },
+    { $limit: limit },
+    { $project: { enrollments: 0, enrollmentCount: 0 } },
+  ]);
+  const courses = await Course.populate(top, [{ path: "creator", select: "name" }, { path: "categoryID" }]);
+  return withStats(courses);
 };
 
 const findByShortName = async (shortName) => {
@@ -73,9 +95,7 @@ const listRelated = async (shortName) => {
 
 module.exports = {
   list,
-  listPresell,
   listPopular,
-  listByCategory,
   findByShortName,
   hideVideos,
   getByShortName,

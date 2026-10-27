@@ -25,8 +25,8 @@ export const text = (label: string, { min = 1, max = 255 }: Length = {}) =>
   z
     .string({ error: `${label} is required` })
     .trim()
-    .min(1, `${label} is required`)
-    .min(min, `${label} must be at least ${min} characters`)
+    .min(1, { error: `${label} is required`, abort: true })
+    .min(min, { error: `${label} must be at least ${min} characters`, abort: true })
     .max(max, `${label} must be at most ${max} characters`);
 
 export const optional = <T extends z.ZodType>(schema: T) =>
@@ -79,3 +79,11 @@ export const file = (label: string) =>
   );
 
 export const idParams = (label = "Id") => z.object({ id: objectId(label) });
+
+export const paginationQuery = z.object({
+  page: optional(number("Page", { min: 1 })).default(1),
+  limit: optional(number("Limit", { min: 1, max: 50 })).default(10),
+});
+
+export const sortChoice = <const T extends readonly [string, ...string[]]>(values: T) =>
+  optional(choice("Sort", values)).default(values[0]);

@@ -1,15 +1,53 @@
 const Comment = require("../../models/comment");
 const AppError = require("../../utils/AppError");
-const { nestAnswers } = require("../shared/comment-tree");
+const paginate = require("../../utils/paginate");
+const { searchFilter } = require("../shared/filter");
 const { ADMIN_USER } = require("../shared/selects");
 
-const list = async () => {
-  const comments = await Comment.find()
+const SORTS = {
+  newest: { _id: -1 },
+  oldest: { _id: 1 },
+  score: { score: -1, _id: -1 },
+};
+
+const STATUS = {
+  pending: { answer: 0 },
+  accepted: { answer: 1 },
+};
+
+const TOP_LEVEL = { mainCommendID: null };
+
+const baseFilter = ({ search, course, score, status }) => ({
+  ...TOP_LEVEL,
+  ...searchFilter("body", search),
+  ...(course && { course }),
+  ...(score && { score }),
+  ...STATUS[status],
+});
+
+const attachAnswers = async (comments) => {
+  const answers = await Comment.find({ mainCommendID: { $in: comments.map((comment) => comment._id) } })
     .populate("creator", ADMIN_USER)
-    .populate("course", "name shortName")
-    .sort({ _id: -1 })
     .lean();
-  return nestAnswers(comments);
+  const answerOf = new Map(answers.map((answer) => [String(answer.mainCommendID), answer]));
+
+  return comments.map((comment) => ({
+    ...comment,
+    course: comment.course?.name ?? null,
+    answerContent: answerOf.get(String(comment._id)) ?? null,
+  }));
+};
+
+const list = async ({ page, limit, sort, ...query }) => {
+  const result = await paginate(Comment, {
+    filter: baseFilter(query),
+    sort: SORTS[sort],
+    page,
+    limit,
+    populate: [{ path: "creator", select: ADMIN_USER }, { path: "course", select: "name shortName" }],
+  });
+
+  return { ...result, items: await attachAnswers(result.items) };
 };
 
 const setApproval = async (id, answer) => {

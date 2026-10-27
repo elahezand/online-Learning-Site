@@ -1,5 +1,6 @@
 const User = require("../../models/user");
 const BannedPhone = require("../../models/ban-phone");
+const AuthSession = require("../../models/auth-session");
 const AppError = require("../../utils/AppError");
 const { ensureUnique, buildChanges } = require("../user/user.service");
 
@@ -16,6 +17,7 @@ const remove = async (admin, id) => {
   if (String(admin._id) === String(id)) throw AppError.badRequest("You can't delete your own account");
   const user = await User.findByIdAndDelete(id).lean();
   if (!user) throw AppError.notFound("User not found");
+  await AuthSession.deleteMany({ user: user._id });
   return { message: "User deleted successfully" };
 };
 
@@ -26,6 +28,7 @@ const ban = async (admin, id) => {
   if (!user.phone) throw AppError.badRequest("This user has no phone number to ban");
 
   await BannedPhone.updateOne({ phone: user.phone }, { $setOnInsert: { phone: user.phone } }, { upsert: true });
+  await AuthSession.deleteMany({ user: user._id });
   return { msg: "User banned successfully" };
 };
 

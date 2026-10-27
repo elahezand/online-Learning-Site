@@ -1,8 +1,7 @@
-const bcrypt = require("bcrypt");
 const User = require("../../models/user");
 const CourseUser = require("../../models/course-user");
 const AppError = require("../../utils/AppError");
-const { SALT_ROUNDS } = require("../public/auth.service");
+const { hashPassword } = require("../../utils/tokens");
 
 const ensureUnique = async (userId, { username, email }) => {
   const or = [];
@@ -14,9 +13,8 @@ const ensureUnique = async (userId, { username, email }) => {
 };
 
 const buildChanges = async ({ password, ...fields }) => {
-  const changes = Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
-  if (password) changes.password = await bcrypt.hash(password, SALT_ROUNDS);
-  return changes;
+  if (password) fields.password = await hashPassword(password);
+  return fields;
 };
 
 const updateProfile = async (user, input) => {
