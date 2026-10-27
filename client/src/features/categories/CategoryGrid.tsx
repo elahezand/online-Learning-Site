@@ -6,10 +6,8 @@ import {
     FaPalette, FaPython, FaServer, FaShieldHalved, FaSquareJs,
 } from "react-icons/fa6"
 import SectionHeader from "../../components/ui/SectionHeader"
-import { useCourses } from "../courses/hooks"
 import { useCategories } from "./hooks"
 import type { Category } from "../../types/models"
-import { categoryIdOf } from "../courses/courseView"
 
 interface RankedCategory extends Category {
     Icon: IconType
@@ -82,15 +80,14 @@ function Tile({ category }: { category: RankedCategory }) {
 
 export default function CategoryGrid() {
     const { data: categories = EMPTY } = useCategories()
-    const { data: courses = EMPTY } = useCourses()
-
+    
     const ranked = useMemo<RankedCategory[]>(() => categories
         .map(category => ({
             ...category,
             Icon: iconFor(category),
-            count: courses.filter(course => categoryIdOf(course) === category._id).length,
+            count: category.coursesCount ?? 0,
         }))
-        .sort((a, b) => b.count - a.count), [categories, courses])
+        .sort((a, b) => b.count - a.count), [categories])
 
     if (!ranked.length) return null
 
@@ -100,7 +97,7 @@ export default function CategoryGrid() {
 
     return (
         <section className="container py-5">
-            <SectionHeader title="Browse by category" desc="Find the path that fits your goals" btnTitle="All courses" btnHref="/courses" />
+            <SectionHeader title="Browse by category" desc="Find the path that fits your goals" />
 
             <div className="row g-3 g-lg-4">
                 <div className="col-12 col-lg-5">

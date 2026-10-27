@@ -2,9 +2,7 @@ import { Link } from "react-router-dom"
 import { FaArrowRight, FaEnvelope, FaPhone } from "react-icons/fa6"
 import { useArticles } from "../../features/articles/hooks"
 import { useIndexInfo } from "../../features/info/hooks"
-import type { Article } from "../../types/models"
 
-const NO_ARTICLES: Article[] = []
 
 const quickLinks = [
     { title: "Courses", to: "/courses" },
@@ -15,8 +13,9 @@ const quickLinks = [
 
 export default function Footer() {
     const { data: info = {} } = useIndexInfo()
-    const { data: articles = NO_ARTICLES } = useArticles()
-    const recentPosts = articles.filter(article => Number(article.publish) === 1).slice(0, 4)
+    const { data } = useArticles({ limit: 4 })
+    const articles = data?.items ?? []
+
 
     return (
         <footer className="bg-body border-top mt-5">
@@ -32,11 +31,11 @@ export default function Footer() {
                         </p>
                     </div>
 
-                    {recentPosts.length > 0 &&
+                    {articles.length > 0 &&
                         <div className="col-12 col-md-6 col-lg-3">
                             <h2 className="h6 text-uppercase fw-bold mb-3">Recent posts</h2>
                             <ul className="list-unstyled d-grid gap-2 mb-0">
-                                {recentPosts.map(post => (
+                                {articles.map(post => (
                                     <li key={post._id}><Link to={`/article-info/${post.shortName}`} className="link-secondary">{post.title}</Link></li>
                                 ))}
                             </ul>

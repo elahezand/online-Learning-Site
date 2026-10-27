@@ -1,15 +1,16 @@
+import { useState } from "react"
 import { Link } from "react-router-dom"
 import { FaArrowRight, FaCheck, FaRegComment, FaReply } from "react-icons/fa6"
-import { useAuth } from "../auth/useAuth"
-import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
-import Input from "../../components/ui/Input"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useAuth } from "../auth/useAuth"
+import Input from "../../components/ui/Input"
 import { commentSchema } from "../../validators"
 import type { CommentData } from "../../validators"
 import type { Comment, CommentAnswer, CourseDetail } from "../../types/models"
 import { useCreateComment } from "./hooks"
+
+const PAGE_SIZE = 5
 
 const RULES = [
     "Be respectful and polite to others",
@@ -33,21 +34,24 @@ function CommentHeader({ creator }: { creator?: Comment["creator"] | CommentAnsw
 }
 
 interface CourseCommentsProps {
-    data: Comment[]
+    data?: Comment[]
     courseInfo: Pick<CourseDetail, "shortName">
 }
 
-export default function CourseComments({ data, courseInfo }: CourseCommentsProps) {
+export default function CourseComments({ data = [], courseInfo }: CourseCommentsProps) {
     const { isLoggedIn } = useAuth()
+    const [visible, setVisible] = useState(PAGE_SIZE)
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: zodResolver(commentSchema),
         defaultValues: { body: "", score: "5" },
         mode: "onTouched",
     })
     const createComment = useCreateComment(() => reset())
-    const { page, pageCount, pageItems: paginatedData } = usePagination(data)
 
-    const sendComment = (data: CommentData) => createComment.mutate({ ...data, courseShortName: courseInfo.shortName })
+    const shownComments = data.slice(0, visible)
+    const remaining = data.length - visible
+
+    const sendComment = (values: CommentData) => createComment.mutate({ ...values, courseShortName: courseInfo.shortName ?? "" })
 
     return (
         <section className="card shadow-sm">
@@ -58,9 +62,9 @@ export default function CourseComments({ data, courseInfo }: CourseCommentsProps
             </div>
 
             <div className="card-body p-3 p-sm-4">
-                {paginatedData.length ?
+                {shownComments.length ?
                     <div className="d-grid gap-3">
-                        {paginatedData.map(item => (
+                        {shownComments.map(item => (
                             <article key={item._id} className="border rounded-3 p-3 bg-body-tertiary">
                                 <CommentHeader creator={item.creator} />
                                 <p className="mt-2 mb-0">{item.body}</p>
@@ -76,7 +80,11 @@ export default function CourseComments({ data, courseInfo }: CourseCommentsProps
                     </div> :
                     <p className="text-body-secondary mb-0">No comments yet — be the first to share your thoughts.</p>}
 
-                <Pagination page={page} pageCount={pageCount} />
+                {remaining > 0 &&
+                    <button type="button" className="btn btn-outline-primary w-100 mt-3"
+                        onClick={() => setVisible(count => count + PAGE_SIZE)}>
+                        Show more comments ({remaining} more)
+                    </button>}
 
                 {isLoggedIn ?
                     <form className="border-top pt-4 mt-4" onSubmit={handleSubmit(sendComment)} noValidate>

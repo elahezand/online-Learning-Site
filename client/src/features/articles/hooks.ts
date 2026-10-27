@@ -1,14 +1,24 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Article } from "../../types/models";
+import type { Article, Paginated } from "../../types/models";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/articles";
 const KEY = ["articles"];
 
-export const useArticles = () =>
-  useGet<Article[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export interface ArticleQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: "published" | "draft" | "all";
+  sort?: "newest" | "oldest" | "title";
+}
+
+export const useArticles = (query: ArticleQuery = {}) =>
+  useGet<Paginated<Article>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, "list", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load articles",
   });
 

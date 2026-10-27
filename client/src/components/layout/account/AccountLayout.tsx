@@ -23,8 +23,8 @@ export default function AccountLayout() {
                         <div className="card shadow-sm h-100">
                             <div className="card-body p-3 p-sm-4">
                                 <Suspense fallback={<PageLoader />}>
-                    <Outlet />
-                </Suspense>
+                                    <Outlet />
+                                </Suspense>
                             </div>
                         </div>
                     </div>

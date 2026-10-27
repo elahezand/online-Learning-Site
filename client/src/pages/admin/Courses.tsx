@@ -1,42 +1,42 @@
-import { useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { FaPenToSquare, FaTrash } from "react-icons/fa6"
+import { FaMagnifyingGlass, FaPenToSquare, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
-import useQueryParam from "../../hooks/useQueryParam"
 import FilterSelect from "../../components/ui/FilterSelect"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
 import { confirmToast } from "../../components/ui/toastActions"
+import useListParams from "../../hooks/useListParams"
+import useDebouncedValue from "../../hooks/useDebouncedValue"
 import CourseForm from "../../features/courses/CourseForm"
 import { CourseCover } from "../../features/courses/CourseCard"
 import { useCourses, useDeleteCourse } from "../../features/courses/hooks"
 import { useCategories } from "../../features/categories/hooks"
-import { categoryIdOf } from "../../features/courses/courseView"
-import type { Category, Course } from "../../types/models"
+import type { Course } from "../../types/models"
 
-const NO_COURSES: Course[] = []
-const NO_CATEGORIES: Category[] = []
+const PAGE_SIZE = 12
+
+const categoryTitle = (course: Course) =>
+    course.categoryID && typeof course.categoryID === "object" ? course.categoryID.title : "—"
 
 export default function Courses() {
-    const { data: courses = NO_COURSES } = useCourses()
-    const { data: categories = NO_CATEGORIES } = useCategories()
     const navigate = useNavigate()
+
+    const { page, get, update } = useListParams()
+    const search = get("search")
+    const category = get("category")
+
+    const debouncedSearch = useDebouncedValue(search.trim())
+
+    const { data: categories = [] } = useCategories()
+    const { data } = useCourses({
+        category: category || undefined,
+        page,
+        limit: PAGE_SIZE,
+        search: debouncedSearch || undefined,
+    })
+    const courses = data?.items ?? []
+    const start = ((data?.pagination.page ?? page) - 1) * PAGE_SIZE
     const deleteCourse = useDeleteCourse()
-    const [category, setCategory] = useQueryParam("category")
-
-    const categoryName = useMemo(() => new Map(categories.map(item => [item._id, item.title])), [categories])
-
-    const categoryOptions = useMemo(() => categories.map(item => ({
-        value: item._id,
-        label: item.title,
-        count: courses.filter(course => categoryIdOf(course) === item._id).length,
-    })), [categories, courses])
-
-    const filtered = useMemo(() => category ?
-        courses.filter(course => categoryIdOf(course) === category) : courses, [courses, category])
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(filtered)
 
     const remove = async (course: Course) => {
         const ok = await confirmToast({ title: `Remove "${course.name}"?`, description: "The course and its sessions will be deleted.", confirmLabel: "Remove" })
@@ -47,8 +47,17 @@ export default function Courses() {
         <>
             <CourseForm />
             <DataTable title="Courses" actions={
-                <FilterSelect label="Filter by category" value={category} onChange={setCategory}
-                    options={categoryOptions} allLabel="All categories" allCount={courses.length} />}>
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                    <div className="input-group input-group-sm w-auto">
+                        <span className="input-group-text bg-body"><FaMagnifyingGlass /></span>
+                        <input type="search" className="form-control" value={search}
+                            onChange={(e) => update({ search: e.target.value })}
+                            placeholder="Search courses…" aria-label="Search courses" />
+                    </div>
+                    <FilterSelect label="Filter by category" allLabel="All categories" value={category}
+                        onChange={(value) => update({ category: value })}
+                        options={categories.map(item => ({ value: item.name, label: item.title, count: item.coursesCount }))} />
+                </div>}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
                     <thead>
                         <tr>
@@ -64,7 +73,7 @@ export default function Courses() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((course, index) => (
+                        {courses.length ? courses.map((course, index) => (
                             <tr key={course._id}>
                                 <td className="text-body-secondary">{start + index + 1}</td>
                                 <td>
@@ -73,7 +82,7 @@ export default function Courses() {
                                         <span className="fw-medium">{course.name}</span>
                                     </Link>
                                 </td>
-                                <td>{categoryName.get(categoryIdOf(course) ?? "") ?? "—"}</td>
+                                <td>{categoryTitle(course)}</td>
                                 <td><StatusBadge ok={course.isComplete} okLabel="Completed" pendingLabel="In progress" /></td>
                                 <td>{course.shortName}</td>
                                 <td>{course.creator}</td>
@@ -88,11 +97,11 @@ export default function Courses() {
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={9}>{category ? "No courses in this category." : "No courses yet."}</EmptyRow>}
+                        )) : <EmptyRow colSpan={9}>{category || search ? "No courses match this filter." : "No courses yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

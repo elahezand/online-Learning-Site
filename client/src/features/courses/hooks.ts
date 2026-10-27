@@ -1,30 +1,35 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
-import type { Course, CourseDetail, Session, SessionDetail } from "../../types/models";
+import type { Course, CourseDetail, Paginated, Session, SessionDetail } from "../../types/models";
 
 const ENDPOINT = "/courses";
 const KEY = ["courses"];
 const SESSIONS_KEY = ["sessions"];
 const enc = encodeURIComponent;
 
-export const useCourses = () =>
-  useGet<Course[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export interface CourseQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: "start" | "presell";
+  free?: 0 | 1;
+  sort?: "newest" | "oldest" | "price-asc" | "price-desc" | "name";
+}
+
+export const useCourses = (query: CourseQuery = {}) =>
+  useGet<Paginated<Course>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, "list", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load courses",
   });
 
 export const usePopularCourses = () =>
   useGet<Course[]>(`${ENDPOINT}/popular`, undefined, {
     queryKey: [...KEY, "popular"],
-    silentError: true,
   });
 
-export const usePresellCourses = () =>
-  useGet<Course[]>(`${ENDPOINT}/presell`, undefined, {
-    queryKey: [...KEY, "presell"],
-    silentError: true,
-  });
 
 export const useCategoryCourses = (categoryName?: string) =>
   useGet<Course[]>(`${ENDPOINT}/category/${enc(categoryName ?? "")}`, undefined, {

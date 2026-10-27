@@ -1,16 +1,19 @@
 import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6"
+import type { Pagination as PaginationInfo } from "../../types/models"
 
-const pageNumbers = (page: number, pageCount: number): (number | string)[] => {
-    const pages = new Set([1, pageCount, page - 1, page, page + 1])
-    const sorted = [...pages].filter(n => n >= 1 && n <= pageCount).sort((a, b) => a - b)
+const pageNumbers = (page: number, pages: number): (number | string)[] => {
+    const numbers = new Set([1, pages, page - 1, page, page + 1])
+    const sorted = [...numbers].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b)
     return sorted.flatMap((n, i) => (i > 0 && n - sorted[i - 1] > 1 ? ["gap-" + n, n] : [n]))
 }
 
-export default function Pagination({ page, pageCount }: { page: number; pageCount: number }) {
+export default function Pagination({ pagination }: { pagination?: PaginationInfo }) {
     const { pathname, search } = useLocation()
-    if (pageCount <= 1) return null
+    if (!pagination || pagination.pages <= 1) return null
+
+    const { page, pages, hasPrev, hasNext } = pagination
 
     const linkTo = (target: number) => {
         const params = new URLSearchParams(search)
@@ -31,13 +34,13 @@ export default function Pagination({ page, pageCount }: { page: number; pageCoun
     return (
         <nav aria-label="Pagination" className="my-4">
             <ul className="pagination justify-content-center flex-wrap gap-1 mb-0">
-                <PageLink target={page - 1} disabled={page === 1} label="Previous page"><FaChevronLeft /></PageLink>
-                {pageNumbers(page, pageCount).map(item => typeof item === "string" ?
+                <PageLink target={page - 1} disabled={!hasPrev} label="Previous page"><FaChevronLeft /></PageLink>
+                {pageNumbers(page, pages).map(item => typeof item === "string" ?
                     <li key={item} className="page-item disabled"><span className="page-link rounded border-0 bg-transparent">…</span></li> :
                     <li key={item} className={`page-item ${item === page ? "active" : ""}`}>
                         <Link to={linkTo(item)} className="page-link rounded" aria-current={item === page ? "page" : undefined}>{item}</Link>
                     </li>)}
-                <PageLink target={page + 1} disabled={page === pageCount} label="Next page"><FaChevronRight /></PageLink>
+                <PageLink target={page + 1} disabled={!hasNext} label="Next page"><FaChevronRight /></PageLink>
             </ul>
         </nav>
     )

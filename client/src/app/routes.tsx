@@ -7,7 +7,6 @@ import Home from "../pages/public/Home"
 const Courses = lazy(() => import("../pages/public/Courses"))
 const CourseInfo = lazy(() => import("../pages/public/CourseInfo"))
 const SessionInfo = lazy(() => import("../pages/public/SessionInfo"))
-const Category = lazy(() => import("../pages/public/Category"))
 const Articles = lazy(() => import("../pages/public/Articles"))
 const ArticleInfo = lazy(() => import("../pages/public/ArticleInfo"))
 const Search = lazy(() => import("../pages/public/Search"))
@@ -52,7 +51,6 @@ const routes: RouteObject[] = [
             { path: "/", element: <Home /> },
             { path: "/courses/:page?", element: <Courses /> },
             { path: "/course-info/:courseName/:page?", element: <CourseInfo /> },
-            { path: "/category-info/:categoryName/:page?", element: <Category /> },
             { path: "/articles/:page?", element: <Articles /> },
             { path: "/article-info/:articleName", element: <ArticleInfo /> },
             { path: "/search/:value", element: <Search /> },

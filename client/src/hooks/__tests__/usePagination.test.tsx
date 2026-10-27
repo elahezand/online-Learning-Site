@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom"
-import usePagination from "../usePagination"
+import usePagination from "../useListParams"
 
 const items = Array.from({ length: 23 }, (_, i) => i + 1)
 

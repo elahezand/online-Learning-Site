@@ -1,7 +1,7 @@
 import { FaBan, FaTrash, FaUserShield } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
+import usePagination from "../../hooks/useListParams"
 import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
 import { confirmToast, promptToast } from "../../components/ui/toastActions"
 import { roleSchema } from "../../validators"

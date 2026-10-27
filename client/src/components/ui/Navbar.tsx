@@ -11,6 +11,8 @@ import useCart from "../../features/cart/useCart"
 
 export default function Navbar() {
     const { data: menu = [] } = useMainMenu()
+    console.log(menu);
+    
     const { isLoggedIn, userInfo } = useAuth()
     const { count } = useCart()
 

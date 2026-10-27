@@ -16,7 +16,7 @@ export default function CourseInfo() {
                 image="/images/blog/bg_2.jpg.webp"
                 breadcrumb={[
                     { title: "Home", to: "/" },
-                    ...(category?.title ? [{ title: category.title, to: `/category-info/${category.name}` }] : []),
+                    ...(category?.title ? [{ title: category.title, to: `/courses?category=${category.name}` }] : []),
                     { title: course?.name ?? "Course" },
                 ]} />
             <CourseDetail />

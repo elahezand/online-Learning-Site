@@ -27,6 +27,7 @@ export interface Category {
     _id: Id
     title: string
     name: string
+    coursesCount?: number
 }
 
 export interface Course {
@@ -206,4 +207,18 @@ export interface SearchResult {
 export interface AuthTokens {
     accessToken?: string
     refreshToken?: string
+}
+
+export interface Pagination {
+    page: number
+    limit: number
+    total: number
+    pages: number
+    hasNext: boolean
+    hasPrev: boolean
+}
+
+export interface Paginated<T> {
+    items: T[]
+    pagination: Pagination
 }

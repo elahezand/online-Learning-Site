@@ -1,9 +1,8 @@
+import { Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FaLayerGroup, FaPen, FaPlus, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
-import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
 import Input from "../../components/ui/Input"
 import FormCard from "../../components/ui/FormCard"
 import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
@@ -13,7 +12,7 @@ import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory 
 import type { Category } from "../../types/models"
 
 export default function Categories() {
-        const { data: categories = [] } = useCategories()
+    const { data: categories = [], isLoading } = useCategories()
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: zodResolver(categorySchema),
         defaultValues: { title: "", name: "" },
@@ -22,9 +21,6 @@ export default function Categories() {
     const createCategory = useCreateCategory(() => reset())
     const deleteCategory = useDeleteCategory()
     const updateCategory = useUpdateCategory()
-
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(categories)
 
     const removeCategory = async (category: Category) => {
         const ok = await confirmToast({ title: `Remove "${category.title}"?`, description: "This category will be deleted.", confirmLabel: "Remove" })
@@ -69,27 +65,41 @@ export default function Categories() {
                             <th className="text-body-secondary">#</th>
                             <th>Title</th>
                             <th>Short name</th>
+                            <th>Courses</th>
                             <th className="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((item, index) => (
-                            <tr key={item._id}>
-                                <td className="text-body-secondary">{start + index + 1}</td>
-                                <td className="fw-medium text-body-emphasis">{item.title}</td>
-                                <td>{item.name}</td>
-                                <td>
-                                    <RowActions>
-                                        <ActionButton icon={<FaPen />} onClick={() => editCategory(item)}>Edit</ActionButton>
-                                        <ActionButton variant="danger" icon={<FaTrash />} onClick={() => removeCategory(item)}>Remove</ActionButton>
-                                    </RowActions>
-                                </td>
-                            </tr>
-                        )) : <EmptyRow colSpan={4}>No categories yet.</EmptyRow>}
+                        {categories.length ? categories.map((item, index) => {
+                            const count = item.coursesCount ?? 0
+                            return (
+                                <tr key={item._id}>
+                                    <td className="text-body-secondary">{index + 1}</td>
+                                    <td className="fw-medium text-body-emphasis">{item.title}</td>
+                                    <td>{item.name}</td>
+                                    <td>
+                                        {count ?
+                                            <Link to={`/p-admin/courses?category=${item.name}`}
+                                                className="badge rounded-pill bg-primary-subtle text-primary-emphasis text-decoration-none">
+                                                {count} {count === 1 ? "course" : "courses"}
+                                            </Link> :
+                                            <span className="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">No courses</span>}
+                                    </td>
+                                    <td>
+                                        <RowActions>
+                                            <ActionButton icon={<FaPen />} onClick={() => editCategory(item)}>Edit</ActionButton>
+                                            <ActionButton variant="danger" icon={<FaTrash />} onClick={() => removeCategory(item)}
+                                                disabled={count > 0} title={count > 0 ? "Move or remove its courses first" : undefined}>
+                                                Remove
+                                            </ActionButton>
+                                        </RowActions>
+                                    </td>
+                                </tr>
+                            )
+                        }) : <EmptyRow colSpan={5}>{isLoading ? "Loading…" : "No categories yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
         </>
     )
 }

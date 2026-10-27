@@ -1,73 +1,63 @@
-import { useMemo } from "react"
-import { FaBan, FaCheck, FaEye, FaReply, FaStar, FaTrash, FaXmark } from "react-icons/fa6"
+import { FaBan, FaCheck, FaEye, FaMagnifyingGlass, FaReply, FaStar, FaTrash, FaXmark } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
-import useStatusFilter, { ALL, type StatusOption } from "../../hooks/useStatusFilter"
 import StatusFilter from "../../components/ui/StatusFilter"
 import FilterSelect from "../../components/ui/FilterSelect"
-import useQueryParam from "../../hooks/useQueryParam"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
 import { confirmToast, messageToast, promptToast } from "../../components/ui/toastActions"
+import useListParams from "../../hooks/useListParams"
+import useDebouncedValue from "../../hooks/useDebouncedValue"
 import { answerSchema } from "../../validators"
 import { useAcceptComment, useAnswerComment, useComments, useDeleteComment, useRejectComment } from "../../features/comments/hooks"
+import type { CommentQuery } from "../../features/comments/hooks"
 import { useBanUser } from "../../features/users/hooks"
 import { useCourses } from "../../features/courses/hooks"
-import type { Comment, Course } from "../../types/models"
+import type { Comment } from "../../types/models"
 
-const EMPTY: Comment[] = []
-const NO_COURSES: Course[] = []
-const SCORES = [5, 4, 3, 2, 1]
-const isObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value)
-const isAccepted = (comment: Comment) => Number(comment.answer) === 1
+const PAGE_SIZE = 10
 
-const FILTERS: readonly StatusOption<Comment>[] = [
-    ALL,
-    { value: "pending", label: "Waiting for review", test: comment => !isAccepted(comment) },
-    { value: "accepted", label: "Accepted", test: isAccepted },
+const STATUS_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Waiting for review" },
+    { value: "accepted", label: "Accepted" },
 ]
 
-const byReview = (a: Comment, b: Comment) =>
-    Number(isAccepted(a)) - Number(isAccepted(b)) ||
-    (b.createdAt ?? "").localeCompare(a.createdAt ?? "")
+const SCORE_OPTIONS = [5, 4, 3, 2, 1].map(value => ({
+    value: String(value),
+    label: `${"★".repeat(value)} ${value} ${value === 1 ? "star" : "stars"}`,
+}))
+
+const isAccepted = (comment: Comment) => Number(comment.answer) === 1
 
 export default function Comments() {
-    const { data = EMPTY } = useComments()
-    const { data: courses = NO_COURSES } = useCourses()
-    const [course, setCourse] = useQueryParam("course")
-    const [score, setScore] = useQueryParam("score")
+    const { page, get, update } = useListParams()
+    const search = get("search")
+    const course = get("course")
+    const score = get("score")
+    const status = get("status") || "all"
+    const debouncedSearch = useDebouncedValue(search.trim())
 
-    const comments = useMemo(() => [...data].sort(byReview), [data])
+    const { data: coursesData } = useCourses({ limit: 50, sort: "name" })
+    const courses = coursesData?.items ?? []
 
-    const courseLabel = useMemo(() => {
-        const names = new Map(courses.map(item => [item._id, item.name]))
-        return (value = "") => names.get(value) ?? (isObjectId(value) ? "Unknown course" : value)
-    }, [courses])
+    const { data, isLoading } = useComments({
+        page,
+        limit: PAGE_SIZE,
+        search: debouncedSearch || undefined,
+        course: course || undefined,
+        score: score ? Number(score) : undefined,
+        status: status === "all" ? undefined : status as CommentQuery["status"],
+    })
+    const comments = data?.items ?? []
+    const total = data?.pagination.total ?? 0
+    const start = ((data?.pagination.page ?? page) - 1) * PAGE_SIZE
+    const isFiltered = Boolean(search || course || score) || status !== "all"
 
-    const courseOptions = useMemo(() => {
-        const totals = new Map<string, number>()
-        comments.forEach(comment => { if (comment.course) totals.set(comment.course, (totals.get(comment.course) ?? 0) + 1) })
-        return [...totals].map(([value, count]) => ({ value, count, label: courseLabel(value) }))
-            .sort((a, b) => a.label.localeCompare(b.label))
-    }, [comments, courseLabel])
-
-    const scoreOptions = useMemo(() => SCORES.map(value => ({
-        value: String(value),
-        label: `${"★".repeat(value)} ${value} ${value === 1 ? "star" : "stars"}`,
-        count: comments.filter(comment => Number(comment.score) === value).length,
-    })), [comments])
-
-    const narrowed = useMemo(() => comments.filter(comment =>
-        (!course || comment.course === course) && (!score || Number(comment.score) === Number(score))),
-        [comments, course, score])
-    const { status, setStatus, counts, filtered } = useStatusFilter(narrowed, FILTERS)
     const deleteComment = useDeleteComment()
     const acceptComment = useAcceptComment()
     const rejectComment = useRejectComment()
     const answerComment = useAnswerComment()
     const banUser = useBanUser()
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(filtered)
 
     const remove = async (comment: Comment) => {
         const ok = await confirmToast({ title: "Remove this comment?", description: comment.body, confirmLabel: "Remove" })
@@ -99,11 +89,18 @@ export default function Comments() {
         <>
             <DataTable title="Comments" actions={
                 <div className="d-flex flex-wrap align-items-center gap-2">
-                    <FilterSelect label="Filter by course" value={course} onChange={setCourse}
-                        options={courseOptions} allLabel="All courses" allCount={comments.length} />
-                    <FilterSelect label="Filter by score" value={score} onChange={setScore}
-                        options={scoreOptions} allLabel="All scores" />
-                    <StatusFilter options={FILTERS} value={status} onChange={setStatus} counts={counts} />
+                    <div className="input-group input-group-sm w-auto">
+                        <span className="input-group-text bg-body"><FaMagnifyingGlass /></span>
+                        <input type="search" className="form-control" value={search}
+                            onChange={(e) => update({ search: e.target.value })}
+                            placeholder="Search comments…" aria-label="Search comments" />
+                    </div>
+                    <FilterSelect label="Filter by course" value={course} onChange={(value) => update({ course: value })}
+                        options={courses.map(item => ({ value: item._id, label: item.name }))} allLabel="All courses" />
+                    <FilterSelect label="Filter by score" value={score} onChange={(value) => update({ score: value })}
+                        options={SCORE_OPTIONS} allLabel="All scores" />
+                    <StatusFilter options={STATUS_OPTIONS} value={status} counts={{ [status]: total }}
+                        onChange={(value) => update({ status: value === "all" ? "" : value })} />
                 </div>}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
                     <thead>
@@ -117,7 +114,7 @@ export default function Comments() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((comment, index) => {
+                        {comments.length ? comments.map((comment, index) => {
                             const pending = !isAccepted(comment)
                             return (
                                 <tr key={comment._id} className={pending ? "fw-bold" : ""}>
@@ -129,7 +126,7 @@ export default function Comments() {
                                         </div>
                                         <div className="small text-body-secondary fw-normal text-truncate" style={{ maxWidth: "22rem" }}>{comment.body}</div>
                                     </td>
-                                    <td className="fw-normal">{courseLabel(comment.course)}</td>
+                                    <td className="fw-normal">{comment.course ?? "—"}</td>
                                     <td><span className="d-inline-flex align-items-center gap-1"><FaStar className="text-warning" />{comment.score}</span></td>
                                     <td><StatusBadge ok={comment.answer} okLabel="Accepted" pendingLabel="New" /></td>
                                     <td>
@@ -145,11 +142,11 @@ export default function Comments() {
                                     </td>
                                 </tr>
                             )
-                        }) : <EmptyRow colSpan={6}>{course || score || status !== "all" ? "No comments match this filter." : "No comments yet."}</EmptyRow>}
+                        }) : <EmptyRow colSpan={6}>{isLoading ? "Loading…" : isFiltered ? "No comments match this filter." : "No comments yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

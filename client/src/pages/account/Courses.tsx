@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Pagination from '../../components/ui/Pagination'
-import usePagination from '../../hooks/usePagination'
+import usePagination from '../../hooks/useListParams'
 import { CourseCover } from '../../features/courses/CourseCard'
 import { useMyCourses } from '../../features/users/hooks'
 import type { MyCourse } from '../../types/models'

@@ -2,21 +2,41 @@ import { Link, useNavigate } from "react-router-dom"
 import { FaPenToSquare, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/usePagination"
+import FilterSelect from "../../components/ui/FilterSelect"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
 import { confirmToast } from "../../components/ui/toastActions"
 import { coverUrl } from "../../config/env"
 import AddArticleForm from "../../features/articles/AddArticleForm"
+import useListParams from "../../hooks/useListParams"
 import { useArticles, useDeleteArticle } from "../../features/articles/hooks"
+import type { ArticleQuery } from "../../features/articles/hooks"
+import { useCategories } from "../../features/categories/hooks"
 import type { Article } from "../../types/models"
 
+const PAGE_SIZE = 12
+
+const STATUS_OPTIONS = [
+    { value: "published", label: "Published" },
+    { value: "draft", label: "Drafts" },
+]
+
 export default function Articles() {
-        const { data: articles = [] } = useArticles()
     const navigate = useNavigate()
+
+    const { page, get, update } = useListParams()
+    const category = get("category")
+    const status = get("status")
+
+    const { data: categories = [] } = useCategories()
+    const { data } = useArticles({
+        page,
+        limit: PAGE_SIZE,
+        category: category || undefined,
+        status: (status || "all") as ArticleQuery["status"],
+    })
+    const articles = data?.items ?? []
+    const start = ((data?.pagination.page ?? page) - 1) * PAGE_SIZE
     const deleteArticle = useDeleteArticle()
-
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(articles)
 
     const remove = async (article: Article) => {
         const ok = await confirmToast({ title: `Remove "${article.title}"?`, description: "The article will be deleted.", confirmLabel: "Remove" })
@@ -26,7 +46,13 @@ export default function Articles() {
     return (
         <>
             <AddArticleForm />
-            <DataTable title="Articles">
+            <DataTable title="Articles" actions={
+                <div className="d-flex flex-wrap align-items-center gap-2">
+                    <FilterSelect label="Filter by category" value={category} onChange={(value) => update({ category: value })} allLabel="All categories"
+                        options={categories.map(item => ({ value: item.name, label: item.title }))} />
+                    <FilterSelect label="Filter by status" value={status} onChange={(value) => update({ status: value })} allLabel="All statuses"
+                        options={STATUS_OPTIONS} />
+                </div>}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
                     <thead>
                         <tr>
@@ -40,7 +66,7 @@ export default function Articles() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((article, index) => (
+                        {articles.length ? articles.map((article, index) => (
                             <tr key={article._id}>
                                 <td className="text-body-secondary">{start + index + 1}</td>
                                 <td>
@@ -62,11 +88,11 @@ export default function Articles() {
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={7}>No articles yet.</EmptyRow>}
+                        )) : <EmptyRow colSpan={7}>{category || status ? "No articles match this filter." : "No articles yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

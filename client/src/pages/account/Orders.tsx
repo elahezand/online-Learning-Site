@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import Pagination from '../../components/ui/Pagination'
-import usePagination from '../../hooks/usePagination'
+import usePagination from '../../hooks/useListParams'
 import { useMyOrders } from '../../features/orders/hooks'
 import type { Order } from '../../types/models'
 

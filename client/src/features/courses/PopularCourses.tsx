@@ -3,7 +3,7 @@ import SectionHeader from "../../components/ui/SectionHeader"
 import CourseSlider from "./CourseSlider"
 
 export default function PopularCourses() {
-    const { data: courses = [] } = usePopularCourses()
+    const { data: courses = [] } = usePopularCourses()    
     if (!courses.length) return null
 
     return (

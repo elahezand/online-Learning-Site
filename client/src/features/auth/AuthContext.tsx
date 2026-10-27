@@ -1,7 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react"
 import type { ReactNode } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
 import { api } from "../../api/client"
 import tokenStorage from "../../api/tokenStorage"
 import type { User } from "../../types/models"
@@ -9,90 +8,60 @@ import type { User } from "../../types/models"
 export type AuthStatus = "loading" | "authenticated" | "guest"
 
 export interface AuthContextValue {
-    token: string | null
     user: User | null
-    status: AuthStatus
-    isLoading: boolean
-    isLoggedIn: boolean
-    isAdmin: boolean
-    login: (token: string, refreshToken?: string) => void
-    logout: () => void
-    refreshUser: (signal?: AbortSignal) => Promise<User | null>
     userInfo: Partial<User>
+    status: AuthStatus
+    isLoggedIn: boolean
+    logout: () => Promise<void>
+    refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [token, setToken] = useState(() => tokenStorage.get())
     const [user, setUser] = useState<User | null>(null)
     const [status, setStatus] = useState<AuthStatus>(() => (tokenStorage.get() ? "loading" : "guest"))
     const queryClient = useQueryClient()
 
     const clearSession = useCallback(() => {
-        queryClient.clear()
         tokenStorage.clear()
-        setToken(null)
         setUser(null)
         setStatus("guest")
+        queryClient.resetQueries()
     }, [queryClient])
 
-    const refreshUser = useCallback(async (signal?: AbortSignal) => {
-        if (!tokenStorage.get()) {
-            clearSession()
-            return null
-        }
+
+    const refreshUser = useCallback(async () => {
+        if (!tokenStorage.get()) return clearSession()
         try {
-            const { data: me } = await api.get<User>("/auth/me", { signal, silentAuth: true })
-            setUser(me)
+            const { data } = await api.get<User>("/auth/me", { silentAuth: true })
+            setUser(data)
             setStatus("authenticated")
-            return me
-        } catch (err) {
-            if (axios.isCancel(err)) return null
-            if (!tokenStorage.get()) clearSession()
-            else setStatus(prev => (prev === "loading" ? "guest" : prev))
-            return null
+        } catch {
+            clearSession()
         }
     }, [clearSession])
 
     useEffect(() => {
-        if (!token) return
-        const controller = new AbortController()
-        setStatus("loading")
-        refreshUser(controller.signal)
-        return () => controller.abort()
-    }, [token, refreshUser])
+        refreshUser()
+    }, [refreshUser])
 
-    useEffect(() => {
-        const onStorage = (e: StorageEvent) => {
-            if (e.key === null || e.key === "accessToken") {
-                const next = tokenStorage.get()
-                if (next) setToken(next)
-                else clearSession()
-            }
+    const logout = useCallback(async () => {
+        const refreshToken = tokenStorage.getRefresh()
+        if (refreshToken) {
+            await api.post("/auth/logout", { refreshToken }, { skipRefresh: true }).catch(() => { })
         }
-        window.addEventListener("storage", onStorage)
-        return () => window.removeEventListener("storage", onStorage)
+        clearSession()
     }, [clearSession])
-
-    const login = useCallback((newToken: string, refreshToken?: string) => {
-        queryClient.clear()
-        tokenStorage.set(newToken, refreshToken)
-        setToken(newToken)
-    }, [queryClient])
 
     const value = useMemo<AuthContextValue>(() => ({
-        token,
         user,
-        status,
-        isLoading: status === "loading",
-        isLoggedIn: status === "authenticated",
-        isAdmin: user?.role === "ADMIN",
-        login,
-        logout: clearSession,
-        refreshUser,
         userInfo: user ?? {},
-    }), [token, user, status, login, clearSession, refreshUser])
+        status,
+        isLoggedIn: status === "authenticated",
+        logout,
+        refreshUser,
+    }), [user, status, logout, refreshUser])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

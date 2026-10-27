@@ -1,14 +1,25 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Comment } from "../../types/models";
+import type { Comment, Paginated } from "../../types/models";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/comments";
 const KEY = ["comments"];
 
-export const useComments = () =>
-  useGet<Comment[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export interface CommentQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  course?: string;
+  score?: number;
+  status?: "pending" | "accepted";
+  sort?: "newest" | "oldest" | "score";
+}
+
+export const useComments = (query: CommentQuery = {}) =>
+  useGet<Paginated<Comment>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, "list", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load comments",
   });
 
