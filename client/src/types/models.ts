@@ -16,6 +16,7 @@ export interface User {
     username: string
     email: string
     phone: string
+    wallet?: { balance: number };
     role: Role
     profile?: string
     notifications?: Notification[]
@@ -221,4 +222,13 @@ export interface Pagination {
 export interface Paginated<T> {
     items: T[]
     pagination: Pagination
+}
+
+export interface Testimonial {
+    _id: Id
+    body: string
+    score: number
+    creator?: Pick<User, "name">
+    course?: Pick<Course, "name" | "shortName">
+    createdAt?: string
 }

@@ -1,6 +1,6 @@
 import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Comment, Paginated } from "../../types/models";
+import type { Comment, Paginated, Testimonial } from "../../types/models";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/comments";
@@ -21,6 +21,12 @@ export const useComments = (query: CommentQuery = {}) =>
     queryKey: [...KEY, "list", query],
     placeholderData: keepPreviousData,
     errorFallback: "Failed to load comments",
+  });
+
+export const useTopComments = (limit = 8) =>
+  useGet<Testimonial[]>(`${ENDPOINT}/top`, { limit }, {
+    queryKey: [...KEY, "top", limit],
+    silentError: true,
   });
 
 export const useCreateComment = (onSuccessCallback?: () => void) =>

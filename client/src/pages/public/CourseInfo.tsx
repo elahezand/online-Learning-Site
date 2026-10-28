@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom"
 import PageHeader from "../../components/ui/PageHeader"
 import CourseDetail from "../../features/courses/CourseDetail"
-import NewsLetter from "../../features/newsletter/NewsLetter"
 import { useCourse } from "../../features/courses/hooks"
 
 export default function CourseInfo() {
@@ -20,7 +19,6 @@ export default function CourseInfo() {
                     { title: course?.name ?? "Course" },
                 ]} />
             <CourseDetail />
-            <NewsLetter />
         </>
     )
 }

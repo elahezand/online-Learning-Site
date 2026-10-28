@@ -19,21 +19,22 @@ function ResultGrid<T extends { _id: string }>({ items, Card, empty }: ResultGri
     )
 }
 
+
 interface SearchResultsProps {
-    allSearchArticles: Article[]
-    allSearchCourses: Course[]
+    courses: Course[]
+    articles: Article[]
 }
 
-export default function SearchResults({ allSearchArticles, allSearchCourses }: SearchResultsProps) {
+export default function SearchResults({ courses, articles }: SearchResultsProps) {
     return (
         <div className="container py-4 py-lg-5 d-grid gap-5">
             <section>
-                <SectionHeader title={`Courses (${allSearchCourses.length})`} />
-                <ResultGrid items={allSearchCourses} Card={CourseCard} empty="No courses found." />
+                <SectionHeader title={`Courses (${courses.length})`} />
+                <ResultGrid items={courses} Card={CourseCard} empty="No courses found." />
             </section>
             <section>
-                <SectionHeader title={`Articles (${allSearchArticles.length})`} />
-                <ResultGrid items={allSearchArticles} Card={ArticleCard} empty="No articles found." />
+                <SectionHeader title={`Articles (${articles.length})`} />
+                <ResultGrid items={articles} Card={ArticleCard} empty="No articles found." />
             </section>
         </div>
     )

@@ -25,11 +25,11 @@ export const useCourses = (query: CourseQuery = {}) =>
     errorFallback: "Failed to load courses",
   });
 
-export const usePopularCourses = () =>
-  useGet<Course[]>(`${ENDPOINT}/popular`, undefined, {
-    queryKey: [...KEY, "popular"],
+export const usePopularCourses = (query:CourseQuery = {}) =>
+  useGet<Course[]>(`${ENDPOINT}/popular`, { ...query }, {
+    queryKey: [...KEY, "popular", query],
+    silentError: true,
   });
-
 
 export const useCategoryCourses = (categoryName?: string) =>
   useGet<Course[]>(`${ENDPOINT}/category/${enc(categoryName ?? "")}`, undefined, {

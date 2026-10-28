@@ -9,7 +9,7 @@ import { useCourse, useRegisterCourse, useRelatedCourses } from "./hooks"
 import { confirmToast } from '../../components/ui/toastActions'
 import { coverUrl } from '../../config/env'
 import { CoursePrice } from './CourseCard'
-import useCart from '../cart/useCart'
+import { useAddToCart, useGetMyCart } from '../cart/hook'
 import { FaCalendarDays, FaCartPlus, FaCartShopping, FaChalkboardUser, FaCircleCheck, FaCircleInfo, FaClock, FaGraduationCap, FaLink, FaPlay, FaRegComments, FaUser, FaUserGraduate, FaUserLarge } from 'react-icons/fa6'
 
 export default function CourseDetail() {
@@ -17,6 +17,8 @@ export default function CourseDetail() {
   const navigator = useNavigate()
 
   const { isLoggedIn } = useAuth()
+  const { data: cart } = useGetMyCart(isLoggedIn)
+
   const { courseName } = params
 
   const { data } = useCourse(courseName)
@@ -29,19 +31,27 @@ export default function CourseDetail() {
   const createdAt = courseInfo.createdAt ?? ""
   const courseTeacher: Partial<NonNullable<CourseDetailData["creator"]>> = courseInfo.creator ?? {}
 
+
   const registerCourse = useRegisterCourse()
-  const cart = useCart()
-  const inCart = cart.has(courseInfo._id)
+  const addToCart = useAddToCart()
+
+
+  const inCart = Boolean(cart?.data.items.some(item => item.course._id === courseInfo._id))
   const isFree = courseInfo.price === 0
 
-  const registerToCourse = async () => {
-    if (!isLoggedIn) {
-      const goToLogin = await confirmToast({ title: "Please log in first", description: "You need an account to enroll in this course.", confirmLabel: "Log in", cancelLabel: "Not now", variant: "primary" })
-      if (goToLogin) navigator("/login", { state: { from: { pathname: `/course-info/${courseName}` } } })
-      return
-    }
+  const requireLogin = async () => {
+    if (isLoggedIn) return true
+    const goToLogin = await confirmToast({ title: "Please log in first", description: "You need an account to enroll in or buy this course.", confirmLabel: "Log in", cancelLabel: "Not now", variant: "primary" })
+    if (goToLogin) navigator("/login", { state: { from: { pathname: `/course-info/${courseName}` } } })
+    return false
+  }
 
-    if (courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id, price: 0 })
+  const registerToCourse = async () => {
+    if (await requireLogin() && courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id, price: 0 })
+  }
+
+  const addCourseToCart = async () => {
+    if (await requireLogin() && courseInfo._id) addToCart.mutate({ courseId: courseInfo._id })
   }
 
   return (
@@ -54,7 +64,7 @@ export default function CourseDetail() {
 
           <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
             {categoryInfo.title &&
-              <Link to={`/category-info/${categoryInfo.name}`} className="badge rounded-pill text-bg-primary">{categoryInfo.title}</Link>}
+              <Link to={`/courses?category=${categoryInfo.name}`} className="badge rounded-pill text-bg-primary">{categoryInfo.title}</Link>}
             <span className={`badge rounded-pill ${Number(courseInfo.isComplete) === 1 ? "text-bg-success" : "text-bg-secondary"}`}>
               {Number(courseInfo.isComplete) === 1 ? "Completed" : "In progress"}
             </span>
@@ -127,10 +137,7 @@ export default function CourseDetail() {
                         <FaCartShopping /> In your cart — view cart
                       </Link> :
                       <button type="button" className="btn btn-primary btn-lg w-100 d-inline-flex align-items-center justify-content-center gap-2"
-                        onClick={() => courseInfo._id && cart.add({
-                          _id: courseInfo._id, name: courseInfo.name ?? "", shortName: courseInfo.shortName ?? "",
-                          cover: courseInfo.cover, price: courseInfo.price ?? 0, discount: courseInfo.discount,
-                        })}>
+                        onClick={addCourseToCart} disabled={addToCart.isPending}>
                         <FaCartPlus /> Add to cart
                       </button>}
 

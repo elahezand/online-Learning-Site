@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import type { RefObject } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import DOMPurify from "dompurify"
 import { toast } from "sonner"
 import { FaArrowLeft, FaFacebookF, FaLink, FaRegCalendar, FaRegClock, FaTelegram, FaXTwitter } from "react-icons/fa6"
 import ArticleSidebar from "./ArticleSidebar"
 import { useArticle } from "./hooks"
-import { useAuth } from "../auth/useAuth"
 import { coverUrl } from "../../config/env"
 
 const formatDate = (iso?: string) =>
@@ -44,17 +43,12 @@ function ReadingProgress({ target }: { target: RefObject<HTMLElement | null> }) 
 
 export default function ArticleDetail() {
     const { articleName } = useParams()
-    const navigate = useNavigate()
     const articleRef = useRef<HTMLElement>(null)
 
     const { data: article, isLoading } = useArticle(articleName)
     const author = article?.creator?.name ?? article?.creator?.username ?? "ACADEMIA"
     const category = article?.categoryID
 
-    const { status } = useAuth()
-    useEffect(() => {
-        if (status === "guest") navigate("/login", { state: { from: { pathname: `/article-info/${articleName}` } } })
-    }, [status, navigate, articleName])
 
     const copyLink = async () => {
         try {
@@ -76,7 +70,7 @@ export default function ArticleDetail() {
                             <div className="card-body p-3 p-sm-4 p-lg-5">
                                 <header className="mb-4">
                                     {category?.title &&
-                                        <Link to={`/category-info/${category.name}`} className="article-kicker d-inline-flex align-items-center gap-2 small fw-bold text-uppercase text-primary text-decoration-none mb-3">
+                                        <Link to={`/articles?category=${category.name}`} className="article-kicker d-inline-flex align-items-center gap-2 small fw-bold text-uppercase text-primary text-decoration-none mb-3">
                                             {category.title}
                                         </Link>}
                                     {article?.description &&

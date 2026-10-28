@@ -6,15 +6,14 @@ import Offcanvas from "react-bootstrap/Offcanvas"
 import { FaCartShopping, FaRightToBracket, FaUser } from "react-icons/fa6"
 import { useMainMenu } from "../../features/menus/hooks"
 import { useAuth } from "../../features/auth/useAuth"
+import { useGetMyCart } from "../../features/cart/hook"
 import ThemeToggle from "./ThemeToggle"
-import useCart from "../../features/cart/useCart"
 
 export default function Navbar() {
     const { data: menu = [] } = useMainMenu()
-    console.log(menu);
-    
     const { isLoggedIn, userInfo } = useAuth()
-    const { count } = useCart()
+    const { data } = useGetMyCart(isLoggedIn)
+    const count = data?.data?.items.length ?? 0
 
     return (
         <BsNavbar expand="lg" sticky="top" className="bg-body border-bottom shadow-sm" collapseOnSelect>
@@ -51,7 +50,7 @@ export default function Navbar() {
                             <Nav.Link as={NavLink} to="/" end>Home</Nav.Link>
                             {menu.map(item => item.submenus?.length ?
                                 <NavDropdown key={item._id} title={item.title} id={`menu-${item._id}`}>
-                                    <NavDropdown.Item as={Link} to={`/category-info/${item.href}`}>
+                                    <NavDropdown.Item as={Link} to={`/courses?category=${item.href}`}>
                                         All {item.title}
                                     </NavDropdown.Item>
                                     <NavDropdown.Divider />
@@ -61,7 +60,7 @@ export default function Navbar() {
                                         </NavDropdown.Item>
                                     ))}
                                 </NavDropdown> :
-                                <Nav.Link key={item._id} as={NavLink} to={`/category-info/${item.href}`}>
+                                <Nav.Link key={item._id} as={Link} to={`/courses?category=${item.href}`}>
                                     {item.title}
                                 </Nav.Link>
                             )}

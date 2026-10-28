@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react"
-import useCart from "../useCart"
+import useCart from "../hook"
 
 const react = { _id: "c1", name: "React", shortName: "react", price: 1000, discount: 20 }
 const html = { _id: "c2", name: "HTML", shortName: "html", price: 500 }

@@ -9,7 +9,6 @@ import ArticlesList from "../../features/articles/ArticlesList"
 const PAGE_SIZE = 9
 
 export default function Articles() {
-
     const { page, get, update } = useListParams()
     const category = get("category")
 

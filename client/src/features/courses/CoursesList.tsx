@@ -11,16 +11,19 @@ import { useCourses } from './hooks'
 import type { CourseQuery } from './hooks'
 import { useCategories } from '../categories/hooks'
 
-type SortOption = "newest" | "oldest" | "price-asc" | "price-desc" | "free" | "paid"
-
-const SORT_OPTIONS: { value: SortOption; label: string; query: Pick<CourseQuery, "sort" | "free"> }[] = [
-    { value: "newest", label: "Latest", query: { sort: "newest" } },
-    { value: "oldest", label: "Oldest", query: { sort: "oldest" } },
-    { value: "price-asc", label: "Price: low to high", query: { sort: "price-asc" } },
-    { value: "price-desc", label: "Price: high to low", query: { sort: "price-desc" } },
-    { value: "free", label: "Free only", query: { free: 1 } },
-    { value: "paid", label: "Paid only", query: { free: 0 } },
+const SORT_OPTIONS: { value: NonNullable<CourseQuery["sort"]>; label: string }[] = [
+    { value: "newest", label: "Latest" },
+    { value: "oldest", label: "Oldest" },
+    { value: "price-asc", label: "Price: low to high" },
+    { value: "price-desc", label: "Price: high to low" },
 ]
+
+const PRICE_OPTIONS = [
+    { value: "free", label: "Free" },
+    { value: "paid", label: "Paid" },
+]
+
+const PRICE_QUERY: Record<string, CourseQuery["free"]> = { free: 1, paid: 0 }
 
 const PAGE_SIZE = 9
 
@@ -29,10 +32,9 @@ export default function CoursesList() {
     const [direction, setDirection] = useState<"row" | "column">("row")
 
     const { page, get, update } = useListParams()
-    const search = get("search")
+    const search = useDebouncedValue(get("search").trim())
     const category = categoryName ?? get("category")
-
-    const debouncedSearch = useDebouncedValue(search.trim())
+    const price = get("price")
     const sort = SORT_OPTIONS.find(option => option.value === get("sort")) ?? SORT_OPTIONS[0]
 
     const { data: categories = [] } = useCategories()
@@ -40,13 +42,13 @@ export default function CoursesList() {
         category: category || undefined,
         page,
         limit: PAGE_SIZE,
-        search: debouncedSearch || undefined,
-        ...sort.query,
+        search: search || undefined,
+        sort: sort.value,
+        free: PRICE_QUERY[price],
     })
     const courses = data?.items ?? []
 
-
-    const isFiltered = Boolean(search) || sort.value !== "newest" || (!categoryName && Boolean(category))
+    const isFiltered = Boolean(search) || Boolean(price) || (!categoryName && Boolean(category))
 
     if (!isLoading && !courses.length && !isFiltered) {
         return (
@@ -66,7 +68,7 @@ export default function CoursesList() {
                         <div className="input-group">
                             <span className="input-group-text bg-body"><FaMagnifyingGlass /></span>
                             <input type="search" className="form-control border-start-0"
-                                value={search}
+                                value={get("search")}
                                 onChange={(e) => update({ search: e.target.value })}
                                 placeholder="Search courses…" aria-label="Search courses" />
                         </div>
@@ -76,6 +78,9 @@ export default function CoursesList() {
                             <FilterSelect label="Filter by category" allLabel="All categories" value={category}
                                 onChange={(value) => update({ category: value })}
                                 options={categories.map(item => ({ value: item.name, label: item.title }))} />}
+                        <FilterSelect label="Filter by price" allLabel="All prices" value={price}
+                            onChange={(value) => update({ price: value })}
+                            options={PRICE_OPTIONS} />
                         <div className="btn-group" role="group" aria-label="Layout">
                             <button type="button"
                                 className={`btn ${direction === "row" ? "btn-primary" : "btn-outline-secondary"}`}
@@ -107,13 +112,15 @@ export default function CoursesList() {
             </div>
 
             <div className={`row g-4 mt-1 ${direction === "row" ? "row-cols-1 row-cols-sm-2 row-cols-lg-3" : "row-cols-1"}`}>
-                {courses.length ?
-                    courses.map(course => (
-                        <div className="col" key={course._id}>
-                            <CourseCard {...course} direction={direction} />
-                        </div>
-                    )) :
-                    !isLoading && <div className="col"><div className="alert alert-warning mb-0">No courses match your search.</div></div>}
+                {isLoading ?
+                    <div className="col-12 text-center py-5"><div className="spinner-border text-primary" role="status" aria-label="Loading" /></div> :
+                    courses.length ?
+                        courses.map(course => (
+                            <div className="col" key={course._id}>
+                                <CourseCard {...course} direction={direction} />
+                            </div>
+                        )) :
+                        <div className="col-12"><div className="alert alert-warning mb-0">No courses match your filters.</div></div>}
             </div>
 
             <Pagination pagination={data?.pagination} />
