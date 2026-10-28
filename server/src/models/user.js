@@ -11,6 +11,7 @@ const userSchema = new Schema(
     name: requiredString("Name", { minlength: 3, maxlength: 60 }),
     phone: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
+    wallet: { type: Number, default: 0, min: [0, "Wallet balance can't be negative"] },
   },
   { timestamps: true, toJSON: hideInternals, toObject: hideInternals }
 );

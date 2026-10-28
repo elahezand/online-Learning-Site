@@ -19,6 +19,10 @@ export const commentListQuery = paginationQuery.extend({
   sort: sortChoice(["newest", "oldest", "score"] as const),
 });
 
+export const topCommentsQuery = z.object({
+  limit: optional(number("Limit", { min: 1, max: 20 })).default(8),
+});
+
 export type CommentListQuery = z.infer<typeof commentListQuery>;
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type AnswerCommentInput = z.infer<typeof answerCommentSchema>;
