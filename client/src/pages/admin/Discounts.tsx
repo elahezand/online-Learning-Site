@@ -78,6 +78,7 @@ export default function Discounts() {
                         <tr>
                             <th className="text-body-secondary">#</th>
                             <th>Code</th>
+                            <th>Course</th>
                             <th>Creator</th>
                             <th>Percent</th>
                             <th>Created</th>
@@ -91,7 +92,8 @@ export default function Discounts() {
                             <tr key={item._id}>
                                 <td className="text-body-secondary">{index + 1}</td>
                                 <td><span className="badge bg-primary-subtle text-primary-emphasis font-monospace">{item.code}</span></td>
-                                <td>{item.creator}</td>
+                                <td>{item.course?.name ?? "—"}</td>
+                                <td>{item.creator?.name ?? "—"}</td>
                                 <td>{item.percent}%</td>
                                 <td>{item.createdAt?.slice(0, 10)}</td>
                                 <td>{item.uses}</td>
@@ -102,7 +104,7 @@ export default function Discounts() {
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={8}>{isLoading ? "Loading…" : "No discount codes yet."}</EmptyRow>}
+                        )) : <EmptyRow colSpan={9}>{isLoading ? "Loading…" : "No discount codes yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>

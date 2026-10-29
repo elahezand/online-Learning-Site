@@ -37,13 +37,6 @@ export const usePopularCourses = (query: CourseQuery = {}) =>
     silentError: true,
   });
 
-export const useCategoryCourses = (categoryName?: string) =>
-  useGet<Course[]>(`${ENDPOINT}/category/${enc(categoryName ?? "")}`, undefined, {
-    queryKey: [...KEY, "category", categoryName],
-    enabled: Boolean(categoryName),
-    errorFallback: "Failed to load courses",
-  });
-
 export const useCourse = (shortName?: string) =>
   useGet<CourseDetail>(`${ENDPOINT}/${enc(shortName ?? "")}`, undefined, {
     queryKey: [...KEY, "detail", shortName],
@@ -100,7 +93,7 @@ export const useDeleteSession = () => {
 };
 
 export const useSession = (shortName?: string, sessionId?: string) =>
-  useGet<SessionDetail>(`${ENDPOINT}/${enc(shortName ?? "")}/${enc(sessionId ?? "")}`, undefined, {
+  useGet<SessionDetail>(`/sessions/${enc(shortName ?? "")}/${enc(sessionId ?? "")}`, undefined, {
     queryKey: [...SESSIONS_KEY, shortName, sessionId],
     enabled: Boolean(shortName && sessionId),
     errorFallback: "Failed to load session",
@@ -135,7 +128,7 @@ export const useUpdateCourse = (courseId: string, onSuccessCallback?: () => void
 export const useRegisterCourse = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
 
-  return usePost<unknown, { courseId: string; price: number }>(({ courseId }) => `${ENDPOINT}/${courseId}/register`, {
+  return usePost<unknown, { courseId: string }>(({ courseId }) => `${ENDPOINT}/${courseId}/register`, {
     onSuccess: () => {
       toast.success("You are registered successfully");
       queryClient.invalidateQueries({ queryKey: KEY });

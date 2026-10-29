@@ -8,4 +8,7 @@ const env = {
 export const coverUrl = (fileName?: string) =>
     fileName ? `${env.filesUrl}/courses/covers/${fileName}` : undefined
 
+export const mediaUrl = (path?: string | null) =>
+    path ? `${env.filesUrl}${path}` : undefined
+
 export default env

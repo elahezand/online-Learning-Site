@@ -86,7 +86,7 @@ export default function Hero({ image }: { image: string }) {
                             <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start gap-2 mt-3">
                                 <span className="small text-body-secondary me-1">Popular:</span>
                                 {categories.slice(0, 4).map(category => (
-                                    <Link key={category._id} to={`/category-info/${category.name}`}
+                                    <Link key={category._id} to={`/courses?category=${category.name}`}
                                         className="btn btn-sm btn-outline-secondary rounded-pill px-3">
                                         {category.title}
                                     </Link>

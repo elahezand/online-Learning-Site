@@ -47,7 +47,7 @@ export default function CourseDetail() {
   }
 
   const registerToCourse = async () => {
-    if (await requireLogin() && courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id, price: 0 })
+    if (await requireLogin() && courseInfo._id) registerCourse.mutate({ courseId: courseInfo._id })
   }
 
   const addCourseToCart = async () => {

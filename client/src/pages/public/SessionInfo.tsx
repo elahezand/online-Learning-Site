@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom"
 import { FaCirclePlay, FaClock, FaLock } from "react-icons/fa6"
 import PageHeader from "../../components/ui/PageHeader"
+import { mediaUrl } from "../../config/env"
 import { useSession } from "../../features/courses/hooks"
 
 export default function SessionInfo() {
@@ -28,7 +29,7 @@ export default function SessionInfo() {
                         <div className="row g-4">
                             <div className="col-12 col-lg-8">
                                 <div className="ratio ratio-16x9 bg-black rounded-3 overflow-hidden shadow-sm">
-                                    <video key={session?._id} controls src={session?.video || undefined} />
+                                    <video key={session?._id} controls src={mediaUrl(session?.videoUrl)} />
                                 </div>
                                 <h2 className="h4 fw-bold mt-3 mb-0">{title}</h2>
                             </div>
@@ -39,12 +40,12 @@ export default function SessionInfo() {
                                     <div className="list-group list-group-flush">
                                         {sessions.map((item, index) => (
                                             <Link key={item._id}
-                                                to={`/${courseName}/${item._id}`}
+                                                to={`/course-info/${courseName}/session/${item._id}`}
                                                 aria-current={item._id === sessionId ? "true" : undefined}
                                                 className={`list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-3 ${item._id === sessionId ? "active" : ""}`}>
                                                 <span className="d-flex align-items-center gap-2 text-truncate">
                                                     <span className="small opacity-75">{index + 1}.</span>
-                                                    <FaCirclePlay className="flex-shrink-0" />
+                                                    {item.locked ? <FaLock className="flex-shrink-0" /> : <FaCirclePlay className="flex-shrink-0" />}
                                                     <span className="text-truncate">{item.title}</span>
                                                 </span>
                                                 <span className="small d-inline-flex align-items-center gap-1 flex-shrink-0"><FaClock />{item.time}</span>

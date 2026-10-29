@@ -13,10 +13,16 @@ export interface MyTicketsQuery {
   limit?: number;
   status?: "pending" | "answered";
 }
+export interface TicketQuery {
+  page?: number;
+  limit?: number;
+  status?: "open" | "answered";
+}
 
-export const useTickets = () =>
-  useGet<Ticket[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export const useTickets = (query: TicketQuery = {}) =>
+  useGet<Paginated<Ticket>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, "list", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load tickets",
   });
 
@@ -89,7 +95,7 @@ export const useSendTicketMessage = (ticketId: string, asAdmin: boolean) => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: key });
-      queryClient.invalidateQueries({ queryKey: asAdmin ? KEY : MY_KEY, exact: asAdmin });
+      queryClient.invalidateQueries({ queryKey: asAdmin ? [...KEY, "list"] : MY_KEY });
     },
     errorFallback: "Failed to send message",
   });

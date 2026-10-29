@@ -32,9 +32,9 @@ test("reads the full conversation when the backend supports it", async () => {
 test("admin and student both reply through the messages endpoint", async () => {
     mock.onPost("/tickets/t1/messages").reply(201, {})
     const admin = renderHook(() => useSendTicketMessage("t1", true), { wrapper: wrapper() })
-    await act(() => admin.result.current.mutateAsync("Here is the fix"))
+    await act(() => admin.result.current.mutateAsync({ body: "Here is the fix" }))
     const student = renderHook(() => useSendTicketMessage("t1", false), { wrapper: wrapper() })
-    await act(() => student.result.current.mutateAsync("Thanks, it works"))
+    await act(() => student.result.current.mutateAsync({ body: "Thanks, it works" }))
     expect(mock.history.post.map(r => [r.url, JSON.parse(r.data).body])).toEqual([
         ["/tickets/t1/messages", "Here is the fix"],
         ["/tickets/t1/messages", "Thanks, it works"],
@@ -47,7 +47,7 @@ test("a failed message is removed from the chat", async () => {
     mock.onPost("/tickets/t1/messages").reply(500)
     const { result } = renderHook(() => ({ thread: useTicketThread("t1"), send: useSendTicketMessage("t1", false) }), { wrapper: wrapper() })
     await waitFor(() => expect(result.current.thread.data?.messages).toHaveLength(1))
-    await act(() => result.current.send.mutateAsync("Lost").catch(() => { }))
+    await act(() => result.current.send.mutateAsync({ body: "Lost" }).catch(() => { }))
     await waitFor(() => expect(result.current.thread.data?.messages).toHaveLength(1))
 })
 

@@ -43,11 +43,13 @@ test("course needs a category and a cover image", () => {
     expect(courseSchema.safeParse({ name: "React", shortName: "react", price: "0", support: "Telegram", categoryID: "c1", status: "start", description: "A long enough description", cover }).success).toBe(true)
 })
 
-test("profile password is optional but must match its repeat", () => {
-    const base = { name: "Sara Ahmadi", username: "sara", email: "s@mail.com", phone: "09121234567" }
+test("profile password is optional but must match its repeat and needs the current one", () => {
+    const base = { name: "Sara Ahmadi", username: "sara", email: "s@mail.com", phone: "09121234567", currentPassword: "" }
     expect(profileSchema.safeParse({ ...base, password: "", confirmPassword: "" }).success).toBe(true)
-    const result = profileSchema.safeParse({ ...base, password: "12345678", confirmPassword: "123" })
-    expect(firstError(result)).toBe("Passwords do not match")
+    const mismatch = profileSchema.safeParse({ ...base, currentPassword: "old-pass1", password: "12345678", confirmPassword: "123" })
+    expect(firstError(mismatch)).toBe("Passwords do not match")
+    const noCurrent = profileSchema.safeParse({ ...base, password: "12345678", confirmPassword: "12345678" })
+    expect(firstError(noCurrent)).toBe("Enter your current password")
 })
 
 test("role is normalised to upper case", () => {

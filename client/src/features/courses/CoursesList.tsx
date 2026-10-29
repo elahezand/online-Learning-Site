@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import Dropdown from 'react-bootstrap/Dropdown'
 import { FaAlignLeft, FaBorderAll, FaMagnifyingGlass } from 'react-icons/fa6'
 import Pagination from '../../components/ui/Pagination'
@@ -28,12 +27,11 @@ const PRICE_QUERY: Record<string, CourseQuery["free"]> = { free: 1, paid: 0 }
 const PAGE_SIZE = 9
 
 export default function CoursesList() {
-    const { categoryName } = useParams()
     const [direction, setDirection] = useState<"row" | "column">("row")
 
     const { page, get, update } = useListParams()
     const search = useDebouncedValue(get("search").trim())
-    const category = categoryName ?? get("category")
+    const category = get("category")
     const price = get("price")
     const sort = SORT_OPTIONS.find(option => option.value === get("sort")) ?? SORT_OPTIONS[0]
 
@@ -48,13 +46,13 @@ export default function CoursesList() {
     })
     const courses = data?.items ?? []
 
-    const isFiltered = Boolean(search) || Boolean(price) || (!categoryName && Boolean(category))
+    const isFiltered = Boolean(search) || Boolean(price) || Boolean(category)
 
     if (!isLoading && !courses.length && !isFiltered) {
         return (
             <div className="container py-4 py-lg-5">
                 <div className="alert alert-primary mb-0">
-                    {categoryName ? "There are no courses in this category yet." : "There are no courses yet."}
+                    There are no courses yet.
                 </div>
             </div>
         )
@@ -74,10 +72,9 @@ export default function CoursesList() {
                         </div>
                     </form>
                     <div className="d-flex flex-wrap align-items-center gap-2">
-                        {!categoryName &&
-                            <FilterSelect label="Filter by category" allLabel="All categories" value={category}
-                                onChange={(value) => update({ category: value })}
-                                options={categories.map(item => ({ value: item.name, label: item.title }))} />}
+                        <FilterSelect label="Filter by category" allLabel="All categories" value={category}
+                            onChange={(value) => update({ category: value })}
+                            options={categories.map(item => ({ value: item.name, label: item.title }))} />
                         <FilterSelect label="Filter by price" allLabel="All prices" value={price}
                             onChange={(value) => update({ price: value })}
                             options={PRICE_OPTIONS} />

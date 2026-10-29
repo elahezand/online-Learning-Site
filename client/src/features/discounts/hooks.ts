@@ -28,11 +28,6 @@ export const useCreateDiscount = (onSuccessCallback?: () => void) => {
   });
 };
 
-export const useApplyDiscount = () =>
-  usePost<Pick<Discount, "percent">, { code: string; course: string }>(({ code }) => `${ENDPOINT}/${encodeURIComponent(code)}`, {
-    errorFallback: "This code is not valid",
-  });
-
 export const useSiteWideDiscount = (onSuccessCallback?: () => void) =>
   usePost<unknown, { discount: number }>(`${ENDPOINT}/all`, {
     onSuccess: () => {

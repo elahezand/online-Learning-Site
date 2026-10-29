@@ -59,7 +59,7 @@ export default function TicketChat({ ticketId, viewer, meta, backTo }: TicketCha
         e?.preventDefault()
         const body = draft.trim()
         if (!body || send.isPending) return
-        send.mutate(body, { onSuccess: () => setDraft("") })
+        send.mutate({ body }, { onSuccess: () => setDraft("") })
     }
 
     const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {

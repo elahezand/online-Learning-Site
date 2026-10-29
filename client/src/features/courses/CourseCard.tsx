@@ -70,7 +70,7 @@ export default function CourseCard(props: CourseCardProps) {
                         <div className="d-flex align-items-center justify-content-between gap-2 small text-body-secondary">
                             <span className="d-inline-flex align-items-center gap-2 text-truncate">
                                 <FaChalkboardUser className="text-primary flex-shrink-0" />
-                                <span className="text-truncate">{creator}</span>
+                                <span className="text-truncate">{creator?.name}</span>
                             </span>
                             <span className="d-inline-flex align-items-center gap-1 flex-shrink-0">
                                 <FaStar className="text-warning" />{courseAverageScore}

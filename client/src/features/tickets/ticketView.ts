@@ -1,5 +1,4 @@
 import type { Department, Priority, Ref, Ticket } from "../../types/models"
-import { ALL, type StatusOption } from "../../hooks/useStatusFilter"
 
 const isObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value)
 
@@ -21,8 +20,6 @@ export const PRIORITY_CLASSES: Record<Priority, string> = {
     2: "bg-warning-subtle text-warning-emphasis",
     1: "bg-secondary-subtle text-secondary-emphasis",
 }
-
-export const isTopLevel = (ticket: Pick<Ticket, "isAnswer" | "parent">) => !ticket.isAnswer && !ticket.parent
 
 export const isAnswered = (ticket: Pick<Ticket, "answer">) => Number(ticket.answer) === 1
 
@@ -57,9 +54,3 @@ export const hasNewReply = (ticket: Pick<Ticket, "_id" | "answer" | "updatedAt">
     const seenAt = readSeen()[ticket._id]
     return !seenAt || (ticket.updatedAt ? ticket.updatedAt > seenAt : false)
 }
-
-export const TICKET_FILTERS: readonly StatusOption<Pick<Ticket, "answer">>[] = [
-    ALL,
-    { value: "open", label: "Waiting for reply", test: ticket => !isAnswered(ticket) },
-    { value: "answered", label: "Answered", test: isAnswered },
-]

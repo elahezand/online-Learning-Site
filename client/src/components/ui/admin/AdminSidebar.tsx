@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa6"
 import { useAuth } from "../../../features/auth/useAuth"
 import { useTickets } from "../../../features/tickets/hooks"
-import { isAnswered, isTopLevel } from "../../../features/tickets/ticketView"
 import { useComments } from "../../../features/comments/hooks"
 import { useContacts } from "../../../features/contacts/hooks"
 
@@ -65,12 +64,13 @@ export default function AdminSidebar({ show, onHide, collapsed, onToggle }: Admi
     const text = collapsed ? "d-lg-none" : ""
     const { logout } = useAuth()
     const navigate = useNavigate()
-    const { data: tickets = [] } = useTickets()
+
+    const { data: openTickets } = useTickets({ status: "open", limit: 1 })
     const { data: pendingComments } = useComments({ status: "pending", limit: 1 })
     const { data: newContacts } = useContacts({ status: "new", limit: 1 })
 
     const badges: Record<string, number> = {
-        tickets: tickets.filter(ticket => isTopLevel(ticket) && !isAnswered(ticket)).length,
+        tickets: openTickets?.pagination.total ?? 0,
         comments: pendingComments?.pagination.total ?? 0,
         contacts: newContacts?.pagination.total ?? 0,
     }

@@ -1,35 +1,39 @@
-import { useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { FaComments } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
-import usePagination from "../../hooks/useListParams"
-import { useTickets } from "../../features/tickets/hooks"
 import StatusFilter from "../../components/ui/StatusFilter"
-import useStatusFilter from "../../hooks/useStatusFilter"
-import { PRIORITY_CLASSES, PRIORITY_LABELS, departmentOf, formatDate, isAnswered, isTopLevel, labelOf, TICKET_FILTERS } from "../../features/tickets/ticketView"
-import type { Ticket } from "../../types/models"
+import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
+import useListParams from "../../hooks/useListParams"
+import { useTickets } from "../../features/tickets/hooks"
+import type { TicketQuery } from "../../features/tickets/hooks"
+import { PRIORITY_CLASSES, PRIORITY_LABELS, departmentOf, formatDate, isAnswered, labelOf } from "../../features/tickets/ticketView"
 
-const EMPTY: Ticket[] = []
+const PAGE_SIZE = 10
 
-const byUrgency = (a: Ticket, b: Ticket) =>
-    Number(isAnswered(a)) - Number(isAnswered(b)) ||
-    (b.priority ?? 0) - (a.priority ?? 0) ||
-    (b.createdAt ?? "").localeCompare(a.createdAt ?? "")
+const STATUS_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "open", label: "Waiting for reply" },
+    { value: "answered", label: "Answered" },
+]
 
 export default function Tickets() {
     const navigate = useNavigate()
-    const { data = EMPTY } = useTickets()
+    const { page, get, update } = useListParams()
+    const status = get("status") || "all"
 
-    const tickets = useMemo(() => data.filter(isTopLevel).sort(byUrgency), [data])
-    const { status: filter, setStatus: setFilter, counts, filtered: visible } = useStatusFilter(tickets, TICKET_FILTERS)
-
-    const { page, pageCount, start, pageItems } = usePagination(visible)
+    const { data, isLoading } = useTickets({
+        page,
+        limit: PAGE_SIZE,
+        status: status === "all" ? undefined : status as TicketQuery["status"],
+    })
+    const tickets = data?.items ?? []
 
     return (
         <>
-            <DataTable title="Tickets" actions={<StatusFilter options={TICKET_FILTERS} value={filter} onChange={setFilter} counts={counts} />}>
+            <DataTable title="Tickets" actions={
+                <StatusFilter options={STATUS_OPTIONS} value={status}
+                    onChange={(value) => update({ status: value === "all" ? "" : value })} />}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
                     <thead>
                         <tr>
@@ -44,12 +48,12 @@ export default function Tickets() {
                         </tr>
                     </thead>
                     <tbody>
-                        {pageItems.length ? pageItems.map((ticket, index) => {
+                        {tickets.length ? tickets.map((ticket, index) => {
                             const waiting = !isAnswered(ticket)
                             const link = `/p-admin/ticket/${ticket._id}`
                             return (
                                 <tr key={ticket._id} className={waiting ? "fw-bold" : ""} style={{ cursor: "pointer" }} onClick={() => navigate(link)}>
-                                    <td className="text-body-secondary fw-normal">{start + index + 1}</td>
+                                    <td className="text-body-secondary fw-normal">{index + 1}</td>
                                     <td>
                                         <div className="d-flex align-items-center gap-2">
                                             {waiting && <span className="d-inline-block rounded-circle bg-primary flex-shrink-0 p-1" title="Waiting for reply" aria-label="Waiting for reply" />}
@@ -74,11 +78,11 @@ export default function Tickets() {
                                     </td>
                                 </tr>
                             )
-                        }) : <EmptyRow colSpan={8}>{filter === "open" ? "No tickets are waiting for a reply." : "No tickets yet."}</EmptyRow>}
+                        }) : <EmptyRow colSpan={8}>{isLoading ? "Loading…" : status === "open" ? "No tickets are waiting for a reply." : "No tickets yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

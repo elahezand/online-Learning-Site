@@ -14,12 +14,21 @@ export interface MyCoursesQuery {
   status?: "free" | "paid" | "completed" | "in-progress";
 }
 
-export const useUsers = () =>
-  useGet<User[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export interface UserQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: Role;
+  status ?: "active" | "banned";
+
+}
+
+export const useUsers = (query: UserQuery = {}) =>
+  useGet<Paginated<User>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load users",
   });
-
 export const useMyCourses = (query: MyCoursesQuery = {}) =>
   useGet<Paginated<MyCourse>>(`${ENDPOINT}/courses`, { ...query }, {
     queryKey: ["me", "courses", query],
@@ -39,6 +48,18 @@ export const useBanUser = () => {
   });
 };
 
+export const useUnbanUser = () => {
+  const queryClient = useQueryClient();
+
+  return usePut<unknown, { id: string }>(({ id }) => `${ENDPOINT}/unban/${id}`, {
+    onSuccess: () => {
+      toast.success("User unbanned");
+      queryClient.invalidateQueries({ queryKey: KEY });
+    },
+    errorFallback: "Failed to unban user",
+  });
+};
+
 export const useChangeRole = () => {
   const queryClient = useQueryClient();
 
@@ -54,7 +75,8 @@ export const useChangeRole = () => {
 export const useUpdateMe = (onSuccessCallback?: () => void) => {
   const { refreshUser } = useAuth();
 
-return usePut<unknown, Partial<Pick<User, "name" | "username" | "email" | "phone">> & { password?: string; currentPassword?: string }>(ENDPOINT, {    onSuccess: () => {
+  return usePut<unknown, Partial<Pick<User, "name" | "username" | "email" | "phone">> & { password?: string; currentPassword?: string }>(ENDPOINT, {
+    onSuccess: () => {
       toast.success("Your account was updated");
       refreshUser();
       onSuccessCallback?.();

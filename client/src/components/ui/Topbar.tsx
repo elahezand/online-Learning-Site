@@ -24,7 +24,7 @@ export default function Topbar() {
 
                 <nav className="d-flex align-items-center gap-3" aria-label="Quick links">
                     {quickLinks.map(item => (
-                        <Link key={item._id} to={`/category-info/${item.href}`} className="link-secondary text-nowrap">
+                        <Link key={item._id} to={`/course-info/${item.href}`} className="link-secondary text-nowrap">
                             {item.title}
                         </Link>
                     ))}

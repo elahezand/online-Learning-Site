@@ -26,15 +26,11 @@ const renderAt = (path: string, auth: AuthContextValue) => render(
 const authState = (status: AuthStatus, role?: Role): AuthContextValue => {
     const user = role ? ({ role } as User) : null
     return {
-        token: role ? "token" : null,
         user,
         status,
-        isLoading: status === "loading",
         isLoggedIn: status === "authenticated",
-        isAdmin: role === "ADMIN",
-        login: () => { },
-        logout: () => { },
-        refreshUser: async () => user,
+        logout: async () => { },
+        refreshUser: async () => { },
         userInfo: user ?? {},
     }
 }

@@ -55,7 +55,8 @@ export interface Session {
     title: string
     time: string
     free: Flag
-    video?: string
+    locked?: boolean
+    videoUrl?: string | null
     course?: Pick<Course, "_id" | "name" | "shortName">
     createdAt?: string
     updatedAt?: string
@@ -181,8 +182,8 @@ export interface Discount {
     percent: number
     max: number
     uses: number
-    creator?: string
-    course?: Id
+    creator?: Pick<User, "_id" | "name">
+    course?: Pick<Course, "_id" | "name" | "shortName">
     createdAt?: string
 }
 
