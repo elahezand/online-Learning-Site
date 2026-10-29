@@ -24,9 +24,9 @@ export default function NewTicket() {
     const departmentSubID = watch("departmentSubID")
     const { data: departments = [] } = useDepartments()
     const { data: subDepartments = [] } = useDepartmentSubs(departmentID)
-    const { data: myCourses = [], isLoading: coursesLoading } = useMyCourses()
-    const enrolled = myCourses.map(enrolledCourse).filter(course => course !== undefined)
 
+    const { data: myCourses, isLoading: coursesLoading } = useMyCourses({ limit: 50 })
+    const enrolled = (myCourses?.items ?? []).map(enrolledCourse).filter(course => course !== undefined)
     return (
         <>
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">

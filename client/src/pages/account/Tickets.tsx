@@ -1,27 +1,30 @@
-import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { FaChevronRight, FaHeadset, FaPlus } from "react-icons/fa6"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/useListParams"
-import { useMyTickets } from "../../features/tickets/hooks"
 import StatusFilter from "../../components/ui/StatusFilter"
-import useStatusFilter from "../../hooks/useStatusFilter"
-import { departmentOf, formatDate, hasNewReply, isAnswered, isTopLevel, TICKET_FILTERS } from "../../features/tickets/ticketView"
-import type { Ticket } from "../../types/models"
+import useListParams from "../../hooks/useListParams"
+import { useMyTickets } from "../../features/tickets/hooks"
+import type { MyTicketsQuery } from "../../features/tickets/hooks"
+import { departmentOf, formatDate, hasNewReply, isAnswered } from "../../features/tickets/ticketView"
 
-const EMPTY: Ticket[] = []
+const STATUS_OPTIONS = [
+    { value: "", label: "All" },
+    { value: "pending", label: "Waiting" },
+    { value: "answered", label: "Answered" },
+] as const
 
-const byActivity = (a: Ticket, b: Ticket) =>
-    Number(hasNewReply(b)) - Number(hasNewReply(a)) ||
-    (b.updatedAt ?? b.createdAt ?? "").localeCompare(a.updatedAt ?? a.createdAt ?? "")
+const PAGE_SIZE = 10
 
 export default function Tickets() {
-    const { data = EMPTY, isLoading } = useMyTickets()
+    const { page, get, update } = useListParams()
+    const status = STATUS_OPTIONS.find(option => option.value === get("status"))?.value ?? ""
 
-    const tickets = useMemo(() => data.filter(isTopLevel).sort(byActivity), [data])
-    const { status: filter, setStatus: setFilter, counts, filtered: visible } = useStatusFilter(tickets, TICKET_FILTERS)
-
-    const { page, pageCount, pageItems } = usePagination(visible)
+    const { data, isLoading } = useMyTickets({
+        page,
+        limit: PAGE_SIZE,
+        status: (status || undefined) as MyTicketsQuery["status"],
+    })
+    const tickets = data?.items ?? []
 
     return (
         <>
@@ -33,14 +36,14 @@ export default function Tickets() {
             </div>
 
             <div className="mb-3">
-                <StatusFilter options={TICKET_FILTERS} value={filter} onChange={setFilter} counts={counts} />
+                <StatusFilter options={STATUS_OPTIONS} value={status} onChange={(value) => update({ status: value })} />
             </div>
 
             {isLoading ?
                 <div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading…</span></div></div> :
-                pageItems.length ?
+                tickets.length ?
                     <div className="list-group shadow-sm">
-                        {pageItems.map(ticket => {
+                        {tickets.map(ticket => {
                             const unread = hasNewReply(ticket)
                             return (
                                 <Link key={ticket._id} to={`/my-account/ticket/${ticket._id}`}
@@ -50,7 +53,7 @@ export default function Tickets() {
                                     </span>
                                     <div className="flex-grow-1 overflow-hidden">
                                         <div className="d-flex align-items-center gap-2">
-                                            <span className={`text-truncate ${unread ? "fw-bold text-body-emphasis" : "fw-medium text-body-emphasis"}`}>{ticket.title}</span>
+                                            <span className={`text-truncate text-body-emphasis ${unread ? "fw-bold" : "fw-medium"}`}>{ticket.title}</span>
                                             {unread && <span className="badge rounded-pill text-bg-primary flex-shrink-0">New reply</span>}
                                         </div>
                                         <div className={`small text-truncate ${unread ? "text-body-emphasis" : "text-body-secondary"}`}>{ticket.body}</div>
@@ -68,10 +71,10 @@ export default function Tickets() {
                         })}
                     </div> :
                     <div className="alert alert-primary">
-                        {filter === "all" ? "You haven't sent any tickets yet." : "No tickets here."}
+                        {status ? "No tickets here." : "You haven't sent any tickets yet."}
                     </div>}
 
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

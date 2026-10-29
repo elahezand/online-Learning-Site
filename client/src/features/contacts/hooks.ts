@@ -1,14 +1,22 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { Contact } from "../../types/models";
+import type { Paginated } from "../../types/models";
 import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/contact";
 const KEY = ["contacts"];
 
-export const useContacts = () =>
-  useGet<Contact[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+export interface ContactQuery {
+  page?: number;
+  limit?: number;
+  status?: "new" | "answered";
+}
+
+export const useContacts = (query: ContactQuery = {}) =>
+  useGet<Paginated<Contact>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load messages",
   });
 

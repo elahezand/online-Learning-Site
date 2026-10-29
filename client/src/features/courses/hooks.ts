@@ -25,7 +25,13 @@ export const useCourses = (query: CourseQuery = {}) =>
     errorFallback: "Failed to load courses",
   });
 
-export const usePopularCourses = (query:CourseQuery = {}) =>
+export const useCourseOptions = () =>
+  useGet<Pick<Course, "_id" | "name">[]>(`${ENDPOINT}/options`, undefined, {
+    queryKey: [...KEY, "options"],
+    errorFallback: "Failed to load courses",
+  });
+
+export const usePopularCourses = (query: CourseQuery = {}) =>
   useGet<Course[]>(`${ENDPOINT}/popular`, { ...query }, {
     queryKey: [...KEY, "popular", query],
     silentError: true,
@@ -52,11 +58,46 @@ export const useRelatedCourses = (shortName?: string) =>
     silentError: true,
   });
 
-export const useSessions = () =>
-  useGet<Session[]>(`${ENDPOINT}/sessions`, undefined, {
-    queryKey: SESSIONS_KEY,
+export interface SessionQuery {
+  page?: number;
+  limit?: number;
+  course?: string;
+  category?: string;
+}
+
+export const useSessions = (query: SessionQuery = {}) =>
+  useGet<Paginated<Session>>("/sessions", { ...query }, {
+    queryKey: [...SESSIONS_KEY, "list", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load sessions",
   });
+
+export const useCreateSession = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+
+  return usePost<unknown, FormData>("/sessions", {
+    onSuccess: () => {
+      toast.success("Session created");
+      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: KEY });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to create session",
+  });
+};
+
+export const useDeleteSession = () => {
+  const queryClient = useQueryClient();
+
+  return useDelete<unknown, string>((id: string) => `/sessions/${id}`, {
+    onSuccess: () => {
+      toast.success("Session removed");
+      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: KEY });
+    },
+    errorFallback: "Failed to remove session",
+  });
+};
 
 export const useSession = (shortName?: string, sessionId?: string) =>
   useGet<SessionDetail>(`${ENDPOINT}/${enc(shortName ?? "")}/${enc(sessionId ?? "")}`, undefined, {
@@ -105,20 +146,6 @@ export const useRegisterCourse = (onSuccessCallback?: () => void) => {
   });
 };
 
-export const useCreateSession = (courseId: string, onSuccessCallback?: () => void) => {
-  const queryClient = useQueryClient();
-
-  return usePost<unknown, FormData>(`${ENDPOINT}/${courseId}/sessions`, {
-    onSuccess: () => {
-      toast.success("Session created");
-      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
-      queryClient.invalidateQueries({ queryKey: KEY });
-      onSuccessCallback?.();
-    },
-    errorFallback: "Failed to create session",
-  });
-};
-
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient();
 
@@ -128,18 +155,5 @@ export const useDeleteCourse = () => {
       queryClient.invalidateQueries({ queryKey: KEY });
     },
     errorFallback: "Failed to remove course",
-  });
-};
-
-export const useDeleteSession = () => {
-  const queryClient = useQueryClient();
-
-  return useDelete<unknown, string>((id: string) => `${ENDPOINT}/sessions/${id}`, {
-    onSuccess: () => {
-      toast.success("Session removed");
-      queryClient.invalidateQueries({ queryKey: SESSIONS_KEY });
-      queryClient.invalidateQueries({ queryKey: KEY });
-    },
-    errorFallback: "Failed to remove session",
   });
 };

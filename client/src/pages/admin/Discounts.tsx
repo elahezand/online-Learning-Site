@@ -3,19 +3,24 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { FaHashtag, FaPercent, FaPlus, FaTicketSimple, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/useListParams"
 import Input from "../../components/ui/Input"
 import FormCard from "../../components/ui/FormCard"
 import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
 import { confirmToast } from "../../components/ui/toastActions"
+import useListParams from "../../hooks/useListParams"
 import { discountSchema } from "../../validators"
-import { useCourses } from "../../features/courses/hooks"
+import { useCourseOptions } from "../../features/courses/hooks"
 import { useCreateDiscount, useDeleteDiscount, useDiscounts } from "../../features/discounts/hooks"
 import type { Discount } from "../../types/models"
 
+const PAGE_SIZE = 10
+
 export default function Discounts() {
-        const { data: discounts = [] } = useDiscounts()
-    const { data: courses = [] } = useCourses()
+    const { page } = useListParams()
+    const { data, isLoading } = useDiscounts({ page, limit: PAGE_SIZE })
+    const discounts = data?.items ?? []
+    const { data: courses = [] } = useCourseOptions()
+
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: zodResolver(discountSchema),
         defaultValues: { code: "", percent: "", max: "", course: "" },
@@ -23,9 +28,6 @@ export default function Discounts() {
     })
     const createDiscount = useCreateDiscount(() => reset())
     const deleteDiscount = useDeleteDiscount()
-
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(discounts)
 
     const removeCode = async (discount: Discount) => {
         const ok = await confirmToast({ title: `Remove code "${discount.code}"?`, description: "Users will no longer be able to use it.", confirmLabel: "Remove" })
@@ -85,9 +87,9 @@ export default function Discounts() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((item, index) => (
+                        {discounts.length ? discounts.map((item, index) => (
                             <tr key={item._id}>
-                                <td className="text-body-secondary">{start + index + 1}</td>
+                                <td className="text-body-secondary">{index + 1}</td>
                                 <td><span className="badge bg-primary-subtle text-primary-emphasis font-monospace">{item.code}</span></td>
                                 <td>{item.creator}</td>
                                 <td>{item.percent}%</td>
@@ -100,11 +102,11 @@ export default function Discounts() {
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={8}>No discount codes yet.</EmptyRow>}
+                        )) : <EmptyRow colSpan={8}>{isLoading ? "Loading…" : "No discount codes yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

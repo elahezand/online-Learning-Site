@@ -1,17 +1,17 @@
-import { FaBan, FaCheck, FaEye, FaMagnifyingGlass, FaReply, FaStar, FaTrash, FaXmark } from "react-icons/fa6"
+import { FaBan, FaCheck, FaEye, FaReply, FaStar, FaTrash, FaXmark } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
 import StatusFilter from "../../components/ui/StatusFilter"
 import FilterSelect from "../../components/ui/FilterSelect"
+import SearchSelect from "../../components/ui/SearchSelect"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
 import { confirmToast, messageToast, promptToast } from "../../components/ui/toastActions"
 import useListParams from "../../hooks/useListParams"
-import useDebouncedValue from "../../hooks/useDebouncedValue"
 import { answerSchema } from "../../validators"
 import { useAcceptComment, useAnswerComment, useComments, useDeleteComment, useRejectComment } from "../../features/comments/hooks"
 import type { CommentQuery } from "../../features/comments/hooks"
 import { useBanUser } from "../../features/users/hooks"
-import { useCourses } from "../../features/courses/hooks"
+import { useCourseOptions } from "../../features/courses/hooks"
 import type { Comment } from "../../types/models"
 
 const PAGE_SIZE = 10
@@ -31,27 +31,21 @@ const isAccepted = (comment: Comment) => Number(comment.answer) === 1
 
 export default function Comments() {
     const { page, get, update } = useListParams()
-    const search = get("search")
     const course = get("course")
     const score = get("score")
     const status = get("status") || "all"
-    const debouncedSearch = useDebouncedValue(search.trim())
 
-    const { data: coursesData } = useCourses({ limit: 50, sort: "name" })
-    const courses = coursesData?.items ?? []
+    const { data: courses = [] } = useCourseOptions()
 
     const { data, isLoading } = useComments({
         page,
         limit: PAGE_SIZE,
-        search: debouncedSearch || undefined,
         course: course || undefined,
         score: score ? Number(score) : undefined,
         status: status === "all" ? undefined : status as CommentQuery["status"],
     })
     const comments = data?.items ?? []
-    const total = data?.pagination.total ?? 0
-    const start = ((data?.pagination.page ?? page) - 1) * PAGE_SIZE
-    const isFiltered = Boolean(search || course || score) || status !== "all"
+    const isFiltered = Boolean(course || score) || status !== "all"
 
     const deleteComment = useDeleteComment()
     const acceptComment = useAcceptComment()
@@ -89,17 +83,11 @@ export default function Comments() {
         <>
             <DataTable title="Comments" actions={
                 <div className="d-flex flex-wrap align-items-center gap-2">
-                    <div className="input-group input-group-sm w-auto">
-                        <span className="input-group-text bg-body"><FaMagnifyingGlass /></span>
-                        <input type="search" className="form-control" value={search}
-                            onChange={(e) => update({ search: e.target.value })}
-                            placeholder="Search comments…" aria-label="Search comments" />
-                    </div>
-                    <FilterSelect label="Filter by course" value={course} onChange={(value) => update({ course: value })}
-                        options={courses.map(item => ({ value: item._id, label: item.name }))} allLabel="All courses" />
+                    <SearchSelect label="Filter by course" value={course} onChange={(value) => update({ course: value })}
+                        options={courses.map(item => ({ value: item._id, label: item.name }))} allLabel="All courses" placeholder="Search courses…" />
                     <FilterSelect label="Filter by score" value={score} onChange={(value) => update({ score: value })}
                         options={SCORE_OPTIONS} allLabel="All scores" />
-                    <StatusFilter options={STATUS_OPTIONS} value={status} counts={{ [status]: total }}
+                    <StatusFilter options={STATUS_OPTIONS} value={status}
                         onChange={(value) => update({ status: value === "all" ? "" : value })} />
                 </div>}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
@@ -118,7 +106,7 @@ export default function Comments() {
                             const pending = !isAccepted(comment)
                             return (
                                 <tr key={comment._id} className={pending ? "fw-bold" : ""}>
-                                    <td className="text-body-secondary fw-normal">{start + index + 1}</td>
+                                    <td className="text-body-secondary fw-normal">{index + 1}</td>
                                     <td>
                                         <div className="d-flex align-items-center gap-2 text-body-emphasis">
                                             {pending && <span className="d-inline-block rounded-circle bg-primary flex-shrink-0 p-1" title="Waiting for review" aria-label="Waiting for review" />}
@@ -126,7 +114,7 @@ export default function Comments() {
                                         </div>
                                         <div className="small text-body-secondary fw-normal text-truncate" style={{ maxWidth: "22rem" }}>{comment.body}</div>
                                     </td>
-                                    <td className="fw-normal">{comment.course ?? "—"}</td>
+                                    <td className="fw-normal">{comment.course?.name ?? "—"}</td>
                                     <td><span className="d-inline-flex align-items-center gap-1"><FaStar className="text-warning" />{comment.score}</span></td>
                                     <td><StatusBadge ok={comment.answer} okLabel="Accepted" pendingLabel="New" /></td>
                                     <td>

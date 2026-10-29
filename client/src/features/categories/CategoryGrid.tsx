@@ -39,7 +39,7 @@ const countLabel = (count: number) => (count ? `${count} ${count === 1 ? "course
 function FeaturedTile({ category }: { category: RankedCategory }) {
     const Icon = category.Icon
     return (
-        <Link to={`/category-info/${category.name}`}
+        <Link to={`/courses?category=${category.name}`}
             className="card card-hover h-100 border-0 rounded-4 shadow bg-primary bg-gradient text-white text-decoration-none overflow-hidden position-relative">
             <Icon className="position-absolute bottom-0 end-0 m-3 display-1 opacity-25" aria-hidden="true" />
             <div className="card-body d-flex flex-column p-4 p-lg-5 position-relative">
@@ -60,7 +60,7 @@ function FeaturedTile({ category }: { category: RankedCategory }) {
 function Tile({ category }: { category: RankedCategory }) {
     const Icon = category.Icon
     return (
-        <Link to={`/category-info/${category.name}`}
+        <Link to={`/courses?category=${category.name}`}
             className="card card-hover h-100 rounded-4 shadow-sm text-decoration-none overflow-hidden position-relative">
             <Icon className="position-absolute bottom-0 end-0 m-2 display-4 text-primary opacity-25" aria-hidden="true" />
             <div className="card-body d-flex flex-column gap-3 p-3 p-lg-4 position-relative">
@@ -80,7 +80,7 @@ function Tile({ category }: { category: RankedCategory }) {
 
 export default function CategoryGrid() {
     const { data: categories = EMPTY } = useCategories()
-    
+
     const ranked = useMemo<RankedCategory[]>(() => categories
         .map(category => ({
             ...category,
@@ -119,7 +119,7 @@ export default function CategoryGrid() {
                 <div className="d-flex flex-wrap align-items-center gap-2 mt-4">
                     <span className="small fw-medium text-body-secondary me-1">More topics:</span>
                     {more.map(category => (
-                        <Link key={category._id} to={`/category-info/${category.name}`}
+                        <Link key={category._id} to={`/courses?category=${category.name}`}
                             className="btn btn-sm btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2">
                             <category.Icon className="text-primary" /> {category.title}
                             {category.count > 0 && <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis">{category.count}</span>}

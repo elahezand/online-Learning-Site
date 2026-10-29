@@ -1,16 +1,19 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient,keepPreviousData } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Discount } from "../../types/models";
+import type { Discount,Paginated } from "../../types/models";
 import { useGet, usePost, useDelete } from "../../hooks/useReactQueryHooks";
 
 const ENDPOINT = "/offs";
 const KEY = ["discounts"];
 
-export const useDiscounts = () =>
-  useGet<Discount[]>(ENDPOINT, undefined, {
-    queryKey: KEY,
+
+export const useDiscounts = (query: { page?: number; limit?: number } = {}) =>
+  useGet<Paginated<Discount>>(ENDPOINT, { ...query }, {
+    queryKey: [...KEY, query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load discounts",
   });
+
 
 export const useCreateDiscount = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient();
@@ -48,5 +51,19 @@ export const useDeleteDiscount = () => {
       queryClient.invalidateQueries({ queryKey: KEY });
     },
     errorFallback: "Failed to remove discount",
+  });
+};
+
+
+export const useEndSiteWideDiscount = (onSuccessCallback?: () => void) => {
+  const queryClient = useQueryClient();
+
+  return useDelete<unknown, void>(`${ENDPOINT}/all`, {
+    onSuccess: () => {
+      toast.success("Site-wide discount ended");
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      onSuccessCallback?.();
+    },
+    errorFallback: "Failed to end site-wide discount",
   });
 };

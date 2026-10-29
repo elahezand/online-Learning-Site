@@ -1,14 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { Department, Ticket, TicketMessage, TicketThread } from "../../types/models";
+import type { Department, Paginated, Ticket, TicketMessage, TicketThread } from "../../types/models";
 import type { TicketData } from "../../validators";
-import { api } from "../../api/client";
 import { useGet, usePost } from "../../hooks/useReactQueryHooks";
-import type { ApiError } from "../../types/api";
 
 const ENDPOINT = "/tickets";
 const KEY = ["tickets"];
 const MY_KEY = ["me", "tickets"];
+
+export interface MyTicketsQuery {
+  page?: number;
+  limit?: number;
+  status?: "pending" | "answered";
+}
 
 export const useTickets = () =>
   useGet<Ticket[]>(ENDPOINT, undefined, {
@@ -16,9 +20,10 @@ export const useTickets = () =>
     errorFallback: "Failed to load tickets",
   });
 
-export const useMyTickets = () =>
-  useGet<Ticket[]>(`${ENDPOINT}/user`, undefined, {
-    queryKey: MY_KEY,
+export const useMyTickets = (query: MyTicketsQuery = {}) =>
+  useGet<Paginated<Ticket>>(`${ENDPOINT}/user`, { ...query }, {
+    queryKey: [...MY_KEY, query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load your tickets",
   });
 
@@ -52,27 +57,21 @@ export const useCreateTicket = (onSuccessCallback?: () => void) => {
 
 export const threadKey = (id?: string) => [...KEY, "thread", id];
 
-const fetchThread = async (id: string, signal: AbortSignal): Promise<TicketThread> => {
-  const { data } = await api.get<TicketThread>(`${ENDPOINT}/${id}/messages`, { signal });
-  return data;
-};
-
 export const useTicketThread = (id?: string) =>
-  useQuery<TicketThread, ApiError>({
+  useGet<TicketThread>(`${ENDPOINT}/${id}/messages`, undefined, {
     queryKey: threadKey(id),
-    queryFn: ({ signal }) => fetchThread(id ?? "", signal),
     enabled: Boolean(id),
     refetchInterval: 20 * 1000,
     staleTime: 10 * 1000,
+    silentError: true,
   });
 
 export const useSendTicketMessage = (ticketId: string, asAdmin: boolean) => {
   const queryClient = useQueryClient();
   const key = threadKey(ticketId);
 
-  return useMutation<unknown, ApiError, string, { previous?: TicketThread }>({
-    mutationFn: (body) => api.post(`${ENDPOINT}/${ticketId}/messages`, { body }),
-    onMutate: async (body) => {
+  return usePost<unknown, { body: string }>(`${ENDPOINT}/${ticketId}/messages`, {
+    onMutate: async ({ body }) => {
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<TicketThread>(key);
       const pending: TicketMessage = {
@@ -84,12 +83,14 @@ export const useSendTicketMessage = (ticketId: string, asAdmin: boolean) => {
       queryClient.setQueryData<TicketThread>(key, (old) => ({ ...old, messages: [...(old?.messages ?? []), pending] }));
       return { previous };
     },
-    onError: (_error, _body, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous);
+    onError: (_error, _variables, result) => {
+      const previous = (result as { previous?: TicketThread } | undefined)?.previous;
+      if (previous) queryClient.setQueryData(key, previous);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: key });
-      queryClient.invalidateQueries({ queryKey: asAdmin ? KEY : MY_KEY, exact: true });
+      queryClient.invalidateQueries({ queryKey: asAdmin ? KEY : MY_KEY, exact: asAdmin });
     },
+    errorFallback: "Failed to send message",
   });
 };

@@ -67,14 +67,13 @@ export default function AdminSidebar({ show, onHide, collapsed, onToggle }: Admi
     const navigate = useNavigate()
     const { data: tickets = [] } = useTickets()
     const { data: pendingComments } = useComments({ status: "pending", limit: 1 })
-    const { data: contacts = [] } = useContacts()
+    const { data: newContacts } = useContacts({ status: "new", limit: 1 })
 
     const badges: Record<string, number> = {
         tickets: tickets.filter(ticket => isTopLevel(ticket) && !isAnswered(ticket)).length,
         comments: pendingComments?.pagination.total ?? 0,
-        contacts: contacts.filter(contact => !contact.answer).length,
+        contacts: newContacts?.pagination.total ?? 0,
     }
-
     const exitPanel = async () => {
         await logout()
         navigate("/login")

@@ -1,6 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AuthTokens, Course, MyCourse, Role, User } from "../../types/models";
+import type { AuthTokens, Course, MyCourse, Paginated, Role, User } from "../../types/models";
 import type { RegisterPayload } from "../auth/types";
 import { useGet, usePost, usePut, useDelete } from "../../hooks/useReactQueryHooks";
 import { useAuth } from "../auth/useAuth";
@@ -8,15 +8,22 @@ import { useAuth } from "../auth/useAuth";
 const ENDPOINT = "/users";
 const KEY = ["users"];
 
+export interface MyCoursesQuery {
+  page?: number;
+  limit?: number;
+  status?: "free" | "paid" | "completed" | "in-progress";
+}
+
 export const useUsers = () =>
   useGet<User[]>(ENDPOINT, undefined, {
     queryKey: KEY,
     errorFallback: "Failed to load users",
   });
 
-export const useMyCourses = () =>
-  useGet<MyCourse[]>(`${ENDPOINT}/courses`, undefined, {
-    queryKey: ["me", "courses"],
+export const useMyCourses = (query: MyCoursesQuery = {}) =>
+  useGet<Paginated<MyCourse>>(`${ENDPOINT}/courses`, { ...query }, {
+    queryKey: ["me", "courses", query],
+    placeholderData: keepPreviousData,
     errorFallback: "Failed to load your courses",
   });
 
@@ -47,8 +54,7 @@ export const useChangeRole = () => {
 export const useUpdateMe = (onSuccessCallback?: () => void) => {
   const { refreshUser } = useAuth();
 
-  return usePut<unknown, Partial<Pick<User, "name" | "username" | "email" | "phone">> & { password?: string }>(ENDPOINT, {
-    onSuccess: () => {
+return usePut<unknown, Partial<Pick<User, "name" | "username" | "email" | "phone">> & { password?: string; currentPassword?: string }>(ENDPOINT, {    onSuccess: () => {
       toast.success("Your account was updated");
       refreshUser();
       onSuccessCallback?.();

@@ -86,7 +86,7 @@ const routes: RouteObject[] = [
             { path: "users/:page?", element: <AdminUsers /> },
             { path: "new-user", element: <AddUserForm /> },
             { path: "courses/:page?", element: <AdminCourses /> },
-            { path: "course/:id/edit", element: <AdminEditCourse /> },
+            { path: "course/:shortName/edit", element: <AdminEditCourse /> },
             { path: "sessions/:page?", element: <AdminSessions /> },
             { path: "categories/:page?", element: <AdminCategories /> },
             { path: "articles/:page?", element: <AdminArticles /> },

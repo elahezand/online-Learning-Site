@@ -1,38 +1,39 @@
-import { useMemo } from "react"
 import { FaEye, FaReply, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
 import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/useListParams"
-import useStatusFilter, { ALL, type StatusOption } from "../../hooks/useStatusFilter"
 import StatusFilter from "../../components/ui/StatusFilter"
+import useListParams from "../../hooks/useListParams"
 import { formatDate } from "../../features/tickets/ticketView"
 import ActionButton, { EmptyRow, RowActions, StatusBadge } from "../../components/ui/ActionButton"
 import { confirmToast, messageToast, promptToast } from "../../components/ui/toastActions"
 import { answerSchema } from "../../validators"
 import { useAnswerContact, useContacts, useDeleteContact } from "../../features/contacts/hooks"
+import type { ContactQuery } from "../../features/contacts/hooks"
 import type { Contact } from "../../types/models"
 
-const EMPTY: Contact[] = []
-const isAnswered = (contact: Contact) => Number(contact.answer) === 1
+const PAGE_SIZE = 10
 
-const FILTERS: readonly StatusOption<Contact>[] = [
-    ALL,
-    { value: "new", label: "Waiting for reply", test: contact => !isAnswered(contact) },
-    { value: "answered", label: "Answered", test: isAnswered },
+const STATUS_OPTIONS = [
+    { value: "all", label: "All" },
+    { value: "new", label: "Waiting for reply" },
+    { value: "answered", label: "Answered" },
 ]
 
-const byReply = (a: Contact, b: Contact) =>
-    Number(isAnswered(a)) - Number(isAnswered(b)) ||
-    (b.createdAt ?? "").localeCompare(a.createdAt ?? "")
+const isAnswered = (contact: Contact) => Number(contact.answer) === 1
 
 export default function Contacts() {
-    const { data = EMPTY } = useContacts()
-    const messages = useMemo(() => [...data].sort(byReply), [data])
-    const { status, setStatus, counts, filtered } = useStatusFilter(messages, FILTERS)
+    const { page, get, update } = useListParams()
+    const status = get("status") || "all"
+
+    const { data, isLoading } = useContacts({
+        page,
+        limit: PAGE_SIZE,
+        status: status === "all" ? undefined : status as ContactQuery["status"],
+    })
+    const messages = data?.items ?? []
+
     const answerContact = useAnswerContact()
     const deleteContact = useDeleteContact()
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(filtered)
 
     const answer = async (contact: Contact) => {
         const body = await promptToast({ title: `Answer ${contact.name}`, description: contact.body, placeholder: "Your answer (sent by email)", schema: answerSchema })
@@ -46,7 +47,9 @@ export default function Contacts() {
 
     return (
         <>
-            <DataTable title="Messages" actions={<StatusFilter options={FILTERS} value={status} onChange={setStatus} counts={counts} />}>
+            <DataTable title="Messages" actions={
+                <StatusFilter options={STATUS_OPTIONS} value={status}
+                    onChange={(value) => update({ status: value === "all" ? "" : value })} />}>
                 <table className="table table-hover align-middle text-nowrap mb-0">
                     <thead>
                         <tr>
@@ -60,11 +63,11 @@ export default function Contacts() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((contact, index) => {
+                        {messages.length ? messages.map((contact, index) => {
                             const waiting = !isAnswered(contact)
                             return (
                                 <tr key={contact._id} className={waiting ? "fw-bold" : ""}>
-                                    <td className="text-body-secondary fw-normal">{start + index + 1}</td>
+                                    <td className="text-body-secondary fw-normal">{index + 1}</td>
                                     <td>
                                         <div className="d-flex align-items-center gap-2 text-body-emphasis">
                                             {waiting && <span className="d-inline-block rounded-circle bg-primary flex-shrink-0 p-1" title="Waiting for reply" aria-label="Waiting for reply" />}
@@ -85,11 +88,11 @@ export default function Contacts() {
                                     </td>
                                 </tr>
                             )
-                        }) : <EmptyRow colSpan={7}>{status === "new" ? "No messages are waiting for a reply." : "No messages yet."}</EmptyRow>}
+                        }) : <EmptyRow colSpan={7}>{isLoading ? "Loading…" : status === "new" ? "No messages are waiting for a reply." : "No messages yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
+            <Pagination pagination={data?.pagination} />
         </>
     )
 }

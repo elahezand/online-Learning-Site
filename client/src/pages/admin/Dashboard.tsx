@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
 import {
@@ -8,25 +7,8 @@ import DataTable from "../../components/ui/DataTable"
 import { EmptyRow } from "../../components/ui/ActionButton"
 import DashboardChart from "../../features/info/DashboardChart"
 import { useAdminDashboard } from "../../features/info/hooks"
-import { useCategories } from "../../features/categories/hooks"
-import { useComments } from "../../features/comments/hooks"
-import { useContacts } from "../../features/contacts/hooks"
-import { useCourses } from "../../features/courses/hooks"
-import { useTickets } from "../../features/tickets/hooks"
-import { PRIORITY_CLASSES, PRIORITY_LABELS, formatDate, isAnswered, isTopLevel, labelOf } from "../../features/tickets/ticketView"
-import { useUsers } from "../../features/users/hooks"
 import { useAuth } from "../../features/auth/useAuth"
-import type { Category, Comment, Contact, Course, Ticket, User } from "../../types/models"
-import { categoryIdOf } from "../../features/courses/courseView"
-
-const EMPTY: never[] = []
-
-const isThisMonth = (iso?: string) => {
-    if (!iso) return false
-    const date = new Date(iso)
-    const now = new Date()
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()
-}
+import { PRIORITY_CLASSES, PRIORITY_LABELS, formatDate } from "../../features/tickets/ticketView"
 
 interface StatCardProps {
     label: string
@@ -73,38 +55,16 @@ function Panel({ title, to, linkLabel, children }: { title: string; to: string; 
 
 export default function Dashboard() {
     const { userInfo } = useAuth()
-    const { data: info } = useAdminDashboard()
-    const { data: users = EMPTY as User[] } = useUsers()
-    const { data: courses = EMPTY as Course[] } = useCourses()
-    const { data: categories = EMPTY as Category[] } = useCategories()
-    const { data: tickets = EMPTY as Ticket[] } = useTickets()
-    const { data: comments = EMPTY as Comment[] } = useComments()
-    const { data: contacts = EMPTY as Contact[] } = useContacts()
+    const { data } = useAdminDashboard()
+    
+    const stats = data?.stats
+    const count = (value?: number) => value ?? 0
 
-    const stats = useMemo(() => {
-        const topTickets = tickets.filter(isTopLevel)
-        return {
-            students: users.filter(user => user.role !== "ADMIN").length,
-            newStudents: users.filter(user => user.role !== "ADMIN" && isThisMonth(user.createdAt)).length,
-            presell: courses.filter(course => course.status === "presell").length,
-            enrollments: courses.reduce((sum, course) => sum + (course.registers ?? 0), 0),
-            openTickets: topTickets.filter(ticket => !isAnswered(ticket)),
-            totalTickets: topTickets.length,
-            pendingComments: comments.filter(comment => !comment.answer),
-            newMessages: contacts.filter(contact => !contact.answer),
-        }
-    }, [users, courses, tickets, comments, contacts])
-
-    const coursesByCategory = useMemo(() => categories
-        .map(category => ({ name: category.title, value: courses.filter(course => categoryIdOf(course) === category._id).length }))
-        .filter(point => point.value > 0)
-        .sort((a, b) => b.value - a.value), [categories, courses])
-
-    const topCourses = useMemo(() => [...courses]
-        .sort((a, b) => (b.registers ?? 0) - (a.registers ?? 0))
-        .slice(0, 5), [courses])
-
-    const recentUsers = info?.lastUsers ?? users.slice(-5).reverse()
+    const openTickets = data?.openTickets ?? []
+    const pendingComments = data?.pendingComments ?? []
+    const topCourses = data?.topCourses ?? []
+    const recentOrders = data?.recentOrders ?? []
+    const lastUsers = data?.lastUsers ?? []
 
     return (
         <>
@@ -117,23 +77,23 @@ export default function Dashboard() {
             </div>
 
             <div className="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3 mb-4">
-                <StatCard label="Students" value={stats.students} icon={<FaUsers />} to="/p-admin/users"
-                    hint={`${stats.newStudents} joined this month`} />
-                <StatCard label="Courses" value={courses.length} icon={<FaGraduationCap />} to="/p-admin/courses"
-                    hint={`${stats.presell} in pre-sale`} />
-                <StatCard label="Enrollments" value={stats.enrollments} icon={<FaBagShopping />}
+                <StatCard label="Students" value={count(stats?.students)} icon={<FaUsers />} to="/p-admin/users"
+                    hint={`${count(stats?.newStudents)} joined this month`} />
+                <StatCard label="Courses" value={count(stats?.courses)} icon={<FaGraduationCap />} to="/p-admin/courses"
+                    hint={`${count(stats?.presell)} in pre-sale`} />
+                <StatCard label="Enrollments" value={count(stats?.enrollments)} icon={<FaBagShopping />}
                     hint="Across all courses" />
-                <StatCard label="Tickets waiting for reply" value={stats.openTickets.length} icon={<FaHeadset />} to="/p-admin/tickets?status=open"
-                    hint={`${stats.totalTickets} tickets in total`} highlight={stats.openTickets.length > 0} />
-                <StatCard label="Comments to review" value={stats.pendingComments.length} icon={<FaComments />} to="/p-admin/comments?status=pending"
-                    hint={`${comments.length} comments in total`} highlight={stats.pendingComments.length > 0} />
-                <StatCard label="New messages" value={stats.newMessages.length} icon={<FaEnvelope />} to="/p-admin/contacts?status=new"
-                    hint={`${contacts.length} messages in total`} highlight={stats.newMessages.length > 0} />
+                <StatCard label="Tickets waiting for reply" value={count(stats?.openTickets)} icon={<FaHeadset />} to="/p-admin/tickets?status=open"
+                    hint={`${count(stats?.totalTickets)} tickets in total`} highlight={count(stats?.openTickets) > 0} />
+                <StatCard label="Comments to review" value={count(stats?.pendingComments)} icon={<FaComments />} to="/p-admin/comments?status=pending"
+                    hint={`${count(stats?.totalComments)} comments in total`} highlight={count(stats?.pendingComments) > 0} />
+                <StatCard label="New messages" value={count(stats?.newMessages)} icon={<FaEnvelope />} to="/p-admin/contacts?status=new"
+                    hint={`${count(stats?.totalMessages)} messages in total`} highlight={count(stats?.newMessages) > 0} />
             </div>
 
             <div className="row g-3 mb-4">
                 <div className="col-12 col-xl-8">
-                    <DashboardChart title="Courses by category" data={coursesByCategory} valueLabel="Courses" />
+                    <DashboardChart title="Courses by category" data={data?.coursesByCategory ?? []} valueLabel="Courses" />
                 </div>
                 <div className="col-12 col-xl-4">
                     <Panel title="Most popular courses" to="/p-admin/courses" linkLabel="All courses">
@@ -141,25 +101,25 @@ export default function Dashboard() {
                             {topCourses.length ? topCourses.map(course => (
                                 <li key={course._id} className="list-group-item d-flex align-items-center gap-2">
                                     <span className="flex-grow-1 text-truncate">{course.name}</span>
-                                    <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis flex-shrink-0">{(course.registers ?? 0).toLocaleString()} students</span>
+                                    <span className="badge rounded-pill bg-primary-subtle text-primary-emphasis flex-shrink-0">{course.registers.toLocaleString()} students</span>
                                 </li>
-                            )) : <li className="list-group-item text-body-secondary">No courses yet.</li>}
+                            )) : <li className="list-group-item text-body-secondary">No enrollments yet.</li>}
                         </ol>
                     </Panel>
                 </div>
             </div>
 
-            <div className="row g-3">
+            <div className="row g-3 mb-4">
                 <div className="col-12 col-xl-6">
                     <Panel title="Tickets waiting for reply" to="/p-admin/tickets?status=open" linkLabel="All tickets">
                         <div className="list-group list-group-flush">
-                            {stats.openTickets.length ? stats.openTickets.slice(0, 5).map(ticket => (
+                            {openTickets.length ? openTickets.map(ticket => (
                                 <Link key={ticket._id} to={`/p-admin/ticket/${ticket._id}`}
                                     className="list-group-item list-group-item-action d-flex align-items-center gap-3">
                                     <span className="d-inline-block rounded-circle bg-primary flex-shrink-0 p-1" aria-hidden="true" />
                                     <div className="flex-grow-1 overflow-hidden">
                                         <div className="fw-bold text-body-emphasis text-truncate">{ticket.title}</div>
-                                        <div className="small text-body-secondary text-truncate">{labelOf(ticket.user) || ticket.body}</div>
+                                        <div className="small text-body-secondary text-truncate">{ticket.user?.name ?? ticket.body}</div>
                                     </div>
                                     {ticket.priority &&
                                         <span className={`badge rounded-pill flex-shrink-0 ${PRIORITY_CLASSES[ticket.priority]}`}>{PRIORITY_LABELS[ticket.priority]}</span>}
@@ -171,11 +131,11 @@ export default function Dashboard() {
                 <div className="col-12 col-xl-6">
                     <Panel title="Comments to review" to="/p-admin/comments?status=pending" linkLabel="All comments">
                         <div className="list-group list-group-flush">
-                            {stats.pendingComments.length ? stats.pendingComments.slice(0, 5).map(comment => (
+                            {pendingComments.length ? pendingComments.map(comment => (
                                 <div key={comment._id} className="list-group-item d-flex align-items-center gap-3">
                                     <div className="flex-grow-1 overflow-hidden">
                                         <div className="fw-medium text-body-emphasis text-truncate">{comment.body}</div>
-                                        <div className="small text-body-secondary text-truncate">{comment.creator?.name} · {comment.course}</div>
+                                        <div className="small text-body-secondary text-truncate">{comment.creator?.name} · {comment.course?.name}</div>
                                     </div>
                                     <span className="d-inline-flex align-items-center gap-1 small flex-shrink-0"><FaStar className="text-warning" />{comment.score}</span>
                                 </div>
@@ -183,6 +143,37 @@ export default function Dashboard() {
                         </div>
                     </Panel>
                 </div>
+            </div>
+
+            <div className="mb-4">
+                <DataTable title="Recent orders">
+                    <table className="table table-hover align-middle text-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Price</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {recentOrders.length ? recentOrders.map(order => (
+                                <tr key={order._id}>
+                                    <td className="fw-medium text-body-emphasis">{order.user?.name ?? "—"}</td>
+                                    <td>
+                                        {order.course ?
+                                            <Link to={`/course-info/${order.course.shortName}`} className="link-body-emphasis text-decoration-none">{order.course.name}</Link> :
+                                            "—"}
+                                    </td>
+                                    <td>{order.price === 0 ?
+                                        <span className="badge rounded-pill bg-success-subtle text-success-emphasis">Free</span> :
+                                        <span className="fw-medium">{order.price.toLocaleString()} $</span>}</td>
+                                    <td className="text-body-secondary">{formatDate(order.createdAt)}</td>
+                                </tr>
+                            )) : <EmptyRow colSpan={4}>No orders yet.</EmptyRow>}
+                        </tbody>
+                    </table>
+                </DataTable>
             </div>
 
             <DataTable title="Recent users" actions={<Link to="/p-admin/users" className="small fw-medium d-inline-flex align-items-center gap-1">All users <FaArrowRight /></Link>}>
@@ -197,7 +188,7 @@ export default function Dashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        {recentUsers.length ? recentUsers.map(user => (
+                        {lastUsers.length ? lastUsers.map(user => (
                             <tr key={user._id}>
                                 <td className="fw-medium text-body-emphasis">{user.name}</td>
                                 <td>{user.username}</td>

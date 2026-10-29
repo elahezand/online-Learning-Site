@@ -12,7 +12,7 @@ import CoverPreview from "../../components/ui/CoverPreview"
 import { useCategories } from "../categories/hooks"
 import { categoryIdOf } from "./courseView"
 import { useCreateCourse, useUpdateCourse } from "./hooks"
-import type { Course } from "../../types/models"
+import type { Course, CourseDetail } from "../../types/models"
 
 const STATUSES = [["start", "Start"], ["presell", "Presell"]] as const
 const STATES = [["0", "In progress"], ["1", "Completed"]] as const
@@ -21,7 +21,7 @@ const emptyValues: CourseFormValues = {
     name: "", shortName: "", price: "", support: "", categoryID: "", status: "start", description: "", cover: "", isComplete: "0",
 }
 
-const valuesOf = (course: Course): CourseFormValues => ({
+const valuesOf = (course: Course | CourseDetail): CourseFormValues => ({
     name: course.name,
     shortName: course.shortName,
     price: String(course.price ?? 0),
@@ -34,7 +34,7 @@ const valuesOf = (course: Course): CourseFormValues => ({
 })
 
 interface CourseFormProps {
-    course?: Course
+    course?: Course | CourseDetail
     onSaved?: () => void
 }
 

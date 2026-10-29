@@ -6,23 +6,24 @@ import FormCard from "../../components/ui/FormCard"
 import { sessionSchema } from "../../validators"
 import type { SessionFormValues } from "../../validators"
 import type { SessionData } from "../../validators"
-import { useCourses, useCreateSession } from "./hooks"
+import { useCourseOptions, useCreateSession } from "./hooks"
 
 const defaultValues: SessionFormValues = { title: "", time: "", course: "", free: "0", video: "" }
 
 const ACCESS = [["0", "Paid"], ["1", "Free"]]
 
 export default function AddSessionForm() {
-    const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: zodResolver(sessionSchema),
         defaultValues,
         mode: "onTouched",
     })
-    const { data: courses = [] } = useCourses()
-    const createSession = useCreateSession(watch("course"), () => reset())
+    const { data: courses = [] } = useCourseOptions()
+    const createSession = useCreateSession(() => reset())
 
-    const onSubmit = ({ title, time, free, video }: SessionData) => {
+    const onSubmit = ({ title, time, course, free, video }: SessionData) => {
         const formData = new FormData()
+        formData.append("course", course)
         formData.append("title", title)
         formData.append("time", time)
         formData.append("free", free)

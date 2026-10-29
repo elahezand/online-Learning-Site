@@ -24,18 +24,16 @@ export default function Courses() {
     const { page, get, update } = useListParams()
     const search = get("search")
     const category = get("category")
-
     const debouncedSearch = useDebouncedValue(search.trim())
 
     const { data: categories = [] } = useCategories()
-    const { data } = useCourses({
+    const { data, isLoading } = useCourses({
         category: category || undefined,
         page,
         limit: PAGE_SIZE,
         search: debouncedSearch || undefined,
     })
     const courses = data?.items ?? []
-    const start = ((data?.pagination.page ?? page) - 1) * PAGE_SIZE
     const deleteCourse = useDeleteCourse()
 
     const remove = async (course: Course) => {
@@ -75,9 +73,9 @@ export default function Courses() {
                     <tbody>
                         {courses.length ? courses.map((course, index) => (
                             <tr key={course._id}>
-                                <td className="text-body-secondary">{start + index + 1}</td>
+                                <td className="text-body-secondary">{index + 1}</td>
                                 <td>
-                                    <Link to={`/p-admin/course/${course._id}/edit`} className="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none">
+                                    <Link to={`/p-admin/course/${course.shortName}/edit`} className="d-flex align-items-center gap-3 link-body-emphasis text-decoration-none">
                                         <span className="flex-shrink-0 rounded-2 overflow-hidden" style={{ width: 96 }}><CourseCover cover={course.cover} /></span>
                                         <span className="fw-medium">{course.name}</span>
                                     </Link>
@@ -85,19 +83,19 @@ export default function Courses() {
                                 <td>{categoryTitle(course)}</td>
                                 <td><StatusBadge ok={course.isComplete} okLabel="Completed" pendingLabel="In progress" /></td>
                                 <td>{course.shortName}</td>
-                                <td>{course.creator}</td>
+                                <td>{course.creator?.name ?? "—"}</td>
                                 <td>{course.support}</td>
                                 <td>{course.price === 0 ?
                                     <span className="fw-medium text-success">Free</span> :
                                     `${course.price?.toLocaleString()} $`}</td>
                                 <td>
                                     <RowActions>
-                                        <ActionButton icon={<FaPenToSquare />} onClick={() => navigate(`/p-admin/course/${course._id}/edit`)}>Edit</ActionButton>
+                                        <ActionButton icon={<FaPenToSquare />} onClick={() => navigate(`/p-admin/course/${course.shortName}/edit`)}>Edit</ActionButton>
                                         <ActionButton variant="danger" icon={<FaTrash />} onClick={() => remove(course)}>Remove</ActionButton>
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={9}>{category || search ? "No courses match this filter." : "No courses yet."}</EmptyRow>}
+                        )) : <EmptyRow colSpan={9}>{isLoading ? "Loading…" : category || search ? "No courses match this filter." : "No courses yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>

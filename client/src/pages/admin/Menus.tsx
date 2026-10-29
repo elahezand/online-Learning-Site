@@ -2,8 +2,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FaBars, FaLink, FaPlus, FaTrash } from "react-icons/fa6"
 import DataTable from "../../components/ui/DataTable"
-import Pagination from "../../components/ui/Pagination"
-import usePagination from "../../hooks/useListParams"
 import Input from "../../components/ui/Input"
 import FormCard from "../../components/ui/FormCard"
 import ActionButton, { EmptyRow, RowActions } from "../../components/ui/ActionButton"
@@ -14,7 +12,7 @@ import type { Menu } from "../../types/models"
 import type { MenuData } from "../../validators"
 
 export default function Menus() {
-        const { data: menus = [] } = useMenus()
+    const { data: menus = [], isLoading } = useMenus()
     const { register, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: zodResolver(menuSchema),
         defaultValues: { title: "", href: "", parent: "" },
@@ -22,9 +20,6 @@ export default function Menus() {
     })
     const createMenu = useCreateMenu(() => reset())
     const deleteMenu = useDeleteMenu()
-
-
-    const { page, pageCount, start, pageItems: paginatedData } = usePagination(menus)
 
     const addMenu = ({ title, href, parent }: MenuData) => createMenu.mutate({ title, href, parent: parent || undefined })
 
@@ -77,9 +72,9 @@ export default function Menus() {
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedData.length ? paginatedData.map((item, index) => (
+                        {menus.length ? menus.map((item, index) => (
                             <tr key={item._id}>
-                                <td className="text-body-secondary">{start + index + 1}</td>
+                                <td className="text-body-secondary">{index + 1}</td>
                                 <td className="fw-medium text-body-emphasis">{item.title}</td>
                                 <td>{item.href}</td>
                                 <td>{item.parent && typeof item.parent === "object" ? item.parent.title :
@@ -90,11 +85,10 @@ export default function Menus() {
                                     </RowActions>
                                 </td>
                             </tr>
-                        )) : <EmptyRow colSpan={5}>No menus yet.</EmptyRow>}
+                        )) : <EmptyRow colSpan={5}>{isLoading ? "Loading…" : "No menus yet."}</EmptyRow>}
                     </tbody>
                 </table>
             </DataTable>
-            <Pagination page={page} pageCount={pageCount} />
         </>
     )
 }

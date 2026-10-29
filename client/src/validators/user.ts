@@ -14,11 +14,15 @@ export const profileSchema = z.object({
     username,
     email,
     phone,
+    currentPassword: z.string(),
     password: z.union([z.literal(""), password]),
     confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+}).refine(data => !data.password || data.currentPassword, {
+    message: "Enter your current password",
+    path: ["currentPassword"],
 })
 
 export const roleSchema = z.string().trim().toUpperCase()

@@ -42,7 +42,7 @@ export interface Course {
     support?: string
     status?: "start" | "presell"
     isComplete?: Flag
-    creator?: string
+    creator?: Pick<User, "_id" | "name">
     categoryID?: Category | Id
     courseAverageScore?: number
     registers?: number
@@ -71,7 +71,7 @@ export interface Comment {
     body: string
     score: number
     answer: Flag
-    course?: string
+    course?: Pick<Course, "_id" | "name" | "shortName">
     creator?: Pick<User, "_id" | "name" | "email" | "phone" | "role" | "updatedAt">
     answerContent?: CommentAnswer | null
     createdAt?: string
@@ -231,4 +231,27 @@ export interface Testimonial {
     creator?: Pick<User, "name">
     course?: Pick<Course, "name" | "shortName">
     createdAt?: string
+}
+
+export interface AdminDashboardInfo {
+    adminName?: string
+    stats?: {
+        students: number
+        newStudents: number
+        courses: number
+        presell: number
+        enrollments: number
+        openTickets: number
+        totalTickets: number
+        pendingComments: number
+        totalComments: number
+        newMessages: number
+        totalMessages: number
+    }
+    coursesByCategory?: { name: string; value: number }[]
+    topCourses?: { _id: Id; name: string; registers: number }[]
+    openTickets?: (Omit<Ticket, "user"> & { user?: Pick<User, "name"> })[]
+    pendingComments?: Comment[]
+    recentOrders?: { _id: Id; price: number; createdAt?: string; user?: Pick<User, "name">; course?: Pick<Course, "name" | "shortName"> }[]
+    lastUsers?: User[]
 }

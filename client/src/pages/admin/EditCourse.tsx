@@ -1,23 +1,13 @@
-import { useMemo } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { FaArrowLeft } from "react-icons/fa6"
 import CourseForm from "../../features/courses/CourseForm"
-import { useCourse, useCourses } from "../../features/courses/hooks"
+import { useCourse } from "../../features/courses/hooks"
 import PageLoader from "../../components/ui/PageLoader"
-import type { Course } from "../../types/models"
 
 export default function EditCourse() {
-    const { id } = useParams()
+    const { shortName } = useParams()
     const navigate = useNavigate()
-    const { data: courses, isLoading } = useCourses()
-    const listed = courses?.find(item => item._id === id)
-    const { data: detail } = useCourse(listed?.shortName)
-
-    const course = useMemo<Course | undefined>(() => listed && {
-        ...listed,
-        description: listed.description ?? detail?.description,
-        categoryID: listed.categoryID ?? detail?.categoryID,
-    }, [listed, detail])
+    const { data: course, isLoading } = useCourse(shortName)
 
     if (isLoading) return <PageLoader />
 

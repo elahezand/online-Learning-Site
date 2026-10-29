@@ -9,7 +9,7 @@ import type { ProfileData, ProfileFormValues } from "../../validators"
 import { useAuth } from "../../features/auth/useAuth"
 import { useUpdateMe } from "../../features/users/hooks"
 
-const defaultValues: ProfileFormValues = { name: "", username: "", email: "", phone: "", password: "", confirmPassword: "" }
+const defaultValues: ProfileFormValues = { name: "", username: "", email: "", phone: "", currentPassword: "", password: "", confirmPassword: "" }
 
 const fields: { name: "name" | "username" | "email" | "phone"; label: string; type?: string; autoComplete: string }[] = [
     { name: "name", label: "Full name", autoComplete: "name" },
@@ -26,6 +26,7 @@ export default function Profile() {
         mode: "onTouched",
     })
     const updateMe = useUpdateMe(() => {
+        resetField("currentPassword")
         resetField("password")
         resetField("confirmPassword")
     })
@@ -41,9 +42,9 @@ export default function Profile() {
         })
     }, [userInfo, reset])
 
-    const save = async ({ confirmPassword: _confirm, password, ...data }: ProfileData) => {
+    const save = async ({ confirmPassword: _confirm, currentPassword, password, ...data }: ProfileData) => {
         const ok = await confirmToast({ title: "Save your changes?", confirmLabel: "Save", variant: "primary" })
-        if (ok) updateMe.mutate({ ...data, ...(password ? { password } : {}) })
+        if (ok) updateMe.mutate({ ...data, ...(password ? { password, currentPassword } : {}) })
     }
 
     return (
@@ -62,10 +63,15 @@ export default function Profile() {
 
                 <fieldset className="row g-3">
                     <legend className="h6 fw-bold text-primary-emphasis border-bottom pb-2 mb-1">Change your password</legend>
+                    <div className="col-12">
+                        <label className="form-label" htmlFor="detail-current">Current password</label>
+                        <Input id="detail-current" type="password" autoComplete="current-password" placeholder="Needed only to set a new password"
+                            {...register("currentPassword")} error={errors.currentPassword?.message} />
+                    </div>
                     <div className="col-12 col-md-6">
                         <label className="form-label" htmlFor="detail-password">New password</label>
                         <Input id="detail-password" type="password" autoComplete="new-password" placeholder="Leave empty to keep it"
-                            {...register("password", { deps: ["confirmPassword"] })} error={errors.password?.message} />
+                            {...register("password", { deps: ["confirmPassword", "currentPassword"] })} error={errors.password?.message} />
                     </div>
                     <div className="col-12 col-md-6">
                         <label className="form-label" htmlFor="detail-confirm">Repeat new password</label>

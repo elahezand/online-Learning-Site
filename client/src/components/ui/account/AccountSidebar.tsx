@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { FaBagShopping, FaGauge, FaGraduationCap, FaRightFromBracket, FaTicket, FaUserGear, FaWallet } from "react-icons/fa6"
 import { useAuth } from "../../../features/auth/useAuth"
 import { useMyTickets } from "../../../features/tickets/hooks"
-import { hasNewReply, isTopLevel } from "../../../features/tickets/ticketView"
+import { hasNewReply } from "../../../features/tickets/ticketView"
 import { confirmToast } from "../toastActions"
 
 interface NavItem {
@@ -26,9 +26,9 @@ const links: NavItem[] = [
 export default function AccountSidebar() {
     const { logout } = useAuth()
     const navigate = useNavigate()
-    const { data: tickets = [] } = useMyTickets()
+    const { data: answeredTickets } = useMyTickets({ status: "answered", limit: 50 })
     const badges: Record<string, number> = {
-        tickets: tickets.filter(ticket => isTopLevel(ticket) && hasNewReply(ticket)).length,
+        tickets: (answeredTickets?.items ?? []).filter(hasNewReply).length,
     }
 
     const exitPanel = async () => {
