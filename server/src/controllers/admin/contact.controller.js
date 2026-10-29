@@ -4,7 +4,7 @@ const { idParams } = require("../../validators/common");
 const { answerContactSchema } = require("../../validators/contact");
 
 exports.getAll = asyncHandler(async (req, res) => {
-  res.json(await contactService.list());
+  res.json(await contactService.list(req.parsed.data));
 });
 
 exports.answer = asyncHandler(async (req, res) => {

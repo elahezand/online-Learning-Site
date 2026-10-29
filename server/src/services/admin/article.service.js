@@ -41,6 +41,10 @@ const update = async (id, { cover, ...input }) => {
   }
   if (cover) article.cover = cover.filename;
 
+  if (article.publish === 1 && !article.cover) {
+    throw AppError.badRequest("Add a cover image before publishing");
+  }
+
   await article.save();
   if (cover && oldCover && oldCover !== cover.filename) removeUpload(oldCover);
 

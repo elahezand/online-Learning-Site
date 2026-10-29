@@ -1,5 +1,6 @@
 const Course = require("../../models/course");
 const Session = require("../../models/session");
+const paginate = require("../../utils/paginate");
 const CourseUser = require("../../models/course-user");
 const AppError = require("../../utils/AppError");
 const { findByShortName, hideVideos } = require("../public/course.service");
@@ -33,4 +34,23 @@ const getSession = async (user, { shortName, sessionID }) => {
   return { session, sessions: hideVideos(sessions, canWatch) };
 };
 
-module.exports = { register, getSession };
+const myCoursesFilter = async (userId, status) => {
+  if (status === "free") return { user: userId, price: 0 };
+  if (status === "paid") return { user: userId, price: { $gt: 0 } };
+  if (status === "completed" || status === "in-progress") {
+    const ids = await Course.find({ isComplete: status === "completed" ? 1 : { $ne: 1 } }).distinct("_id");
+    return { user: userId, course: { $in: ids } };
+  }
+  return { user: userId };
+};
+
+const listCourses = async (user, { status, page, limit }) =>
+  paginate(CourseUser, {
+    filter: await myCoursesFilter(user._id, status),
+    sort: { _id: -1 },
+    page,
+    limit,
+    populate: [{ path: "course", select: "name shortName cover price isComplete" }],
+  });
+
+module.exports = { register, getSession, listCourses };

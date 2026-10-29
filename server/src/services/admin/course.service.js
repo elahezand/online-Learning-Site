@@ -74,4 +74,6 @@ const removeSession = async (id) => {
   return session;
 };
 
-module.exports = { create, update, remove, listSessions, createSession, removeSession };
+const listOptions = () => Course.find().select("name").sort({ name: 1 }).lean();
+
+module.exports = { create, update, remove, listSessions, createSession, removeSession, listOptions };

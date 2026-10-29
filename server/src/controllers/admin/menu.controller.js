@@ -1,13 +1,10 @@
 const asyncHandler = require("../../utils/asyncHandler");
 const menuService = require("../../services/admin/menu.service");
-const { idParams } = require("../../validators/common");
-const { createMenuSchema } = require("../../validators/menu");
 
 exports.create = asyncHandler(async (req, res) => {
-  res.status(201).json(await menuService.create(createMenuSchema.parse(req.body)));
+  res.status(201).json(await menuService.create(req.parsed.data));
 });
 
 exports.remove = asyncHandler(async (req, res) => {
-  const { id } = idParams("Menu id").parse(req.params);
-  res.json(await menuService.remove(id));
+  res.json(await menuService.remove(req.parsed.data.id));
 });

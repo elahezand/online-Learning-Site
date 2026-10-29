@@ -1,23 +1,20 @@
 const asyncHandler = require("../../utils/asyncHandler");
 const discountService = require("../../services/admin/discount.service");
-const { idParams } = require("../../validators/common");
-const { createDiscountSchema, siteWideDiscountSchema } = require("../../validators/discount");
 
 exports.create = asyncHandler(async (req, res) => {
-  res.status(201).json(await discountService.create(req.user, createDiscountSchema.parse(req.body)));
+  res.status(201).json(await discountService.create(req.user, req.parsed.data));
 });
 
 exports.getAll = asyncHandler(async (req, res) => {
-  res.json(await discountService.list());
+  res.json(await discountService.list(req.parsed.data));
 });
 
 exports.remove = asyncHandler(async (req, res) => {
-  const { id } = idParams("Discount id").parse(req.params);
-  res.json(await discountService.remove(id));
+  res.json(await discountService.remove(req.parsed.data.id));
 });
 
 exports.setOnAll = asyncHandler(async (req, res) => {
-  res.json(await discountService.setOnAllCourses(siteWideDiscountSchema.parse(req.body)));
+  res.json(await discountService.setOnAllCourses(req.parsed.data));
 });
 
 exports.removeFromAll = asyncHandler(async (req, res) => {

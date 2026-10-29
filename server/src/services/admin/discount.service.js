@@ -1,6 +1,7 @@
 const Off = require("../../models/off");
 const Course = require("../../models/course");
 const AppError = require("../../utils/AppError");
+const paginate = require("../../utils/paginate");
 
 const create = async (user, input) => {
   if (!(await Course.exists({ _id: input.course }))) throw AppError.notFound("Course not found");
@@ -10,9 +11,9 @@ const create = async (user, input) => {
   return Off.create({ ...input, uses: 0, creator: user._id });
 };
 
-const list = async () => {
-  const discounts = await Off.find().populate("creator", "name").sort({ _id: -1 }).lean();
-  return discounts.map((discount) => ({ ...discount, creator: discount.creator?.name ?? null }));
+const list = async ({ page, limit }) => {
+  const result = await paginate(Off, { page, limit, populate: [{ path: "creator", select: "name" }] });
+  return { ...result, items: result.items.map((discount) => ({ ...discount, creator: discount.creator?.name ?? null })) };
 };
 
 const remove = async (id) => {

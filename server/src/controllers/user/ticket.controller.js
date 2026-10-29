@@ -10,7 +10,7 @@ exports.create = asyncHandler(async (req, res) => {
 });
 
 exports.getMine = asyncHandler(async (req, res) => {
-  res.json(await ticketService.listMine(req.user));
+  res.json(await ticketService.listMine(req.user, req.parsed.data));
 });
 
 exports.getAnswer = asyncHandler(async (req, res) => {

@@ -70,4 +70,11 @@ const addReply = async (root, author, body, fromAdmin) => {
   return reply;
 };
 
-module.exports = { toListItem, findRoots, loadThread, findRootById, addReply };
+const LIST_POPULATE = [
+  { path: "user", select: "name" },
+  { path: "course", select: "name" },
+  { path: "departmentID", select: "title" },
+  { path: "departmentSubID", select: "title" },
+];
+
+module.exports = { toListItem, findRoots, loadThread, findRootById, addReply,LIST_POPULATE };

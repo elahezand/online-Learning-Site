@@ -1,19 +1,21 @@
 import { z } from "zod";
-import { choice, email, objectId, optional, password, phone, text, username } from "./common";
-
+import { choice, email, objectId, optional, paginationQuery, password, phone, text, username } from "./common";
 const ROLES = ["ADMIN", "USER"] as const;
 
 const role = z.preprocess(
   (value) => (typeof value === "string" ? value.trim().toUpperCase() : value),
   choice("Role", ROLES)
 );
-
 export const updateProfileSchema = z.object({
   name: text("Full name", { min: 3, max: 60 }),
   username,
   email,
   phone,
   password: optional(password),
+  currentPassword: optional(text("Current password", { max: 64 })),
+}).refine((data) => !data.password || data.currentPassword, {
+  message: "Enter your current password",
+  path: ["currentPassword"],
 });
 
 export const editUserSchema = z.object({
@@ -28,6 +30,10 @@ export const editUserSchema = z.object({
 export const changeRoleSchema = z.object({
   id: objectId("User id"),
   role,
+});
+
+export const myCoursesQuery = paginationQuery.extend({
+  status: optional(choice("Status", ["free", "paid", "completed", "in-progress"] as const)),
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

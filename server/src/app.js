@@ -18,6 +18,7 @@ const orderRoutes = require("./routes/v1/order");
 const searchRoutes = require("./routes/v1/search");
 const ticketRoutes = require("./routes/v1/ticket");
 const userRoutes = require("./routes/v1/user");
+const sessionRoutes = require("./routes/v1/session");
 
 const app = express();
 
@@ -42,6 +43,8 @@ app.use("/v1/orders", orderRoutes);
 app.use("/v1/search", searchRoutes);
 app.use("/v1/tickets", ticketRoutes);
 app.use("/v1/users", userRoutes);
+app.use("/v1/sessions", sessionRoutes);
+
 
 app.use(notFound);
 app.use(errorHandler);

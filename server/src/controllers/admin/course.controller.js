@@ -34,3 +34,7 @@ exports.createSession = asyncHandler(async (req, res) => {
 exports.removeSession = asyncHandler(async (req, res) => {
   res.json(await courseService.removeSession(sessionId(req)));
 });
+
+exports.getOptions = asyncHandler(async (req, res) => {
+  res.json(await courseService.listOptions());
+});

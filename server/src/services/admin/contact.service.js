@@ -1,8 +1,20 @@
 const Contact = require("../../models/contact");
 const AppError = require("../../utils/AppError");
+const paginate = require("../../utils/paginate");
 const { sendMail } = require("../../utils/mailer");
 
-const list = () => Contact.find().sort({ _id: -1 }).lean();
+const STATUS = {
+  new: { answer: 0 },
+  answered: { answer: 1 },
+};
+
+const list = ({ page, limit, status }) =>
+  paginate(Contact, {
+    filter: { ...STATUS[status] },
+    sort: { answer: 1, _id: -1 },
+    page,
+    limit,
+  });
 
 const answer = async ({ email, answer: text }) => {
   const contact = await Contact.findOne({ email }).sort({ _id: -1 });

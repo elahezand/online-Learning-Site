@@ -3,6 +3,13 @@ const { requiredString, hideInternals } = require("./fields");
 
 const ROLES = ["ADMIN", "USER"];
 
+const walletSchema = new Schema(
+  {
+    balance: { type: Number, default: 0, min: [0, "Wallet balance can't be negative"] },
+  },
+  { _id: false }
+);
+
 const userSchema = new Schema(
   {
     username: requiredString("Username", { unique: true, minlength: 3, maxlength: 30 }),
@@ -11,7 +18,7 @@ const userSchema = new Schema(
     name: requiredString("Name", { minlength: 3, maxlength: 60 }),
     phone: { type: String, trim: true },
     role: { type: String, enum: ROLES, default: "USER" },
-    wallet: { type: Number, default: 0, min: [0, "Wallet balance can't be negative"] },
+    wallet: { type: walletSchema, default: () => ({}) },
   },
   { timestamps: true, toJSON: hideInternals, toObject: hideInternals }
 );

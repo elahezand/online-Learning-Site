@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { number, objectId, optional, text } from "./common";
+import { choice, number, objectId, optional, paginationQuery, text } from "./common";
+
+export const myTicketsQuery = paginationQuery.extend({
+  status: optional(choice("Status", ["pending", "answered"] as const)),
+});
 
 export const createTicketSchema = z.object({
   departmentID: objectId("Department"),

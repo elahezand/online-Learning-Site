@@ -1,13 +1,11 @@
 const asyncHandler = require("../../utils/asyncHandler");
 const courseService = require("../../services/user/course.service");
-const { idParams } = require("../../validators/common");
-const { registerSchema, sessionParams } = require("../../validators/course");
 
 exports.register = asyncHandler(async (req, res) => {
-  const { id } = idParams("Course id").parse(req.params);
-  res.status(201).json(await courseService.register(req.user, id, registerSchema.parse(req.body)));
+  const { id, price } = req.parsed.data;
+  res.status(201).json(await courseService.register(req.user, id, { price }));
 });
 
-exports.getSession = asyncHandler(async (req, res) => {
-  res.json(await courseService.getSession(req.user, sessionParams.parse(req.params)));
+exports.getCourses = asyncHandler(async (req, res) => {
+  res.json(await courseService.listCourses(req.user, req.parsed.data));
 });
