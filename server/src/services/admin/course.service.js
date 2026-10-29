@@ -3,7 +3,7 @@ const Category = require("../../models/category");
 const Session = require("../../models/session");
 const Comment = require("../../models/comment");
 const AppError = require("../../utils/AppError");
-const { removeUpload } = require("../../utils/files");
+const { removeUpload, removeVideo } = require("../../utils/files");
 
 const ensureShortNameFree = async (shortName, exceptId) => {
   const filter = exceptId ? { shortName, _id: { $ne: exceptId } } : { shortName };
@@ -56,24 +56,10 @@ const remove = async (id) => {
   await Promise.all([Session.deleteMany({ course: course._id }), Comment.deleteMany({ course: course._id })]);
 
   removeUpload(course.cover);
-  sessions.forEach((session) => removeUpload(session.video));
+  sessions.forEach((session) => removeVideo(session.video));
   return course;
-};
-
-const listSessions = () => Session.find().populate("course", "name shortName").sort({ _id: -1 }).lean();
-
-const createSession = async (courseId, { video, ...input }) => {
-  if (!(await Course.exists({ _id: courseId }))) throw AppError.notFound("Course not found");
-  return Session.create({ ...input, course: courseId, video: video.filename });
-};
-
-const removeSession = async (id) => {
-  const session = await Session.findByIdAndDelete(id).lean();
-  if (!session) throw AppError.notFound("Session not found");
-  removeUpload(session.video);
-  return session;
 };
 
 const listOptions = () => Course.find().select("name").sort({ name: 1 }).lean();
 
-module.exports = { create, update, remove, listSessions, createSession, removeSession, listOptions };
+module.exports = { create, update, remove, listOptions };

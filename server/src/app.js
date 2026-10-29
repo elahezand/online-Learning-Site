@@ -1,5 +1,6 @@
 const path = require("path");
 const express = require("express");
+const helmet = require("helmet");
 const cors = require("./middlewares/cors");
 const { errorHandler, notFound } = require("./middlewares/errorHandler");
 
@@ -23,6 +24,7 @@ const sessionRoutes = require("./routes/v1/session");
 const app = express();
 
 app.disable("x-powered-by");
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(cors);
@@ -44,7 +46,6 @@ app.use("/v1/search", searchRoutes);
 app.use("/v1/tickets", ticketRoutes);
 app.use("/v1/users", userRoutes);
 app.use("/v1/sessions", sessionRoutes);
-
 
 app.use(notFound);
 app.use(errorHandler);

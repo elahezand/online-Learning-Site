@@ -36,17 +36,6 @@ export const updateCourseSchema = z.object({
   cover: optional(file("Cover image")),
 });
 
-export const createSessionSchema = z.object({
-  title: text("Title", { min: 3, max: 120 }),
-  time: text("Time", { max: 6 }).regex(/^\d{1,3}:[0-5]\d$/, "Time must look like 12:30"),
-  free: flag("Free"),
-  video: file("Video"),
-});
-
-export const registerSchema = z.object({
-  price: number("Price", { min: 0 }),
-});
-
 export const COURSE_SORTS = ["newest", "oldest", "price-asc", "price-desc", "name"] as const;
 
 export const courseListQuery = paginationQuery.extend({
@@ -63,12 +52,6 @@ export const popularQuery = z.object({
 
 export const shortNameParams = z.object({ shortName: text("Course link", { max: 80 }) });
 
-export const sessionParams = z.object({
-  shortName: text("Course link", { max: 80 }),
-  sessionID: objectId("Session id"),
-});
-
 export type CourseListQuery = z.infer<typeof courseListQuery>;
 export type CreateCourseInput = z.infer<typeof createCourseSchema>;
 export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
-export type CreateSessionInput = z.infer<typeof createSessionSchema>;

@@ -2,7 +2,7 @@ const Session = require("../../models/session");
 const Course = require("../../models/course");
 const AppError = require("../../utils/AppError");
 const paginate = require("../../utils/paginate");
-const { removeUpload } = require("../../utils/files");
+const { removeVideo } = require("../../utils/files");
 
 const buildFilter = async ({ course, category }) => {
   if (course) return { course };
@@ -26,7 +26,7 @@ const create = async ({ course, video, ...input }) => {
 const remove = async (id) => {
   const session = await Session.findByIdAndDelete(id).lean();
   if (!session) throw AppError.notFound("Session not found");
-  removeUpload(session.video);
+  removeVideo(session.video);
   return session;
 };
 

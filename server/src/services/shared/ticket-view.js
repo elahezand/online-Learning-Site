@@ -2,25 +2,6 @@ const Ticket = require("../../models/ticket");
 
 const ROOT = { parent: null };
 
-const titleOf = (value) => (value && typeof value === "object" ? value.title ?? null : null);
-
-const toListItem = (ticket) => ({
-  ...ticket,
-  departmentID: titleOf(ticket.departmentID),
-  departmentSubID: titleOf(ticket.departmentSubID),
-  user: ticket.user?.name ?? null,
-  course: ticket.course?.name ?? null,
-});
-
-const findRoots = (filter = {}) =>
-  Ticket.find({ ...ROOT, ...filter })
-    .populate("user", "name")
-    .populate("course", "name")
-    .populate("departmentID", "title")
-    .populate("departmentSubID", "title")
-    .sort({ updatedAt: -1, _id: -1 })
-    .lean();
-
 const loadThread = async (ticket) => {
   const replies = await Ticket.find({ parent: ticket._id })
     .populate("user", "name role")
@@ -77,4 +58,4 @@ const LIST_POPULATE = [
   { path: "departmentSubID", select: "title" },
 ];
 
-module.exports = { toListItem, findRoots, loadThread, findRootById, addReply,LIST_POPULATE };
+module.exports = { loadThread, findRootById, addReply, LIST_POPULATE };

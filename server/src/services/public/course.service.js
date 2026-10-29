@@ -56,8 +56,12 @@ const findByShortName = async (shortName) => {
   return course;
 };
 
-const hideVideos = (sessions, canWatch) =>
-  sessions.map((session) => (canWatch || session.free === 1 ? session : { ...session, video: undefined }));
+const toPublicSession = ({ video, ...session }, canWatch) => ({
+  ...session,
+  locked: !canWatch && session.free !== 1,
+});
+
+const toPublicSessions = (sessions, canWatch) => sessions.map((session) => toPublicSession(session, canWatch));
 
 const getByShortName = async (shortName, user) => {
   const course = await Course.findOne({ shortName })
@@ -79,7 +83,7 @@ const getByShortName = async (shortName, user) => {
   return {
     ...course,
     courseStudentsCount,
-    sessions: hideVideos(sessions, canWatch),
+    sessions: toPublicSessions(sessions, canWatch),
     comments: nestAnswers(comments),
     isUserRegisteredToThisCourse,
   };
@@ -87,17 +91,20 @@ const getByShortName = async (shortName, user) => {
 
 const listRelated = async (shortName) => {
   const course = await findByShortName(shortName);
-  return Course.find({ categoryID: course.categoryID, _id: { $ne: course._id } })
+  const related = await Course.find({ categoryID: course.categoryID, _id: { $ne: course._id } })
+    .populate("creator", "name")
     .sort({ _id: -1 })
     .limit(RELATED_LIMIT)
     .lean();
+  return withStats(related);
 };
 
 module.exports = {
   list,
   listPopular,
   findByShortName,
-  hideVideos,
+  toPublicSession,
+  toPublicSessions,
   getByShortName,
   listRelated,
 };

@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const ALGORITHM = "HS256";
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 const REFRESH_TOKEN_TTL_SECONDS = 15 * 24 * 60 * 60;
+const VIDEO_TOKEN_TTL_SECONDS = 6 * 60 * 60;
+const VIDEO_AUDIENCE = "session-video";
 
 const hashPassword = (password) => hash(password, 12);
 
@@ -33,6 +35,21 @@ const safeVerify = (token, secret) => {
 
 const verifyToken = (token) => safeVerify(token, process.env.ACCESS_TOKEN_SECRET);
 
+const generateVideoToken = (sessionId, userId) =>
+  sign({ sid: String(sessionId), uid: String(userId) }, process.env.ACCESS_TOKEN_SECRET, {
+    algorithm: ALGORITHM,
+    expiresIn: VIDEO_TOKEN_TTL_SECONDS,
+    audience: VIDEO_AUDIENCE,
+  });
+
+const verifyVideoToken = (token) => {
+  try {
+    return verify(token, process.env.ACCESS_TOKEN_SECRET, { algorithms: [ALGORITHM], audience: VIDEO_AUDIENCE });
+  } catch {
+    return null;
+  }
+};
+
 const verifyRefreshToken = (token) => safeVerify(token, process.env.REFRESH_TOKEN_SECRET);
 
 const hashToken = (token) => crypto.createHash("sha256").update(String(token)).digest("hex");
@@ -54,6 +71,8 @@ module.exports = {
   generateRefreshToken,
   verifyToken,
   verifyRefreshToken,
+  generateVideoToken,
+  verifyVideoToken,
   hashToken,
   compareTokenHash,
 };

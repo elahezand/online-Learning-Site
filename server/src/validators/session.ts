@@ -16,3 +16,11 @@ export const sessionListQuery = paginationQuery.extend({
 
 export type CreateSessionInput = z.infer<typeof createSessionSchema>;
 export type SessionListQuery = z.infer<typeof sessionListQuery>;
+export const sessionParams = z.object({
+  shortName: text("Course link", { max: 80 }),
+  sessionID: objectId("Session id"),
+});
+
+export const videoQuery = z.object({
+  token: text("Video token", { max: 1000 }),
+});

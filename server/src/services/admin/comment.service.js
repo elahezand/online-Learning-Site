@@ -33,7 +33,6 @@ const attachAnswers = async (comments) => {
 
   return comments.map((comment) => ({
     ...comment,
-    course: comment.course?.name ?? null,
     answerContent: answerOf.get(String(comment._id)) ?? null,
   }));
 };

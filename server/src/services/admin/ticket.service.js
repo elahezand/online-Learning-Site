@@ -1,7 +1,21 @@
+const Ticket = require("../../models/ticket");
 const AppError = require("../../utils/AppError");
-const { toListItem, findRoots, findRootById, addReply } = require("../shared/ticket-view");
+const paginate = require("../../utils/paginate");
+const { findRootById, addReply, LIST_POPULATE } = require("../shared/ticket-view");
 
-const list = async () => (await findRoots()).map(toListItem);
+const STATUS = {
+  open: { answer: 0 },
+  answered: { answer: 1 },
+};
+
+const list = ({ page, limit, status }) =>
+  paginate(Ticket, {
+    filter: { parent: null, ...STATUS[status] },
+    sort: { answer: 1, priority: -1, _id: -1 },
+    page,
+    limit,
+    populate: LIST_POPULATE,
+  });
 
 const answer = async (admin, { ticketID, body }) => {
   const ticket = await findRootById(ticketID);

@@ -19,4 +19,20 @@ const registerLimiter = limiter({ minutes: 60, max: 5, message: "Too many accoun
 
 const refreshLimiter = limiter({ minutes: 15, max: 30, message: "Too many session refreshes." });
 
-module.exports = { loginLimiter, registerLimiter, refreshLimiter };
+const commentLimiter = limiter({ minutes: 15, max: 10, message: "Too many comments." });
+
+const ticketLimiter = limiter({ minutes: 15, max: 20, message: "Too many ticket messages." });
+
+const contactLimiter = limiter({ minutes: 60, max: 5, message: "Too many messages sent." });
+
+const newsletterLimiter = limiter({ minutes: 60, max: 5, message: "Too many subscription attempts." });
+
+module.exports = {
+  loginLimiter,
+  registerLimiter,
+  refreshLimiter,
+  commentLimiter,
+  ticketLimiter,
+  contactLimiter,
+  newsletterLimiter,
+};

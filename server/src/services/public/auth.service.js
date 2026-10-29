@@ -13,7 +13,6 @@ const {
   hashToken,
   compareTokenHash,
 } = require("../../utils/tokens");
-const { log } = require("node:console");
 
 const sessionExpiry = () => new Date(Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000);
 

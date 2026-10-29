@@ -3,7 +3,7 @@ const DepartmentSub = require("../../models/department-sub");
 const Course = require("../../models/course");
 const AppError = require("../../utils/AppError");
 const paginate = require("../../utils/paginate");
-const { toListItem, findRootById, loadThread, addReply, LIST_POPULATE } = require("../shared/ticket-view");
+const { findRootById, loadThread, addReply, LIST_POPULATE } = require("../shared/ticket-view");
 
 const STATUS = {
   answered: { answer: 1 },
@@ -28,16 +28,15 @@ const create = async (user, input) => {
     .lean();
 };
 
-const listMine = async (user, { page, limit, status }) => {
-  const result = await paginate(Ticket, {
+const listMine = (user, { page, limit, status }) =>
+  paginate(Ticket, {
     filter: { parent: null, user: user._id, ...STATUS[status] },
     sort: { updatedAt: -1, _id: -1 },
     page,
     limit,
     populate: LIST_POPULATE,
   });
-  return { ...result, items: result.items.map(toListItem) };
-};
+
 const findAccessibleRoot = async (user, id) => {
   const ticket = await findRootById(id);
   if (!ticket) throw AppError.notFound("Ticket not found");

@@ -11,10 +11,8 @@ const create = async (user, input) => {
   return Off.create({ ...input, uses: 0, creator: user._id });
 };
 
-const list = async ({ page, limit }) => {
-  const result = await paginate(Off, { page, limit, populate: [{ path: "creator", select: "name" }] });
-  return { ...result, items: result.items.map((discount) => ({ ...discount, creator: discount.creator?.name ?? null })) };
-};
+const list = ({ page, limit }) =>
+  paginate(Off, { page, limit, populate: [{ path: "creator", select: "name" }, { path: "course", select: "name shortName" }] });
 
 const remove = async (id) => {
   const discount = await Off.findByIdAndDelete(id).lean();

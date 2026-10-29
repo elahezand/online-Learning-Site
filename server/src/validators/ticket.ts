@@ -23,5 +23,8 @@ export const ticketMessageSchema = z.object({
   body: text("Message", { min: 1, max: 5000 }),
 });
 
+export const ticketListQuery = paginationQuery.extend({
+  status: optional(choice("Status", ["open", "answered"] as const)),
+});
 export type CreateTicketInput = z.infer<typeof createTicketSchema>;
 export type AnswerTicketInput = z.infer<typeof answerTicketSchema>;

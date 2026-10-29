@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { user, admin } = require("../guards");
 const validate = require("../../middlewares/validate");
+const { commentLimiter } = require("../../middlewares/rateLimit");
 const { idParams } = require("../../validators/common");
 const { createCommentSchema, answerCommentSchema, commentListQuery, topCommentsQuery } = require("../../validators/comment");
 const publicComments = require("../../controllers/public/comment.controller");
@@ -10,7 +11,7 @@ const adminComments = require("../../controllers/admin/comment.controller");
 const router = Router();
 const byId = validate({ params: idParams("Comment id") });
 
-router.route("/").get(admin, validate({ query: commentListQuery }), adminComments.getAll).post(user, validate({ body: createCommentSchema }), userComments.create);
+router.route("/").get(admin, validate({ query: commentListQuery }), adminComments.getAll).post(user, commentLimiter, validate({ body: createCommentSchema }), userComments.create);
 router.get("/top", validate({ query: topCommentsQuery }), publicComments.getTop);
 router.delete("/:id", admin, byId, adminComments.remove);
 router.post("/answer/:id", admin, byId, validate({ body: answerCommentSchema }), adminComments.answer);

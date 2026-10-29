@@ -29,7 +29,6 @@ const withStats = async (courses) => {
     const id = String(course._id);
     return {
       ...course,
-      creator: course.creator?.name ?? null,
       registers: registers.get(id)?.count ?? 0,
       courseAverageScore: averageScore(scores.get(id)),
     };

@@ -36,6 +36,12 @@ export const myCoursesQuery = paginationQuery.extend({
   status: optional(choice("Status", ["free", "paid", "completed", "in-progress"] as const)),
 });
 
+export const userListQuery = paginationQuery.extend({
+  search: optional(text("Search", { max: 80 })),
+  role: optional(role),
+  status: optional(choice("Status", ["active", "banned"] as const)).default("active"),
+});
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type EditUserInput = z.infer<typeof editUserSchema>;
 export type ChangeRoleInput = z.infer<typeof changeRoleSchema>;

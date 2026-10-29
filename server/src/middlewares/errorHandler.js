@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const { ZodError } = require("zod");
 const AppError = require("../utils/AppError");
 const env = require("../config/env");
-const { removeUpload } = require("../utils/files");
+const { removeFile } = require("../utils/files");
 
 const formatZodErrors = (error) =>
   error.issues.map((issue) => ({ field: issue.path.join("."), message: issue.message }));
@@ -44,7 +44,7 @@ const notFound = (req, res) => {
 const errorHandler = (error, req, res, next) => {
   const { status, body } = toResponse(error);
   if (status >= 500) console.error(error);
-  if (req.file) removeUpload(req.file.filename);
+  if (req.file?.path) removeFile(req.file.path);
   if (!env.isProduction && status >= 500) body.detail = error.message;
   res.status(status).json(body);
 };
