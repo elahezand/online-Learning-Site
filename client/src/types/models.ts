@@ -153,14 +153,32 @@ export interface Department {
     _id: Id
     title: string
 }
+export type OrderStatus = "created" | "processing" | "completed" | "cancelled"
+export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
+
+export interface OrderItem {
+    _id: Id
+    course?: Pick<Course, "_id" | "name" | "shortName" | "cover"> | null
+    price: number
+    discount: number
+    finalPrice: number
+    snapshot: { name: string; shortName?: string | null; cover?: string | null }
+    cancelledAt?: string | null
+}
 
 export interface Order {
     _id: Id
-    course?: Pick<Course, "_id" | "name" | "shortName" | "cover" | "price" | "isComplete">
-    price: number
-    isComplete?: Flag
-    createdAt?: string
+    items: OrderItem[]
+    coupon?: { code: string; percent: number } | null
+    pricing: { subtotal: number; discount: number; walletUsed: number; total: number }
+    status: OrderStatus
+    paymentMethod: "zarinpal" | "wallet" | "free"
+    paymentStatus: PaymentStatus
+    payment?: { refId?: string | null; paidAt?: string | null }
+    refundAmount?: number
+    createdAt: string
 }
+
 
 export interface MyCourse {
     _id: Id

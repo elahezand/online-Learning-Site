@@ -15,6 +15,7 @@ const Login = lazy(() => import("../pages/public/Login"))
 const Register = lazy(() => import("../pages/public/Register"))
 const Cart = lazy(() => import("../pages/public/Cart"))
 const Checkout = lazy(() => import("../pages/public/Checkout"))
+const PaymentResult = lazy(() => import("../pages/public/PaymentResult"))
 
 const AdminLayout = lazy(() => import("../components/layout/admin/AdminLayout"))
 const AdminDashboard = lazy(() => import("../pages/admin/Dashboard"))
@@ -57,6 +58,8 @@ const routes: RouteObject[] = [
             { path: "/contact-Us", element: <Contact /> },
             { path: "/cart", element: <Cart /> },
             { path: "/checkout", element: <RequireAuth><Checkout /></RequireAuth> },
+            { path: "/payment-success", element: <PaymentResult success /> },
+            { path: "/payment-failed", element: <PaymentResult success={false} /> },
             { path: "/login", element: <GuestOnly><Login /></GuestOnly> },
             { path: "/register", element: <GuestOnly><Register /></GuestOnly> },
             { path: "/course-info/:courseName/session/:sessionId", element: <SessionInfo /> },
@@ -66,7 +69,7 @@ const routes: RouteObject[] = [
                 children: [
                     { path: "", element: <AccountDashboard /> },
                     { path: "courses", element: <AccountCourses /> },
-                    { path: "orders/:page?", element: <AccountOrders /> },
+                    {path: "orders", element: <AccountOrders /> },
                     { path: "wallet", element: <AccountWallet /> },
                     { path: "detail", element: <AccountProfile /> },
                     { path: "tickets", element: <AccountTickets /> },

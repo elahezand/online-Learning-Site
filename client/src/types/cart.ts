@@ -31,9 +31,6 @@ export interface ICart {
 
 export type CartResponse = ICart;
 export interface CheckoutResponse {
-  success: boolean;
-  data: {
-    order: { _id: string; paymentMethod: string };
-    paymentUrl: string | null;
-  };
+  order: { _id: string; paymentMethod: string; paymentStatus: string };
+  paymentUrl: string | null;
 }

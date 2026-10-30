@@ -74,12 +74,12 @@ export const useCheckout = (
             queryClient.invalidateQueries({ queryKey: CART_KEY });
             queryClient.invalidateQueries({ queryKey: ["me", "courses"] });
 
-            if (data?.data?.paymentUrl) {
-                window.location.href = data.data.paymentUrl;
+            if (data?.paymentUrl) {
+                window.location.href = data.paymentUrl;
                 return;
             }
             toast.success("Order placed successfully");
-            onPlaced?.(data?.data?.order?._id);
+            onPlaced?.(data?.order?._id);
         },
         errorFallback: "Checkout failed",
     });

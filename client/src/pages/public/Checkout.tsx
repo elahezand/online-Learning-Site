@@ -31,9 +31,11 @@ export default function Checkout() {
     const { data: cart, isLoading } = useGetMyCart()
     const items = cart?.items ?? []
     const pricing = cart?.pricing
+
     const checkout = useCheckout(cart?._id, (orderId) => {
-        navigate(orderId ? `/my-account/orders/${orderId}` : "/my-account/orders", { replace: true })
+        navigate(`/payment-success${orderId ? `?orderId=${orderId}` : ""}`, { replace: true })
     })
+
     const [useWallet, setUseWallet] = useState(false)
     const [agreed, setAgreed] = useState(false)
 

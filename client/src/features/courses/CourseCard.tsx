@@ -32,15 +32,14 @@ export function CourseCover({ cover, className = "" }: { cover?: string; classNa
 
 export function CoursePrice({ price, discount }: { price: number; discount?: number }) {
     if (price === 0) return <span className="fw-bold text-success">Free</span>
-    const final = discount ? price - (price * discount) / 100 : price
+    const final = discount ? Math.round((price * (100 - discount)) / 100) : price
     return (
         <span className="d-inline-flex align-items-baseline gap-2 flex-wrap">
-            <span className="fw-bold text-body-emphasis">{final.toLocaleString()} $</span>
-            {discount ? <del className="small text-body-secondary">{price.toLocaleString()} $</del> : null}
+            <span className="fw-bold text-body-emphasis">{final.toLocaleString()} Toman</span>
+            {discount ? <del className="small text-body-secondary">{price.toLocaleString()} Toman</del> : null}
         </span>
     )
 }
-
 interface CourseCardProps extends Course {
     direction?: "row" | "column"
 }

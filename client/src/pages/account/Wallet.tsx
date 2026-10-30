@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom"
 import { FaWallet } from "react-icons/fa6"
 import { useAuth } from "../../features/auth/useAuth"
-import { money } from "../../features/cart/"
 
 export default function Wallet() {
     const { userInfo } = useAuth()
@@ -17,7 +16,7 @@ export default function Wallet() {
                     </span>
                     <div>
                         <div className="small text-white text-opacity-75">Available balance</div>
-                        <div className="display-6 fw-bold">{money(balance)}</div>
+                        <div className="display-6 fw-bold">{balance.toLocaleString()} $</div>
                     </div>
                 </div>
             </div>
