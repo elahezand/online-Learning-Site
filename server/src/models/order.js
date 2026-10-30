@@ -3,6 +3,7 @@ const { ref } = require("./fields");
 
 const PAYMENT_METHODS = ["zarinpal", "wallet", "free"];
 const PAYMENT_STATUS = ["pending", "paid", "failed", "refunded"];
+const ORDER_STATUS = ["created", "processing", "completed", "cancelled"];
 
 const orderItemSchema = new Schema(
   {
@@ -15,8 +16,9 @@ const orderItemSchema = new Schema(
       shortName: { type: String, default: null },
       cover: { type: String, default: null },
     },
-  },
-  { _id: false }
+    cancelledAt: { type: Date, default: null },
+    cancelReason: { type: String, default: null },
+  }
 );
 
 const orderCouponSchema = new Schema(
@@ -48,6 +50,7 @@ const orderSchema = new Schema(
     },
     coupon: { type: orderCouponSchema, default: null },
     pricing: { type: pricingSchema, required: true },
+    status: { type: String, enum: ORDER_STATUS, default: "created" },
     paymentMethod: { type: String, enum: PAYMENT_METHODS, required: true },
     paymentStatus: { type: String, enum: PAYMENT_STATUS, default: "pending" },
     payment: {
@@ -57,6 +60,9 @@ const orderSchema = new Schema(
     },
     couponCounted: { type: Boolean, default: false },
     walletRefunded: { type: Boolean, default: false },
+    refundAmount: { type: Number, default: 0, min: 0 },
+    refundedAt: { type: Date, default: null },
+    revertedAt: { type: Date, default: null },
     idempotencyKey: { type: String, default: null },
     finalizedAt: { type: Date, default: null },
     autoCompletedAt: { type: Date, default: null },
@@ -71,7 +77,9 @@ orderSchema.index(
 );
 orderSchema.index({ "payment.authority": 1 });
 orderSchema.index({ paymentStatus: 1, createdAt: 1 });
+orderSchema.index({ status: 1, createdAt: -1 });
 
 module.exports = model("Order", orderSchema);
 module.exports.PAYMENT_METHODS = PAYMENT_METHODS;
 module.exports.PAYMENT_STATUS = PAYMENT_STATUS;
+module.exports.ORDER_STATUS = ORDER_STATUS;

@@ -16,6 +16,12 @@ const env = {
   accessTokenSecret: required("ACCESS_TOKEN_SECRET"),
   refreshTokenSecret: required("REFRESH_TOKEN_SECRET"),
   corsOrigin: process.env.CORS_ORIGIN || "*",
+  clientUrl: process.env.CLIENT_URL || "http://localhost:5173",
+  zarinpal: {
+    merchantId: process.env.ZARINPAL_MERCHANT_ID || "",
+    sandbox: process.env.ZARINPAL_SANDBOX !== "false",
+    callbackUrl: process.env.ZARINPAL_CALLBACK_URL || "http://localhost:4000/v1/orders/verify",
+  },
   mail: {
     service: process.env.MAIL_SERVICE || "gmail",
     user: process.env.MAIL_USER || "",
