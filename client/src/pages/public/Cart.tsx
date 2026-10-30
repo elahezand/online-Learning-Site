@@ -12,9 +12,9 @@ export default function Cart() {
     const { mutate: removeItem } = useRemoveFromCart()
     const [couponCode, setCouponCode] = useState("")
 
-    const items = cart?.data.items ?? []
-    const pricing = cart?.data.pricing ?? { subtotal: 0, discount: 0, total: 0 }
-    const coupon = cart?.data.coupon
+    const items = cart?.items ?? []
+    const pricing = cart?.pricing ?? { subtotal: 0, discount: 0, total: 0 }
+    const coupon = cart?.coupon
     const count = items.length
 
     const submitCoupon = (e: React.FormEvent) => {

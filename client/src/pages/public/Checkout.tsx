@@ -4,7 +4,6 @@ import { FaArrowLeft, FaCreditCard, FaWallet } from "react-icons/fa6"
 import PageHeader from "../../components/ui/PageHeader"
 import { CourseCover } from "../../features/courses/CourseCard"
 import CartSummary from "../../features/cart/CartSummary"
-import { money } from "../../features/cart/cartStore"
 import { useCheckout, useGetMyCart } from "../../features/cart/hook"
 import { useAuth } from "../../features/auth/useAuth"
 import { getCheckoutKey } from "../../utils/idempotencyKey"
@@ -29,8 +28,7 @@ function Steps({ current }: { current: number }) {
 export default function Checkout() {
     const navigate = useNavigate()
     const { userInfo } = useAuth()
-    const { data, isLoading } = useGetMyCart()
-    const cart = data?.data
+    const { data: cart, isLoading } = useGetMyCart()
     const items = cart?.items ?? []
     const pricing = cart?.pricing
     const checkout = useCheckout(cart?._id, (orderId) => {
@@ -97,15 +95,16 @@ export default function Checkout() {
                                 <div className="card-body p-4 d-grid gap-3">
                                     <h2 className="h5 fw-bold mb-0">Payment</h2>
 
-                                    <div className="checkout-method card rounded-4 border-primary bg-primary-subtle">
-                                        <span className="card-body d-flex align-items-center gap-3">
-                                            <span className="d-inline-flex align-items-center justify-content-center rounded-3 bg-body text-primary-emphasis fs-5 p-2 lh-1 flex-shrink-0"><FaCreditCard /></span>
-                                            <span>
-                                                <span className="d-block fw-semibold text-body-emphasis">Online payment</span>
-                                                <span className="d-block small text-body-secondary">Pay with your bank card</span>
+                                    {leftToPay > 0 &&
+                                        <div className="checkout-method card rounded-4 border-primary bg-primary-subtle">
+                                            <span className="card-body d-flex align-items-center gap-3">
+                                                <span className="d-inline-flex align-items-center justify-content-center rounded-3 bg-body text-primary-emphasis fs-5 p-2 lh-1 flex-shrink-0"><FaCreditCard /></span>
+                                                <span>
+                                                    <span className="d-block fw-semibold text-body-emphasis">Online payment</span>
+                                                    <span className="d-block small text-body-secondary">Pay with your bank card</span>
+                                                </span>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </div>}
 
                                     {walletBalance > 0 &&
                                         <label className={`checkout-method card rounded-4 ${useWallet ? "border-primary bg-primary-subtle" : ""}`} htmlFor="checkout-wallet">
@@ -115,7 +114,7 @@ export default function Checkout() {
                                                 <span className="d-inline-flex align-items-center justify-content-center rounded-3 bg-body text-primary-emphasis fs-5 p-2 lh-1 flex-shrink-0"><FaWallet /></span>
                                                 <span>
                                                     <span className="d-block fw-semibold text-body-emphasis">Use wallet balance</span>
-                                                    <span className="d-block small text-body-secondary">{money(walletBalance)} available</span>
+                                                    <span className="d-block small text-body-secondary">{walletBalance.toLocaleString()} $ available</span>
                                                 </span>
                                             </span>
                                         </label>}
@@ -124,11 +123,11 @@ export default function Checkout() {
                                         <div className="small d-grid gap-1">
                                             <div className="d-flex justify-content-between text-body-secondary">
                                                 <span>Paid from wallet</span>
-                                                <span>-{money(walletPart)}</span>
+                                                <span>-{walletPart.toLocaleString()} $</span>
                                             </div>
                                             <div className="d-flex justify-content-between fw-bold">
                                                 <span>Left to pay</span>
-                                                <span>{money(leftToPay)}</span>
+                                                <span>{leftToPay.toLocaleString()} $</span>
                                             </div>
                                             {leftToPay === 0 && <span className="text-success fw-semibold">Your wallet covers this order — no online payment needed.</span>}
                                         </div>}
@@ -150,7 +149,7 @@ export default function Checkout() {
                                             <li key={item.course._id} className="d-flex align-items-center gap-3">
                                                 <span className="flex-shrink-0 rounded-2 overflow-hidden" style={{ width: 72 }}><CourseCover cover={item.course.cover} /></span>
                                                 <span className="small fw-medium text-body-emphasis flex-grow-1 text-truncate">{item.course.name}</span>
-                                                <span className="small text-nowrap">{item.finalPrice === 0 ? "Free" : money(item.finalPrice)}</span>
+                                                <span className="small text-nowrap">{item.finalPrice === 0 ? "Free" : `${item.finalPrice.toLocaleString()} $`}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -161,7 +160,7 @@ export default function Checkout() {
                                     </div>
                                     <button type="submit" className="btn btn-primary btn-lg w-100 rounded-pill mt-3"
                                         disabled={!agreed || checkout.isPending}>
-                                        {checkout.isPending ? "Processing..." : leftToPay ? `Pay ${money(leftToPay)}` : "Place order"}
+                                        {checkout.isPending ? "Processing..." : leftToPay ? `Pay ${leftToPay.toLocaleString()} $` : "Place order"}
                                     </button>
                                 </CartSummary>
                             </div>

@@ -21,9 +21,7 @@ export default function Courses() {
     const { page, get, update } = useListParams()
     const status = FILTERS.find(filter => filter.status === get("status"))?.status ?? ""
 
-    const { data, isLoading } = useMyCourses({ page, limit: PAGE_SIZE, status: status || undefined })
-    console.log(data);
-    
+    const { data, isLoading } = useMyCourses({ page, limit: PAGE_SIZE, status: status || undefined })    
     const courses = data?.items ?? []
 
     return (

@@ -13,7 +13,7 @@ export default function Navbar() {
     const { data: menu = [] } = useMainMenu()
     const { isLoggedIn, userInfo } = useAuth()
     const { data } = useGetMyCart(isLoggedIn)
-    const count = data?.data?.items.length ?? 0
+    const count = data?.items.length || 0
 
     return (
         <BsNavbar expand="lg" sticky="top" className="bg-body border-bottom shadow-sm" collapseOnSelect>

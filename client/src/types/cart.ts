@@ -22,18 +22,14 @@ export interface ICart {
   _id: string;
   user: string;
   items: CartItem[];
-  coupon: { _id: string; code: string; percent: number } | null;
+  coupon: { _id: string; code: string; percent: number; course: string } | null;
   removedItems?: { reason: string; courseId?: string }[];
   pricing: CartPricing;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface CartResponse {
-  success: boolean;
-  data: ICart;
-}
-
+export type CartResponse = ICart;
 export interface CheckoutResponse {
   success: boolean;
   data: {

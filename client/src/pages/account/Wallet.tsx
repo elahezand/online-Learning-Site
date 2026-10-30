@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { FaWallet } from "react-icons/fa6"
 import { useAuth } from "../../features/auth/useAuth"
-import { money } from "../../features/cart/cartStore"
+import { money } from "../../features/cart/"
 
 export default function Wallet() {
     const { userInfo } = useAuth()

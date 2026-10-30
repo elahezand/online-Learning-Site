@@ -4,13 +4,24 @@ import { toast } from "sonner";
 import type { CheckoutResponse, CartResponse } from "../../types/cart";
 import { clearCheckoutKey } from "../../utils/idempotencyKey";
 
+const CART_KEY = ["cart"];
+
 export interface CheckoutBody {
     paymentMethod: "zarinpal"
     useWallet: boolean
     idempotencyKey: string
 }
+
+export const useGetMyCart = (enabled = true) =>
+    useGet<CartResponse>("/cart/me", undefined, {
+        queryKey: CART_KEY,
+        enabled,
+        staleTime: 0,
+    });
+
 export const useAddToCart = () => {
     const queryClient = useQueryClient();
+
     return usePost<CartResponse, { courseId: string }>("/cart/me/items", {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: CART_KEY });
@@ -19,15 +30,35 @@ export const useAddToCart = () => {
         errorFallback: "Couldn't add this course to the cart",
     });
 };
-export const useApplyCoupon = () => {
+
+export const useRemoveFromCart = () => {
     const queryClient = useQueryClient();
 
-    return usePost<CartResponse, { code: string }>("/cart/coupon", {
+    return useDelete<CartResponse, { courseId: string }>(({ courseId }) => `/cart/me/items/${courseId}`, {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: CART_KEY }),
+        errorFallback: "Failed to remove course",
+    });
+};
+
+export const useApplyCoupon = (onSuccessCallback?: () => void) => {
+    const queryClient = useQueryClient();
+
+    return usePost<CartResponse, { code: string }>("/cart/me/coupon", {
         onSuccess: () => {
             toast.success("Discount code applied");
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
+            queryClient.invalidateQueries({ queryKey: CART_KEY });
+            onSuccessCallback?.();
         },
         errorFallback: "This code is not valid",
+    });
+};
+
+export const useRemoveCoupon = () => {
+    const queryClient = useQueryClient();
+
+    return useDelete<CartResponse, void>("/cart/me/coupon", {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: CART_KEY }),
+        errorFallback: "Failed to remove the code",
     });
 };
 
@@ -53,24 +84,3 @@ export const useCheckout = (
         errorFallback: "Checkout failed",
     });
 };
-
-const CART_KEY = ["cart"];
-
-export const useGetMyCart = (enabled = true) =>
-    useGet<CartResponse>("/cart/me", undefined, {
-        queryKey: CART_KEY,
-        enabled,
-        staleTime: 0,
-    });
-
-export const useRemoveFromCart = () => {
-    const queryClient = useQueryClient();
-
-    return useDelete<CartResponse, { courseId: string }>(({ courseId }) => `/cart/${courseId}`, {
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["cart"] });
-        },
-        errorFallback: "Failed to remove course",
-    });
-};
-

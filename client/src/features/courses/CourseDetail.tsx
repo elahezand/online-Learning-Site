@@ -36,7 +36,7 @@ export default function CourseDetail() {
   const addToCart = useAddToCart()
 
 
-  const inCart = Boolean(cart?.data.items.some(item => item.course._id === courseInfo._id))
+  const inCart = Boolean(cart?.items.some(item => item.course._id === courseInfo._id))
   const isFree = courseInfo.price === 0
 
   const requireLogin = async () => {
