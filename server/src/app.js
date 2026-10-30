@@ -20,6 +20,8 @@ const searchRoutes = require("./routes/v1/search");
 const ticketRoutes = require("./routes/v1/ticket");
 const userRoutes = require("./routes/v1/user");
 const sessionRoutes = require("./routes/v1/session");
+const cartRoutes = require("./routes/v1/cart");
+
 
 const app = express();
 
@@ -46,6 +48,7 @@ app.use("/v1/search", searchRoutes);
 app.use("/v1/tickets", ticketRoutes);
 app.use("/v1/users", userRoutes);
 app.use("/v1/sessions", sessionRoutes);
+app.use("/v1/cart", cartRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
