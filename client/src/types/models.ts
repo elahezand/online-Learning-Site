@@ -153,6 +153,7 @@ export interface Department {
     _id: Id
     title: string
 }
+
 export type OrderStatus = "created" | "processing" | "completed" | "cancelled"
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
 
@@ -179,6 +180,9 @@ export interface Order {
     createdAt: string
 }
 
+export interface AdminOrder extends Order {
+    user?: Pick<User, "_id" | "name" | "username" | "phone"> | null
+}
 
 export interface MyCourse {
     _id: Id
@@ -202,6 +206,13 @@ export interface Discount {
     uses: number
     creator?: Pick<User, "_id" | "name">
     course?: Pick<Course, "_id" | "name" | "shortName">
+    createdAt?: string
+}
+
+export interface Campaign {
+    _id: Id
+    percent: number
+    endsAt: string
     createdAt?: string
 }
 

@@ -9,7 +9,11 @@ export const discountSchema = z.object({
 })
 
 export const siteWideDiscountSchema = z.object({
-    discount: numberField("Discount", { min: 1, max: 100 }),
+    percent: numberField("Discount", { min: 1, max: 100 }),
+    endsAt: text("End date")
+        .refine(value => !Number.isNaN(new Date(value).getTime()), "End date is not valid")
+        .refine(value => new Date(value).getTime() > Date.now(), "End date must be in the future")
+        .transform(value => new Date(value).toISOString()),
 })
 
 export type DiscountFormValues = z.input<typeof discountSchema>

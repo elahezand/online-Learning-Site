@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { CheckoutResponse, CartResponse } from "../../types/cart";
 import { clearCheckoutKey } from "../../utils/idempotencyKey";
+import { useAuth } from "../auth/useAuth";
 
 const CART_KEY = ["cart"];
 
@@ -62,17 +63,16 @@ export const useRemoveCoupon = () => {
     });
 };
 
-export const useCheckout = (
-    cartId?: string,
-    onPlaced?: (orderId?: string) => void
-) => {
+export const useCheckout = (cartId?: string, onPlaced?: (orderId?: string) => void) => {
     const queryClient = useQueryClient();
+    const { refreshUser } = useAuth();
 
     return usePost<CheckoutResponse, CheckoutBody>("/orders/checkout", {
         onSuccess: (data) => {
             if (cartId) clearCheckoutKey(cartId);
             queryClient.invalidateQueries({ queryKey: CART_KEY });
             queryClient.invalidateQueries({ queryKey: ["me", "courses"] });
+            refreshUser();
 
             if (data?.paymentUrl) {
                 window.location.href = data.paymentUrl;

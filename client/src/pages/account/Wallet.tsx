@@ -1,10 +1,15 @@
+import { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { FaWallet } from "react-icons/fa6"
 import { useAuth } from "../../features/auth/useAuth"
 
 export default function Wallet() {
-    const { userInfo } = useAuth()
+    const { userInfo, refreshUser } = useAuth()
     const balance = userInfo.wallet?.balance ?? 0
+
+    useEffect(() => {
+        refreshUser()
+    }, [refreshUser])
 
     return (
         <>
@@ -16,7 +21,7 @@ export default function Wallet() {
                     </span>
                     <div>
                         <div className="small text-white text-opacity-75">Available balance</div>
-                        <div className="display-6 fw-bold">{balance.toLocaleString()} $</div>
+                        <div className="display-6 fw-bold">{balance.toLocaleString()} Toman</div>
                     </div>
                 </div>
             </div>

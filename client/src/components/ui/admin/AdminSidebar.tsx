@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import Offcanvas from "react-bootstrap/Offcanvas"
 import {
-    FaAnglesLeft, FaAnglesRight, FaBars, FaComments, FaGraduationCap, FaHouse, FaLayerGroup, FaMessage, FaNewspaper,
+    FaAnglesLeft, FaAnglesRight, FaBagShopping, FaBars, FaComments, FaGraduationCap, FaHouse, FaLayerGroup, FaMessage, FaNewspaper,
     FaPercent, FaRightFromBracket, FaTicket, FaTicketSimple, FaUsers, FaVideo,
 } from "react-icons/fa6"
 import { useAuth } from "../../../features/auth/useAuth"
@@ -46,6 +46,7 @@ const groups: { title: string; items: NavItem[] }[] = [
     {
         title: "Store",
         items: [
+            { to: "orders", label: "Orders", icon: <FaBagShopping />, match: "/p-admin/orders" },
             { to: "menu", label: "Menus", icon: <FaBars />, match: "/p-admin/menu" },
             { to: "discounts", label: "Discounts", icon: <FaTicketSimple />, match: "/p-admin/discounts" },
             { to: "siteWide-discounts", label: "Site-wide discount", icon: <FaPercent /> },

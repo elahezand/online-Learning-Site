@@ -33,6 +33,7 @@ const AdminDiscounts = lazy(() => import("../pages/admin/Discounts"))
 const AdminSiteWideDiscount = lazy(() => import("../pages/admin/SiteWideDiscount"))
 const AdminTickets = lazy(() => import("../pages/admin/Tickets"))
 const AdminTicket = lazy(() => import("../pages/admin/Ticket"))
+const AdminOrders = lazy(() => import("../pages/admin/Orders"))
 const AddUserForm = lazy(() => import("../features/users/AddUserForm"))
 
 const AccountLayout = lazy(() => import("../components/layout/account/AccountLayout"))
@@ -69,7 +70,7 @@ const routes: RouteObject[] = [
                 children: [
                     { path: "", element: <AccountDashboard /> },
                     { path: "courses", element: <AccountCourses /> },
-                    {path: "orders", element: <AccountOrders /> },
+                    { path: "orders", element: <AccountOrders /> },
                     { path: "wallet", element: <AccountWallet /> },
                     { path: "detail", element: <AccountProfile /> },
                     { path: "tickets", element: <AccountTickets /> },
@@ -99,6 +100,7 @@ const routes: RouteObject[] = [
             { path: "menu", element: <AdminMenus /> },
             { path: "discounts", element: <AdminDiscounts /> },
             { path: "siteWide-discounts", element: <AdminSiteWideDiscount /> },
+            { path: "orders", element: <AdminOrders /> },
             { path: "tickets", element: <AdminTickets /> },
             { path: "ticket/:id", element: <AdminTicket /> },
         ],

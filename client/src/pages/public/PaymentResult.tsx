@@ -2,11 +2,20 @@ import { useEffect } from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { useQueryClient } from "@tanstack/react-query"
 import { FaCircleCheck, FaCircleXmark } from "react-icons/fa6"
+import { useAuth } from "../../features/auth/useAuth"
 
 export default function PaymentResult({ success }: { success: boolean }) {
     const [params] = useSearchParams()
     const orderId = params.get("orderId")
     const queryClient = useQueryClient()
+    const { refreshUser } = useAuth()
+
+    useEffect(() => {
+        refreshUser()
+        if (!success) return
+        queryClient.invalidateQueries({ queryKey: ["cart"] })
+        queryClient.invalidateQueries({ queryKey: ["me"] })
+    }, [success, queryClient, refreshUser])
 
     useEffect(() => {
         if (!success) return
