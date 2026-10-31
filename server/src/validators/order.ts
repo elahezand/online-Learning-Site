@@ -26,12 +26,9 @@ export const orderItemParams = z.object({
   itemId: objectId("Item id"),
 });
 
-export const updateOrderSchema = z
-  .object({
-    status: optional(z.literal("cancelled", { error: "Status can only be changed to cancelled" })),
-    paymentStatus: optional(z.literal("failed", { error: "Payment status can only be changed to failed" })),
-  })
-  .refine((data) => data.status || data.paymentStatus, { message: "Nothing to change" });
+export const updateOrderSchema = z.object({
+  status: z.literal("cancelled", { error: "Status can only be changed to cancelled" }),
+});
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export type MyOrdersQuery = z.infer<typeof myOrdersQuery>;

@@ -14,9 +14,9 @@ exports.remove = asyncHandler(async (req, res) => {
 });
 
 exports.setOnAll = asyncHandler(async (req, res) => {
-  res.json(await discountService.setOnAllCourses(req.parsed.data));
+  res.status(201).json(await discountService.startSiteWide(req.user, req.parsed.data));
 });
 
 exports.removeFromAll = asyncHandler(async (req, res) => {
-  res.json(await discountService.removeFromAllCourses());
+  res.json(await discountService.endSiteWide());
 });

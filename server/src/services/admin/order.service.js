@@ -2,7 +2,7 @@ const Order = require("../../models/order");
 const AppError = require("../../utils/AppError");
 const paginate = require("../../utils/paginate");
 const withTransaction = require("../../utils/transaction");
-const { buildOrderIdSearchExpr, revertOrder, releaseWallet, cancelItems, activeItems } = require("../shared/order");
+const { buildOrderIdSearchExpr, revertOrder, cancelItems, activeItems } = require("../shared/order");
 const { runOrderSweeps } = require("../shared/order-sweeper");
 const notifyUser = require("../../utils/notify");
 
@@ -46,41 +46,25 @@ const getOne = async (id) => {
   return order;
 };
 
-const assertAdminOrderChange = (order, data) => {
-  if (data.status && data.status !== order.status) {
-    if (data.status !== "cancelled" || ["completed", "cancelled"].includes(order.status)) {
-      throw AppError.badRequest(`An order can't go from "${order.status}" to "${data.status}"`);
-    }
-  }
-
-  if (data.paymentStatus && data.paymentStatus !== order.paymentStatus) {
-    const canFail = data.paymentStatus === "failed" && order.paymentStatus === "pending";
-    if (!canFail) {
-      throw AppError.badRequest(`Payment status can't go from "${order.paymentStatus}" to "${data.paymentStatus}"`);
-    }
+const assertCancellable = (order) => {
+  if (order.status === "cancelled") throw AppError.badRequest("This order is already cancelled");
+  if (order.paymentStatus !== "paid") {
+    throw AppError.badRequest("Only a paid order can be cancelled — unpaid orders are closed by Run checks");
   }
 };
 
-const update = (id, data) =>
+const cancel = (id) =>
   withTransaction(async (session) => {
     const order = await findOrder(id, session);
-    assertAdminOrderChange(order, data);
-
-    const wasStatus = order.status;
-    const wasPayment = order.paymentStatus;
-
-    if (data.paymentStatus) order.paymentStatus = data.paymentStatus;
-    if (wasPayment === "pending" && order.paymentStatus === "failed") await releaseWallet(order, session);
-
-    if (wasStatus !== "cancelled" && data.status === "cancelled") await revertOrder(order, session);
-
-    await order.save({ session });
+    assertCancellable(order);
+    await revertOrder(order, session);
     return order;
   });
 
 const cancelItem = async (id, itemId) => {
   const { order, item, refund } = await withTransaction(async (session) => {
     const order = await findOrder(id, session);
+    assertCancellable(order);
 
     const item = activeItems(order).find((entry) => String(entry._id) === String(itemId));
     if (!item) throw AppError.notFound("Course not found in this order or already cancelled");
@@ -100,4 +84,4 @@ const cancelItem = async (id, itemId) => {
 
 const runSweeps = () => runOrderSweeps();
 
-module.exports = { list, getOne, update, cancelItem, runSweeps };
+module.exports = { list, getOne, cancel, cancelItem, runSweeps };

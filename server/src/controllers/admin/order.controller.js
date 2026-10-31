@@ -9,9 +9,8 @@ exports.getOne = asyncHandler(async (req, res) => {
   res.json(await orderService.getOne(req.parsed.data.id));
 });
 
-exports.update = asyncHandler(async (req, res) => {
-  const { id, ...data } = req.parsed.data;
-  res.json(await orderService.update(id, data));
+exports.cancel = asyncHandler(async (req, res) => {
+  res.json(await orderService.cancel(req.parsed.data.id));
 });
 
 exports.cancelItem = asyncHandler(async (req, res) => {

@@ -11,7 +11,11 @@ export const createDiscountSchema = z.object({
 });
 
 export const siteWideDiscountSchema = z.object({
-  discount: number("Discount", { min: 0, max: 100 }),
+  percent: number("Discount", { min: 1, max: 100 }),
+  endsAt: z.coerce
+    .date({ error: "End date is not valid" })
+    .refine((date) => date.getTime() > Date.now(), "End date must be in the future"),
 });
 
 export type CreateDiscountInput = z.infer<typeof createDiscountSchema>;
+export type SiteWideDiscountInput = z.infer<typeof siteWideDiscountSchema>;

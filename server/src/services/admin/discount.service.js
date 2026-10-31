@@ -2,6 +2,7 @@ const Off = require("../../models/off");
 const Course = require("../../models/course");
 const AppError = require("../../utils/AppError");
 const paginate = require("../../utils/paginate");
+const { startCampaign, endCampaign } = require("../shared/campaign");
 
 const create = async (user, input) => {
   if (!(await Course.exists({ _id: input.course }))) throw AppError.notFound("Course not found");
@@ -20,14 +21,12 @@ const remove = async (id) => {
   return discount;
 };
 
-const setOnAllCourses = async ({ discount }) => {
-  await Course.updateMany({}, { discount });
-  return { message: `A ${discount}% discount was set on all courses` };
+const startSiteWide = (user, input) => startCampaign(user, input);
+
+const endSiteWide = async () => {
+  const campaign = await endCampaign();
+  if (!campaign) throw AppError.notFound("No campaign is running");
+  return campaign;
 };
 
-const removeFromAllCourses = async () => {
-  await Course.updateMany({}, { discount: 0 });
-  return { success: true, message: "Discounts were removed from all courses" };
-};
-
-module.exports = { create, list, remove, setOnAllCourses, removeFromAllCourses };
+module.exports = { create, list, remove, startSiteWide, endSiteWide };
