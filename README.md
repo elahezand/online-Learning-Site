@@ -84,7 +84,7 @@ client/src/
 │   ├── courses/    hooks.ts, CourseCard, CourseDetail, CourseForm, ...
 │   ├── articles/   hooks.ts, ArticleCard, ArticleDetail, ArticleFields, ...
 │   ├── tickets/    hooks.ts, TicketChat, ticketView
-│   ├── cart/       cartStore (localStorage), useCart, CartSummary
+│   ├── cart/       useCart, CartSummary
 │   └── ...         categories, comments, contacts, discounts, info, menus,
 │                   newsletter, notifications, orders, search, users
 ├── components/

@@ -9,7 +9,8 @@
     "start": "tsx src/server.js",
     "typecheck": "tsc --noEmit",
     "migrate:videos": "tsx src/scripts/move-videos.js",
-    "seed:videos": "tsx src/scripts/fill-sample-videos.js"
+    "seed:videos": "tsx src/scripts/fill-sample-videos.js",
+    "seed": "tsx src/scripts/seed.js"
   },
   "engines": {
     "node": ">=20"
